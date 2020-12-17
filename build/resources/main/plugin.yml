@@ -1,0 +1,12 @@
+name: M0-OnlinePlayersGUI
+main: me.M0dii.OnlinePlayersGUI.Main
+description: M0-OnlinePlayersGUI
+version: 1.0
+api-version: 1.16
+author: M0dii
+commands:
+  online:
+    description: Online gui player list command.
+    permission: m0onlinegui.see
+    usage: /<command>
+    aliases: [onlinegui]

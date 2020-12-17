@@ -1,0 +1,5 @@
+M0-OnlinePlayersGUI:
+  Name: '&6%player%'
+  Lore:
+  - '&eRight click to ...'
+  - '&7Left click to ...'
