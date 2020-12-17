@@ -1,4 +1,4 @@
-![Java CI with Gradle](https://github.com/M0diis/M0-AntiAnvilRename/workflows/Java%20CI%20with%20Gradle/badge.svg)
+![Java CI with Gradle](https://github.com/M0diis/M0-OnlinePlayersGUI/workflows/Java%20CI%20with%20Gradle/badge.svg)
 
 ## M0-OnlinePlayersGUI
 A simple minecraft online player GUI plugin.
