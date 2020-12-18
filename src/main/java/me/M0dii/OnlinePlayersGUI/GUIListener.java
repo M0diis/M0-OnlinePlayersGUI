@@ -7,6 +7,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.SkullMeta;
 
 import java.util.List;
 
@@ -30,12 +32,21 @@ public class GUIListener implements Listener
                 List<String> lccmds = Config.LEFT_CLICK_COMMANDS;
     
                 HumanEntity clicked = e.getWhoClicked();
-    
-                for(String cmd : lccmds)
+                
+                ItemStack clickedItem = e.getCurrentItem();
+                
+                if(clickedItem != null)
                 {
-                    String replaced = cmd.replaceAll("%player%", clicked.getName());
+                    SkullMeta sm = (SkullMeta)clickedItem.getItemMeta();
+
+                    String ownerName = sm.getOwningPlayer().getName();
+                    
+                    for(String cmd : lccmds)
+                    {
+                        String replaced = cmd.replaceAll("%player%", ownerName);
         
-                    Bukkit.dispatchCommand(clicked, replaced);
+                        Bukkit.dispatchCommand(clicked, replaced);
+                    }
                 }
             }
     
@@ -44,12 +55,21 @@ public class GUIListener implements Listener
                 List<String> rccmds = Config.RIGHT_CLICK_COMMANDS;
                 
                 HumanEntity clicked = e.getWhoClicked();
-                
-                for(String cmd : rccmds)
-                {
-                    String replaced = cmd.replaceAll("%player%", clicked.getName());
     
-                    Bukkit.dispatchCommand(clicked, replaced);
+                ItemStack clickedItem = e.getCurrentItem();
+    
+                if(clickedItem != null)
+                {
+                    SkullMeta sm = (SkullMeta)clickedItem.getItemMeta();
+        
+                    String ownerName = sm.getOwningPlayer().getName();
+        
+                    for(String cmd : rccmds)
+                    {
+                        String replaced = cmd.replaceAll("%player%", ownerName);
+            
+                        Bukkit.dispatchCommand(clicked, replaced);
+                    }
                 }
             }
             
