@@ -3,3 +3,8 @@ M0-OnlinePlayersGUI:
   Lore:
   - '&eRight click to ...'
   - '&7Left click to ...'
+  Commands:
+    Left-Click:
+      - 'msg %player% Left click action..'
+    Right-Click:
+      - 'msg %player% Right click action..'

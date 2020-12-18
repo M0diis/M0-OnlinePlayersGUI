@@ -101,8 +101,7 @@ public class PlayerListGUI
             sm.setOwningPlayer(p);
     
             head.setItemMeta(sm);
-    
-    
+            
             gui.setItem(j, head);
         }
         
