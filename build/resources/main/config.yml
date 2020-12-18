@@ -1,6 +1,7 @@
 M0-OnlinePlayersGUI:
   Name: '&6%player%'
   ReloadMessage: '&2Configuration has been reloaded.'
+  NoPermission: '&2You do not have permission to this command.'
   Lore:
   - '&eRight click to ...'
   - '&7Left click to ...'

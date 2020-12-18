@@ -7,9 +7,14 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class GUIListener implements Listener
@@ -19,6 +24,52 @@ public class GUIListener implements Listener
     public GUIListener(Main plugin)
     {
         this.plugin = plugin;
+        
+        this.viewers = new ArrayList<>();
+    }
+    
+    List<HumanEntity> viewers;
+    
+    @EventHandler
+    public void openGUI(InventoryOpenEvent e)
+    {
+        if(e.getView().getTitle().equalsIgnoreCase("Online Players"))
+        {
+            viewers.add(e.getPlayer());
+        }
+    }
+    
+    @EventHandler
+    public void closeGUI(InventoryCloseEvent e)
+    {
+        if(e.getView().getTitle().equalsIgnoreCase("Online Players"))
+        {
+            viewers.remove(e.getPlayer());
+        }
+    }
+    
+    @EventHandler
+    public void updateOnJoin(PlayerJoinEvent e)
+    {
+        if(Config.UPDATE_ON_JOIN)
+        {
+            for(HumanEntity p : viewers)
+            {
+                PlayerListGUI.showPlayers((Player)p);
+            }
+        }
+    }
+    
+    @EventHandler
+    public void updateOnLeave(PlayerQuitEvent e)
+    {
+        if(Config.UPDATE_ON_LEAVE)
+        {
+            for(HumanEntity p : viewers)
+            {
+                PlayerListGUI.showPlayers((Player)p);
+            }
+        }
     }
     
     @EventHandler
