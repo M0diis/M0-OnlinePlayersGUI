@@ -1,14 +1,14 @@
 M0-OnlinePlayersGUI:
-  Name: '&6%player%'
+  Name: '&6%player_name%'
   ReloadMessage: '&2Configuration has been reloaded.'
   NoPermission: '&2You do not have permission to this command.'
   UpdateOnJoin: true
   UpdateOnLeave: true
   Lore:
-  - '&eRight click to ...'
-  - '&7Left click to ...'
+    - '&eRight click to ...'
+    - '&eLeft click to ...'
   Commands:
     Left-Click:
-      - 'msg %player% Left click action..'
+      - 'say %player_name% Left click action..'
     Right-Click:
-      - 'msg %player% Right click action..'
+      - 'msg %player_name% Right click action..'

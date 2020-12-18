@@ -1,5 +1,6 @@
 package me.M0dii.OnlinePlayersGUI;
 
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.PluginManager;
@@ -39,6 +40,13 @@ public class Main extends JavaPlugin
         }
         
         Config.load(this);
+    
+        if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") == null)
+        {
+            this.getLogger().warning("Could not find PlaceholderAPI! This plugin is required.");
+            
+            Bukkit.getPluginManager().disablePlugin(this);
+        }
         
         this.manager.registerEvents(new GUIListener(this), this);
         

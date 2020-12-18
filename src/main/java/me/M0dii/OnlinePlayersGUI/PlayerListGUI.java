@@ -10,6 +10,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
+import me.clip.placeholderapi.PlaceholderAPI;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -88,11 +90,10 @@ public class PlayerListGUI
             
             for(String s : Config.HEAD_LORE)
             {
-                lore.add(format(s));
+                lore.add(format(PlaceholderAPI.setPlaceholders(p, s)));
             }
     
-            meta.setDisplayName(format(Config.HEAD_NAME
-                    .replaceAll("%player%", p.getDisplayName())));
+            meta.setDisplayName(format(PlaceholderAPI.setPlaceholders(p, Config.HEAD_NAME)));
             
             meta.setLore(lore);
             

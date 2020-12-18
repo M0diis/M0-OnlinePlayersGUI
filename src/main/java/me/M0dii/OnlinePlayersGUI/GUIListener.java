@@ -13,6 +13,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
+import me.clip.placeholderapi.PlaceholderAPI;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -92,9 +93,11 @@ public class GUIListener implements Listener
 
                     String ownerName = sm.getOwningPlayer().getName();
                     
+                    Player player = Bukkit.getPlayer(ownerName);
+                    
                     for(String cmd : lccmds)
                     {
-                        String replaced = cmd.replaceAll("%player%", ownerName);
+                        String replaced = PlaceholderAPI.setPlaceholders(player, cmd);
         
                         Bukkit.dispatchCommand(clicked, replaced);
                     }
@@ -104,7 +107,7 @@ public class GUIListener implements Listener
             if(e.isRightClick())
             {
                 List<String> rccmds = Config.RIGHT_CLICK_COMMANDS;
-                
+    
                 HumanEntity clicked = e.getWhoClicked();
     
                 ItemStack clickedItem = e.getCurrentItem();
@@ -115,9 +118,11 @@ public class GUIListener implements Listener
         
                     String ownerName = sm.getOwningPlayer().getName();
         
+                    Player player = Bukkit.getPlayer(ownerName);
+        
                     for(String cmd : rccmds)
                     {
-                        String replaced = cmd.replaceAll("%player%", ownerName);
+                        String replaced = PlaceholderAPI.setPlaceholders(player, cmd);
             
                         Bukkit.dispatchCommand(clicked, replaced);
                     }
