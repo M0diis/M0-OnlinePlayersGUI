@@ -56,7 +56,8 @@ public class GUIListener implements Listener
         {
             for(HumanEntity p : viewers)
             {
-                PlayerListGUI.showPlayers((Player)p);
+                Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, () ->
+                        PlayerListGUI.showPlayers((Player)p), 20L);
             }
         }
     }
@@ -68,7 +69,8 @@ public class GUIListener implements Listener
         {
             for(HumanEntity p : viewers)
             {
-                PlayerListGUI.showPlayers((Player)p);
+                Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, () ->
+                        PlayerListGUI.showPlayers((Player)p), 20L);
             }
         }
     }

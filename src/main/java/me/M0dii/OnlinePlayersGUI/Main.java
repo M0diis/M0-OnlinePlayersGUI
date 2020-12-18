@@ -13,9 +13,9 @@ import java.io.OutputStream;
 
 public class Main extends JavaPlugin
 {
-    private static Main plugin;
+    public static Main plugin;
     
-    private PluginManager manager;
+    private final PluginManager manager;
     
     private boolean loaded;
     
@@ -31,6 +31,8 @@ public class Main extends JavaPlugin
     {
         this.configFile = new File(getDataFolder(), "config.yml");
         this.config = YamlConfiguration.loadConfiguration(this.configFile);
+        
+        plugin = this;
     
         if(!this.configFile.exists())
         {

@@ -23,7 +23,6 @@ public class PlayerListGUI
     private final String name;
     private final Map<Integer, ItemStack> guiContents;
     private static PlayerListGUI playerListGUI;
-    static ArrayList<Player> online;
     
     public PlayerListGUI()
     {
@@ -32,8 +31,6 @@ public class PlayerListGUI
         this.inv = Bukkit.createInventory(null, 54, this.name);
         
         this.guiContents = new HashMap<>(54);
-        
-        online = new ArrayList<>(Bukkit.getOnlinePlayers());
         
         playerListGUI = this;
     }
@@ -67,42 +64,44 @@ public class PlayerListGUI
     
     public void show(HumanEntity h)
     {
-        Inventory inv = Bukkit.createInventory(h, getInventory().getSize(), name);
+        Inventory inventory = Bukkit.createInventory(h, this.getInventory().getSize(), name);
+    
+        inventory.setContents(this.getInventory().getContents());
         
-        inv.setContents(getInventory().getContents());
-        
-        h.openInventory(inv);
+        h.openInventory(inventory);
     }
     
     public static void showPlayers(Player player)
     {
         PlayerListGUI gui = new PlayerListGUI();
         
+        List<Player> online = new ArrayList<>(Bukkit.getOnlinePlayers());
+        
         for(int j = 0; j < (Math.min(online.size(), 54)); j++)
         {
             ItemStack head = new ItemStack(Material.PLAYER_HEAD);
-            
+
             Player p = online.get(j);
-            
+
             ItemMeta meta = head.getItemMeta();
 
             List<String> lore = new ArrayList<>();
-            
+
             for(String s : Config.HEAD_LORE)
             {
                 lore.add(format(PlaceholderAPI.setPlaceholders(p, s)));
             }
-    
+
             meta.setDisplayName(format(PlaceholderAPI.setPlaceholders(p, Config.HEAD_NAME)));
-            
+
             meta.setLore(lore);
-            
+
             SkullMeta sm = (SkullMeta)meta;
-            
+
             sm.setOwningPlayer(p);
-    
+
             head.setItemMeta(sm);
-            
+
             gui.setItem(j, head);
         }
         
