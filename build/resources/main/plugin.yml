@@ -10,3 +10,10 @@ commands:
     permission: m0onlinegui.see
     usage: /<command>
     aliases: [onlinegui]
+permissions:
+  m0onlinegui.see:
+    description: Permission to see online player GUI.
+    default: op
+  m0onlinegui.reload:
+    description: Permission to see reload the configuration.
+    default: op

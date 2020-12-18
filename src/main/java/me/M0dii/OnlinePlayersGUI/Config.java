@@ -8,6 +8,8 @@ import java.util.List;
 public class Config
 {
     public static String HEAD_NAME;
+    public static String CONFIG_RELOADED;
+    public static String NO_PERMISSION;
     public static List<String> HEAD_LORE;
     public static List<String> LEFT_CLICK_COMMANDS;
     public static List<String> RIGHT_CLICK_COMMANDS;
@@ -18,6 +20,8 @@ public class Config
     
         HEAD_NAME = format(cfg.getString("M0-OnlinePlayersGUI.Name"));
         HEAD_LORE = cfg.getStringList("M0-OnlinePlayersGUI.Lore");
+        NO_PERMISSION = format(cfg.getString("M0-OnlinePlayersGUI.ReloadMessage"));
+        CONFIG_RELOADED = format(cfg.getString("M0-OnlinePlayersGUI.ReloadMessage"));
         LEFT_CLICK_COMMANDS = cfg.getStringList("M0-OnlinePlayersGUI.Commands.Left-Click");
         RIGHT_CLICK_COMMANDS = cfg.getStringList("M0-OnlinePlayersGUI.Commands.Right-Click");
     }

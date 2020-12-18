@@ -1,5 +1,6 @@
 M0-OnlinePlayersGUI:
   Name: '&6%player%'
+  ReloadMessage: '&2Configuration has been reloaded.'
   Lore:
   - '&eRight click to ...'
   - '&7Left click to ...'
