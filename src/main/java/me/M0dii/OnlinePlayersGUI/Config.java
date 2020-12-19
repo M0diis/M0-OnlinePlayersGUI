@@ -15,6 +15,7 @@ public class Config
     public static List<String> RIGHT_CLICK_COMMANDS;
     public static boolean UPDATE_ON_JOIN;
     public static boolean UPDATE_ON_LEAVE;
+    public static int GUI_SIZE;
 
     public static void load(Main plugin)
     {
@@ -31,6 +32,8 @@ public class Config
         
         LEFT_CLICK_COMMANDS = cfg.getStringList("M0-OnlinePlayersGUI.Commands.Left-Click");
         RIGHT_CLICK_COMMANDS = cfg.getStringList("M0-OnlinePlayersGUI.Commands.Right-Click");
+        
+        GUI_SIZE = cfg.getInt("M0-OnlinePlayersGUI.GUISize");
     }
     
     private static String format(String text)

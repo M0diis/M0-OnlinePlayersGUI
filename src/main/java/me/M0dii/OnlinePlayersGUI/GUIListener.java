@@ -2,6 +2,7 @@ package me.M0dii.OnlinePlayersGUI;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -34,7 +35,9 @@ public class GUIListener implements Listener
     @EventHandler
     public void openGUI(InventoryOpenEvent e)
     {
-        if(e.getView().getTitle().equalsIgnoreCase("Online Players"))
+        String viewName = ChatColor.stripColor(e.getView().getTitle());
+    
+        if(viewName.startsWith("Online Players"))
         {
             viewers.add(e.getPlayer());
         }
@@ -43,7 +46,9 @@ public class GUIListener implements Listener
     @EventHandler
     public void closeGUI(InventoryCloseEvent e)
     {
-        if(e.getView().getTitle().equalsIgnoreCase("Online Players"))
+        String viewName = ChatColor.stripColor(e.getView().getTitle());
+        
+        if(viewName.startsWith("Online Players"))
         {
             viewers.remove(e.getPlayer());
         }
@@ -79,59 +84,88 @@ public class GUIListener implements Listener
     public void cancelClick(InventoryClickEvent e)
     {
         if(ChatColor.stripColor(e.getView().getTitle())
-                .equalsIgnoreCase("Online Players"))
+                .startsWith("Online Players"))
         {
             if(e.isLeftClick())
             {
-                List<String> lccmds = Config.LEFT_CLICK_COMMANDS;
-    
-                HumanEntity clicked = e.getWhoClicked();
-                
-                ItemStack clickedItem = e.getCurrentItem();
-                
-                if(clickedItem != null)
-                {
-                    SkullMeta sm = (SkullMeta)clickedItem.getItemMeta();
-
-                    String ownerName = sm.getOwningPlayer().getName();
-                    
-                    Player player = Bukkit.getPlayer(ownerName);
-                    
-                    for(String cmd : lccmds)
-                    {
-                        String replaced = PlaceholderAPI.setPlaceholders(player, cmd);
-        
-                        Bukkit.dispatchCommand(clicked, replaced);
-                    }
-                }
+                executeClickCommands(e, Config.LEFT_CLICK_COMMANDS);
             }
     
             if(e.isRightClick())
             {
-                List<String> rccmds = Config.RIGHT_CLICK_COMMANDS;
-    
-                HumanEntity clicked = e.getWhoClicked();
-    
-                ItemStack clickedItem = e.getCurrentItem();
-    
-                if(clickedItem != null)
-                {
-                    SkullMeta sm = (SkullMeta)clickedItem.getItemMeta();
-        
-                    String ownerName = sm.getOwningPlayer().getName();
-        
-                    Player player = Bukkit.getPlayer(ownerName);
-        
-                    for(String cmd : rccmds)
-                    {
-                        String replaced = PlaceholderAPI.setPlaceholders(player, cmd);
-            
-                        Bukkit.dispatchCommand(clicked, replaced);
-                    }
-                }
+                executeClickCommands(e, Config.RIGHT_CLICK_COMMANDS);
             }
             
             e.setCancelled(true);
+        }
+    }
+    
+    private void executeClickCommands(InventoryClickEvent e, List<String> cmds)
+    {
+        HumanEntity clicked = e.getWhoClicked();
+        
+        ItemStack clickedItem = e.getCurrentItem();
+        
+        if(clickedItem != null)
+        {
+            if(clickedItem.getType().equals(Material.PLAYER_HEAD))
+            {
+                SkullMeta sm = (SkullMeta)clickedItem.getItemMeta();
+    
+                String ownerName = sm.getOwningPlayer().getName();
+    
+                Player player = Bukkit.getPlayer(ownerName);
+    
+                for(String cmd : cmds)
+                {
+                    String replaced = PlaceholderAPI.setPlaceholders(player, cmd);
+        
+                    Bukkit.dispatchCommand(clicked, replaced);
+                }
+            }
+            
+            if(clickedItem.getType().equals(Material.BOOK))
+            {
+                String number = e.getView().getTitle().replaceAll("\\D", "");
+    
+    
+                int page = Integer.parseInt(number) - 1;
+    
+    
+                if(clickedItem.getItemMeta().getDisplayName().startsWith("Next"))
+                {
+                    try
+                    {
+                        PlayerListGUI next = PlayerListGUI.GUIs.get(page + 1);
+    
+                        if(next != null)
+                        {
+                            PlayerListGUI.GUIs.get(page + 1).show(e.getWhoClicked());
+                        }
+                    }
+                    catch(IndexOutOfBoundsException ex)
+                    {
+                        // Handle
+                    }
+                }
+    
+                if(clickedItem.getItemMeta().getDisplayName().startsWith("Prev"))
+                {
+                    try
+                    {
+                        PlayerListGUI next = PlayerListGUI.GUIs.get(page - 1);
+            
+                        if(next != null)
+                        {
+                            PlayerListGUI.GUIs.get(page - 1).show(e.getWhoClicked());
+                        }
+                    }
+                    catch(IndexOutOfBoundsException ex)
+                    {
+                        // Handle
+                    }
+                }
+            }
         }
     }
 }

@@ -4,6 +4,7 @@ M0-OnlinePlayersGUI:
   NoPermission: '&2You do not have permission to this command.'
   UpdateOnJoin: true
   UpdateOnLeave: true
+  GUISize: 54
   Lore:
     - '&eRight click to ...'
     - '&eLeft click to ...'

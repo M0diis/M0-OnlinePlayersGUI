@@ -13,33 +13,35 @@ import org.bukkit.inventory.meta.SkullMeta;
 import me.clip.placeholderapi.PlaceholderAPI;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.stream.Collectors;
 
 public class PlayerListGUI
 {
+    public static List<PlayerListGUI> GUIs;
     private final Inventory inv;
     private final String name;
-    private final Map<Integer, ItemStack> guiContents;
     private static PlayerListGUI playerListGUI;
+    private final int page;
     
-    public PlayerListGUI()
+    public PlayerListGUI(int page)
     {
-        this.name = format("Online Players");
+        this.page = page + 1;
         
-        this.inv = Bukkit.createInventory(null, 54, this.name);
-        
-        this.guiContents = new HashMap<>(54);
+        this.name = format("Online Players " + this.page);
+
+        this.inv = Bukkit.createInventory(null, Config.GUI_SIZE, this.name);
         
         playerListGUI = this;
     }
     
     public void setItem(int slot, ItemStack item)
     {
-        this.guiContents.put(slot, item);
-        
         this.inv.setItem(slot, item);
+    }
+    
+    public int getPage() {
+        return this.page;
     }
     
     public static PlayerListGUI getGUI()
@@ -49,7 +51,7 @@ public class PlayerListGUI
     
     public ItemStack getItem(int slot)
     {
-        return this.guiContents.get(slot);
+        return this.inv.getItem(slot);
     }
     
     public ItemStack getItem(int x, int y)
@@ -73,39 +75,89 @@ public class PlayerListGUI
     
     public static void showPlayers(Player player)
     {
-        PlayerListGUI gui = new PlayerListGUI();
+        List<Player> online =
+                Bukkit.getOnlinePlayers().stream().filter(p ->
+                !p.hasPermission("m0onlinegui.hidden"))
+                .collect(Collectors.toList());
         
-        List<Player> online = new ArrayList<>(Bukkit.getOnlinePlayers());
+        GUIs = new ArrayList<>();
         
-        for(int j = 0; j < (Math.min(online.size(), 54)); j++)
+        int requiredPages = calculatePages(online);
+        
+        int curr = 0;
+        
+        for(int page = 0; page < requiredPages; page++)
         {
-            ItemStack head = new ItemStack(Material.PLAYER_HEAD);
-
-            Player p = online.get(j);
-
-            ItemMeta meta = head.getItemMeta();
-
-            List<String> lore = new ArrayList<>();
-
-            for(String s : Config.HEAD_LORE)
+            PlayerListGUI gui = new PlayerListGUI(page);
+            
+            for(int slot = 0; slot < Math.min(Config.GUI_SIZE - 9, online.size()); slot++)
             {
-                lore.add(format(PlaceholderAPI.setPlaceholders(p, s)));
+                if(curr < online.size())
+                {
+                    ItemStack head = new ItemStack(Material.PLAYER_HEAD);
+    
+                    Player p = online.get(curr);
+                    
+                    curr++;
+    
+                    ItemMeta meta = head.getItemMeta();
+    
+                    List<String> lore = new ArrayList<>();
+    
+                    for(String s : Config.HEAD_LORE)
+                    {
+                        lore.add(format(PlaceholderAPI.setPlaceholders(p, s)));
+                    }
+    
+                    meta.setDisplayName(format(PlaceholderAPI.setPlaceholders(p, Config.HEAD_NAME)));
+    
+                    meta.setLore(lore);
+    
+                    SkullMeta sm = (SkullMeta)meta;
+    
+                    sm.setOwningPlayer(p);
+    
+                    head.setItemMeta(sm);
+    
+                    gui.setItem(slot, head);
+                }
             }
+            
+            ItemStack nextButton = new ItemStack(Material.BOOK);
+            ItemMeta nextButtonMeta = nextButton.getItemMeta();
+    
+            nextButtonMeta.setDisplayName("Next Page");
+            nextButton.setItemMeta(nextButtonMeta);
+    
+            gui.setItem(Config.GUI_SIZE - 4, nextButton);
+            
+            nextButtonMeta.setDisplayName("Previous Page");
+            nextButton.setItemMeta(nextButtonMeta);
+            gui.setItem(Config.GUI_SIZE - 6, nextButton);
 
-            meta.setDisplayName(format(PlaceholderAPI.setPlaceholders(p, Config.HEAD_NAME)));
-
-            meta.setLore(lore);
-
-            SkullMeta sm = (SkullMeta)meta;
-
-            sm.setOwningPlayer(p);
-
-            head.setItemMeta(sm);
-
-            gui.setItem(j, head);
+            GUIs.add(gui);
         }
         
-        gui.show(player);
+        GUIs.get(0).show(player);
+    }
+    
+    private static int calculatePages(List<Player> players)
+    {
+        int pages = 1;
+        int size = 0;
+        
+        for(int i = 0; i < players.size(); i++)
+        {
+            size++;
+
+            if(size > Config.GUI_SIZE - 9)
+            {
+                pages++;
+                size = 0;
+            }
+        }
+        
+        return pages;
     }
     
     private static String format(String text)
