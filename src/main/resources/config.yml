@@ -4,10 +4,10 @@ M0-OnlinePlayersGUI:
   NoPermission: '&2You do not have permission to this command.'
   UpdateOnJoin: true
   UpdateOnLeave: true
-  HideButtonsOnSinglePage: true
-  PreviousPageMaterial: 'ENCHANTED_BOOK'
+  HideButtonsOnSinglePage: true # Hides the buttons if there's only one page
+  PreviousPageMaterial: 'ENCHANTED_BOOK' # Has to be a valid material name
   PreviousPageName: '&cPrevious Page'
-  NextPageMaterial: 'ENCHANTED_BOOK'
+  NextPageMaterial: 'ENCHANTED_BOOK' # Has to be a valid material name
   NextPageName: '&aNext Page'
   GUISize: 54 # Size has to be in increments of 9 (+9 for page row).
   Lore: # Lore: []
