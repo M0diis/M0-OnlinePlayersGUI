@@ -3,6 +3,7 @@ package me.M0dii.OnlinePlayersGUI;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -15,6 +16,8 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 import me.clip.placeholderapi.PlaceholderAPI;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -124,47 +127,56 @@ public class GUIListener implements Listener
                 }
             }
             
-            if(clickedItem.getType().equals(Material.BOOK))
+            if(clickedItem.getType().equals(Config.PREVIOUS_PAGE_MATERIAL)
+            || clickedItem.getType().equals(Config.NEXT_PAGE_MATERIAL))
             {
                 String number = e.getView().getTitle().replaceAll("\\D", "");
-    
-    
+                
                 int page = Integer.parseInt(number) - 1;
     
+                NamespacedKey key = new NamespacedKey(this.plugin, "Button");
+                PersistentDataContainer cont = clickedItem.getItemMeta().getPersistentDataContainer();
     
-                if(clickedItem.getItemMeta().getDisplayName().startsWith("Next"))
+                if(cont.has(key, PersistentDataType.STRING))
                 {
-                    try
+                    String buttonType = cont.get(key, PersistentDataType.STRING);
+                    
+                    if(buttonType.equalsIgnoreCase("Next"))
                     {
-                        PlayerListGUI next = PlayerListGUI.GUIs.get(page + 1);
-    
-                        if(next != null)
+                        try
                         {
-                            PlayerListGUI.GUIs.get(page + 1).show(e.getWhoClicked());
-                        }
-                    }
-                    catch(IndexOutOfBoundsException ex)
-                    {
-                        // Handle
-                    }
-                }
-    
-                if(clickedItem.getItemMeta().getDisplayName().startsWith("Prev"))
-                {
-                    try
-                    {
-                        PlayerListGUI next = PlayerListGUI.GUIs.get(page - 1);
+                            PlayerListGUI next = PlayerListGUI.GUIs.get(page + 1);
             
-                        if(next != null)
+                            if(next != null)
+                            {
+                                PlayerListGUI.GUIs.get(page + 1).show(e.getWhoClicked());
+                            }
+                        }
+                        catch(IndexOutOfBoundsException ex)
                         {
-                            PlayerListGUI.GUIs.get(page - 1).show(e.getWhoClicked());
+                            // Handle
                         }
                     }
-                    catch(IndexOutOfBoundsException ex)
+    
+                    if(buttonType.equalsIgnoreCase("Previous"))
                     {
-                        // Handle
+                        try
+                        {
+                            PlayerListGUI next = PlayerListGUI.GUIs.get(page - 1);
+            
+                            if(next != null)
+                            {
+                                PlayerListGUI.GUIs.get(page - 1).show(e.getWhoClicked());
+                            }
+                        }
+                        catch(IndexOutOfBoundsException ex)
+                        {
+                            // Handle
+                        }
                     }
                 }
+                
+
             }
         }
     }

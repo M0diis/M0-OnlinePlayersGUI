@@ -55,6 +55,10 @@ public class Main extends JavaPlugin
         this.getCommand("online").setExecutor(new CommandHandler(this));
     }
     
+    public static Main getInstance() {
+        return plugin;
+    }
+    
     private void copy(InputStream in, File file)
     {
         if(in == null)

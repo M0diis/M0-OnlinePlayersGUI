@@ -3,6 +3,7 @@ package me.M0dii.OnlinePlayersGUI;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -11,6 +12,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
 import me.clip.placeholderapi.PlaceholderAPI;
+import org.bukkit.persistence.PersistentDataType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +25,7 @@ public class PlayerListGUI
     private final String name;
     private static PlayerListGUI playerListGUI;
     private final int page;
+    private static final Main plugin = Main.getInstance();
     
     public PlayerListGUI(int page)
     {
@@ -123,18 +126,32 @@ public class PlayerListGUI
                 }
             }
             
-            ItemStack nextButton = new ItemStack(Material.BOOK);
-            ItemMeta nextButtonMeta = nextButton.getItemMeta();
+            if(!Config.HIDE_BUTTONS_ON_SINGLE)
+            {
+                ItemStack nextButton = new ItemStack(Config.NEXT_PAGE_MATERIAL);
+                ItemMeta nextButtonMeta = nextButton.getItemMeta();
     
-            nextButtonMeta.setDisplayName("Next Page");
-            nextButton.setItemMeta(nextButtonMeta);
+                nextButtonMeta.getPersistentDataContainer().set(
+                        new NamespacedKey(plugin, "Button"),
+                        PersistentDataType.STRING, "Next");
     
-            gui.setItem(Config.GUI_SIZE - 4, nextButton);
+                nextButtonMeta.setDisplayName(Config.NEXT_PAGE_NAME);
+                nextButton.setItemMeta(nextButtonMeta);
+    
+                gui.setItem(Config.GUI_SIZE - 4, nextButton);
+    
+                ItemStack prevButton = new ItemStack(Config.PREVIOUS_PAGE_MATERIAL);
+                ItemMeta prevButtonMeta = prevButton.getItemMeta();
+    
+                prevButtonMeta.getPersistentDataContainer().set(
+                        new NamespacedKey(plugin, "Button"),
+                        PersistentDataType.STRING, "Previous");
+    
+                prevButtonMeta.setDisplayName(Config.PREVIOUS_PAGE_NAME);
+                prevButton.setItemMeta(prevButtonMeta);
+                gui.setItem(Config.GUI_SIZE - 6, prevButton);
+            }
             
-            nextButtonMeta.setDisplayName("Previous Page");
-            nextButton.setItemMeta(nextButtonMeta);
-            gui.setItem(Config.GUI_SIZE - 6, nextButton);
-
             GUIs.add(gui);
         }
         
