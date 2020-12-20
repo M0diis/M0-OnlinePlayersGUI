@@ -14,10 +14,15 @@ public class Config
     
     public static String PREVIOUS_PAGE_NAME;
     public static String NEXT_PAGE_NAME;
+    public static String GUI_TITLE;
     
     public static List<String> HEAD_LORE;
     public static List<String> LEFT_CLICK_COMMANDS;
     public static List<String> RIGHT_CLICK_COMMANDS;
+    
+    public static List<String> PREVIOUS_PAGE_LORE;
+    public static List<String> NEXT_PAGE_LORE;
+    
     public static boolean UPDATE_ON_JOIN;
     public static boolean UPDATE_ON_LEAVE;
     public static boolean HIDE_BUTTONS_ON_SINGLE;
@@ -30,26 +35,32 @@ public class Config
     {
         FileConfiguration cfg = plugin.getConfig();
     
-        UPDATE_ON_JOIN = cfg.getBoolean("M0-OnlinePlayersGUI.UpdateOnJoin");
-        UPDATE_ON_LEAVE = cfg.getBoolean("M0-OnlinePlayersGUI.UpdateOnLeave");
+        UPDATE_ON_JOIN = cfg.getBoolean("M0-OnlinePlayersGUI.GUI.UpdateOn.Join");
+        UPDATE_ON_LEAVE = cfg.getBoolean("M0-OnlinePlayersGUI.GUI.UpdateOn.Leave");
+        
         HIDE_BUTTONS_ON_SINGLE = cfg.getBoolean("M0-OnlinePlayersGUI.HideButtonsOnSinglePage");
         
-        HEAD_NAME = format(cfg.getString("M0-OnlinePlayersGUI.Name"));
-        HEAD_LORE = cfg.getStringList("M0-OnlinePlayersGUI.Lore");
+        HEAD_NAME = format(cfg.getString("M0-OnlinePlayersGUI.PlayerDisplay.Name"));
+        HEAD_LORE = cfg.getStringList("M0-OnlinePlayersGUI.PlayerDisplay.Lore");
+    
+        GUI_TITLE = format(cfg.getString("M0-OnlinePlayersGUI.GUI.Title"));
         
         NO_PERMISSION = format(cfg.getString("M0-OnlinePlayersGUI.NoPermission"));
         CONFIG_RELOADED = format(cfg.getString("M0-OnlinePlayersGUI.ReloadMessage"));
-    
-        PREVIOUS_PAGE_NAME = format(cfg.getString("M0-OnlinePlayersGUI.PreviousPageName"));
-        NEXT_PAGE_NAME = format(cfg.getString("M0-OnlinePlayersGUI.NextPageName"));
         
-        LEFT_CLICK_COMMANDS = cfg.getStringList("M0-OnlinePlayersGUI.Commands.Left-Click");
-        RIGHT_CLICK_COMMANDS = cfg.getStringList("M0-OnlinePlayersGUI.Commands.Right-Click");
+        LEFT_CLICK_COMMANDS = cfg.getStringList("M0-OnlinePlayersGUI.PlayerDisplay.Commands.Left-Click");
+        RIGHT_CLICK_COMMANDS = cfg.getStringList("M0-OnlinePlayersGUI.PlayerDisplay.Commands.Right-Click");
         
-        GUI_SIZE = cfg.getInt("M0-OnlinePlayersGUI.GUISize");
+        GUI_SIZE = cfg.getInt("M0-OnlinePlayersGUI.GUI.Size");
     
-        PREVIOUS_PAGE_MATERIAL = Material.getMaterial(cfg.getString("M0-OnlinePlayersGUI.PreviousPageMaterial"));
-        NEXT_PAGE_MATERIAL =Material.getMaterial(cfg.getString("M0-OnlinePlayersGUI.NextPageMaterial"));
+        PREVIOUS_PAGE_MATERIAL = Material.getMaterial(cfg.getString("M0-OnlinePlayersGUI.PreviousButton.Material"));
+        NEXT_PAGE_MATERIAL =Material.getMaterial(cfg.getString("M0-OnlinePlayersGUI.NextButton.Material"));
+    
+        PREVIOUS_PAGE_LORE = cfg.getStringList("M0-OnlinePlayersGUI.PreviousButton.Lore");
+        NEXT_PAGE_LORE = cfg.getStringList("M0-OnlinePlayersGUI.NextButton.Lore");
+        
+        PREVIOUS_PAGE_NAME = format(cfg.getString("M0-OnlinePlayersGUI.PreviousButton.Name"));
+        NEXT_PAGE_NAME = format(cfg.getString("M0-OnlinePlayersGUI.NextButton.Name"));
     }
     
     private static String format(String text)

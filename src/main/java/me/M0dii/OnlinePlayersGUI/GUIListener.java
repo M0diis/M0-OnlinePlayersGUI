@@ -20,7 +20,9 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 
 public class GUIListener implements Listener
 {
@@ -31,16 +33,29 @@ public class GUIListener implements Listener
         this.plugin = plugin;
         
         this.viewers = new ArrayList<>();
+        
+        currentPage = new HashMap<>();
     }
     
     List<HumanEntity> viewers;
+    private static HashMap<UUID, Integer> currentPage;
+    
+    public static void setWatchingPage(Player p, int page)
+    {
+        currentPage.put(p.getUniqueId(), page);
+    }
+    
+    public static int getWatchingPage(Player p)
+    {
+        return currentPage.get(p.getUniqueId());
+    }
     
     @EventHandler
     public void openGUI(InventoryOpenEvent e)
     {
         String viewName = ChatColor.stripColor(e.getView().getTitle());
     
-        if(viewName.startsWith("Online Players"))
+        if(viewName.equalsIgnoreCase(ChatColor.stripColor(Config.GUI_TITLE)))
         {
             viewers.add(e.getPlayer());
         }
@@ -50,8 +65,8 @@ public class GUIListener implements Listener
     public void closeGUI(InventoryCloseEvent e)
     {
         String viewName = ChatColor.stripColor(e.getView().getTitle());
-        
-        if(viewName.startsWith("Online Players"))
+    
+        if(viewName.equalsIgnoreCase(ChatColor.stripColor(Config.GUI_TITLE)))
         {
             viewers.remove(e.getPlayer());
         }
@@ -86,8 +101,9 @@ public class GUIListener implements Listener
     @EventHandler
     public void cancelClick(InventoryClickEvent e)
     {
-        if(ChatColor.stripColor(e.getView().getTitle())
-                .startsWith("Online Players"))
+        String viewName = ChatColor.stripColor(e.getView().getTitle());
+    
+        if(viewName.equalsIgnoreCase(ChatColor.stripColor(Config.GUI_TITLE)))
         {
             if(e.isLeftClick())
             {
@@ -105,7 +121,7 @@ public class GUIListener implements Listener
     
     private void executeClickCommands(InventoryClickEvent e, List<String> cmds)
     {
-        HumanEntity clicked = e.getWhoClicked();
+        HumanEntity player = e.getWhoClicked();
         
         ItemStack clickedItem = e.getCurrentItem();
         
@@ -114,25 +130,23 @@ public class GUIListener implements Listener
             if(clickedItem.getType().equals(Material.PLAYER_HEAD))
             {
                 SkullMeta sm = (SkullMeta)clickedItem.getItemMeta();
-    
+
                 String ownerName = sm.getOwningPlayer().getName();
     
-                Player player = Bukkit.getPlayer(ownerName);
+                Player skullOwner = Bukkit.getPlayer(ownerName);
     
                 for(String cmd : cmds)
                 {
-                    String replaced = PlaceholderAPI.setPlaceholders(player, cmd);
+                    String replaced = PlaceholderAPI.setPlaceholders(skullOwner, cmd);
         
-                    Bukkit.dispatchCommand(clicked, replaced);
+                    Bukkit.dispatchCommand(player, replaced);
                 }
             }
             
             if(clickedItem.getType().equals(Config.PREVIOUS_PAGE_MATERIAL)
             || clickedItem.getType().equals(Config.NEXT_PAGE_MATERIAL))
             {
-                String number = e.getView().getTitle().replaceAll("\\D", "");
-                
-                int page = Integer.parseInt(number) - 1;
+                int page = getWatchingPage((Player)player);
     
                 NamespacedKey key = new NamespacedKey(this.plugin, "Button");
                 PersistentDataContainer cont = clickedItem.getItemMeta().getPersistentDataContainer();
@@ -141,42 +155,36 @@ public class GUIListener implements Listener
                 {
                     String buttonType = cont.get(key, PersistentDataType.STRING);
                     
+                    int nextPage = page;
+                    
+                    if(buttonType == null) return;
+                    
                     if(buttonType.equalsIgnoreCase("Next"))
                     {
-                        try
-                        {
-                            PlayerListGUI next = PlayerListGUI.GUIs.get(page + 1);
-            
-                            if(next != null)
-                            {
-                                PlayerListGUI.GUIs.get(page + 1).show(e.getWhoClicked());
-                            }
-                        }
-                        catch(IndexOutOfBoundsException ex)
-                        {
-                            // Handle
-                        }
+                        nextPage = page + 1;
+                    }
+                    else if(buttonType.equalsIgnoreCase("Previous"))
+                    {
+                        nextPage = page - 1;
+
                     }
     
-                    if(buttonType.equalsIgnoreCase("Previous"))
+                    try
                     {
-                        try
+                        PlayerListGUI next = PlayerListGUI.GUIs.get(nextPage);
+        
+                        if(next != null)
                         {
-                            PlayerListGUI next = PlayerListGUI.GUIs.get(page - 1);
-            
-                            if(next != null)
-                            {
-                                PlayerListGUI.GUIs.get(page - 1).show(e.getWhoClicked());
-                            }
-                        }
-                        catch(IndexOutOfBoundsException ex)
-                        {
-                            // Handle
+                            next.show(player);
+                            
+                            setWatchingPage((Player)player, nextPage);
                         }
                     }
+                    catch(IndexOutOfBoundsException ex)
+                    {
+                        // Handle
+                    }
                 }
-                
-
             }
         }
     }

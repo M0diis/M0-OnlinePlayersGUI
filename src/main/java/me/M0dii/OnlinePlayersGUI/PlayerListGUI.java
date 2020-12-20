@@ -26,16 +26,39 @@ public class PlayerListGUI
     private static PlayerListGUI playerListGUI;
     private final int page;
     private static final Main plugin = Main.getInstance();
+    private final int size;
     
     public PlayerListGUI(int page)
     {
         this.page = page + 1;
         
-        this.name = format("Online Players " + this.page);
+        this.name = Config.GUI_TITLE;
+        
+        this.size = initializeSize();
 
-        this.inv = Bukkit.createInventory(null, Config.GUI_SIZE, this.name);
+        this.inv = Bukkit.createInventory(null, this.size, this.name);
         
         playerListGUI = this;
+    }
+    
+    private int initializeSize()
+    {
+        plugin.getLogger().info(String.valueOf(Config.GUI_SIZE));
+        
+        if(Config.GUI_SIZE % 9 == 0)
+        {
+            return Config.GUI_SIZE;
+        }
+        else if (Config.GUI_SIZE < 18)
+        {
+            return 18;
+        }
+        else if (Config.GUI_SIZE > 54)
+        {
+            return 54;
+        }
+        
+        return 54;
     }
     
     public void setItem(int slot, ItemStack item)
@@ -43,7 +66,8 @@ public class PlayerListGUI
         this.inv.setItem(slot, item);
     }
     
-    public int getPage() {
+    public int getPage()
+    {
         return this.page;
     }
     
@@ -82,6 +106,10 @@ public class PlayerListGUI
                 Bukkit.getOnlinePlayers().stream().filter(p ->
                 !p.hasPermission("m0onlinegui.hidden"))
                 .collect(Collectors.toList());
+        
+        for(int i = 0; i < 15; i++) {
+            online.add(online.get(0));
+        }
         
         GUIs = new ArrayList<>();
         
@@ -131,6 +159,15 @@ public class PlayerListGUI
                 ItemStack nextButton = new ItemStack(Config.NEXT_PAGE_MATERIAL);
                 ItemMeta nextButtonMeta = nextButton.getItemMeta();
     
+                List<String> nextLore = new ArrayList<>();
+    
+                for(String m : Config.NEXT_PAGE_LORE)
+                {
+                    nextLore.add(format(m));
+                }
+    
+                nextButtonMeta.setLore(nextLore);
+    
                 nextButtonMeta.getPersistentDataContainer().set(
                         new NamespacedKey(plugin, "Button"),
                         PersistentDataType.STRING, "Next");
@@ -142,6 +179,15 @@ public class PlayerListGUI
     
                 ItemStack prevButton = new ItemStack(Config.PREVIOUS_PAGE_MATERIAL);
                 ItemMeta prevButtonMeta = prevButton.getItemMeta();
+                
+                List<String> prevLore = new ArrayList<>();
+                
+                for(String m : Config.PREVIOUS_PAGE_LORE)
+                {
+                    prevLore.add(format(m));
+                }
+                
+                prevButtonMeta.setLore(prevLore);
     
                 prevButtonMeta.getPersistentDataContainer().set(
                         new NamespacedKey(plugin, "Button"),
@@ -156,6 +202,8 @@ public class PlayerListGUI
         }
         
         GUIs.get(0).show(player);
+        
+        GUIListener.setWatchingPage(player, 1);
     }
     
     private static int calculatePages(List<Player> players)
