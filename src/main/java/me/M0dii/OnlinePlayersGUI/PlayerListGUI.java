@@ -107,10 +107,6 @@ public class PlayerListGUI
                 !p.hasPermission("m0onlinegui.hidden"))
                 .collect(Collectors.toList());
         
-        for(int i = 0; i < 15; i++) {
-            online.add(online.get(0));
-        }
-        
         GUIs = new ArrayList<>();
         
         int requiredPages = calculatePages(online);
