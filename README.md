@@ -16,7 +16,7 @@ gradlew build
 
 You can find the resource on spigot:
 
-https://www.spigotmc.org/resources/m0-onlineplayersgui.86813/history
+https://www.spigotmc.org/resources/m0-onlineplayersgui.86813
 
 ## Dev Builds
 
