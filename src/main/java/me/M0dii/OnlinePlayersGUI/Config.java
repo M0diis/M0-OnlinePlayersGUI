@@ -30,6 +30,8 @@ public class Config
     
     public static Material PREVIOUS_PAGE_MATERIAL;
     public static Material NEXT_PAGE_MATERIAL;
+    
+    public static boolean ESSENTIALSX_HOOK;
 
     public static void load(Main plugin)
     {
@@ -64,6 +66,8 @@ public class Config
         
         PREVIOUS_PAGE_NAME = format(cfg.getString("M0-OnlinePlayersGUI.PreviousButton.Name"));
         NEXT_PAGE_NAME = format(cfg.getString("M0-OnlinePlayersGUI.NextButton.Name"));
+        
+        ESSENTIALSX_HOOK = cfg.getBoolean("M0-OnlinePlayersGUI.EssentialsXHook");
     }
     
     private static String format(String text)

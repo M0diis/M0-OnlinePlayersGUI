@@ -1,5 +1,6 @@
 package me.M0dii.OnlinePlayersGUI;
 
+import net.ess3.api.IEssentials;
 import org.bukkit.*;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
@@ -25,9 +26,13 @@ public class GUIListener implements Listener
 {
     private final Main plugin;
     
-    public GUIListener(Main plugin)
+    private final IEssentials ess;
+    
+    public GUIListener(Main plugin, IEssentials ess)
     {
         this.plugin = plugin;
+        
+        this.ess = ess;
         
         this.viewers = new ArrayList<>();
         

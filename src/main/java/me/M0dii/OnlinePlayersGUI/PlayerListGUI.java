@@ -1,5 +1,6 @@
 package me.M0dii.OnlinePlayersGUI;
 
+import net.ess3.api.IEssentials;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -28,6 +29,7 @@ public class PlayerListGUI
     private final int page;
     private static final Main plugin = Main.getInstance();
     private final int size;
+    private static IEssentials ess = plugin.getEssentials();
     
     public PlayerListGUI(int page)
     {
@@ -44,8 +46,6 @@ public class PlayerListGUI
     
     private int initializeSize()
     {
-        plugin.getLogger().info(String.valueOf(Config.GUI_SIZE));
-        
         if(Config.GUI_SIZE % 9 == 0)
         {
             return Config.GUI_SIZE;
@@ -101,12 +101,29 @@ public class PlayerListGUI
         h.openInventory(inventory);
     }
     
+    private static List<Player> getOnline(boolean hook)
+    {
+        List<Player> online = new ArrayList<>();
+        
+        if(hook)
+        {
+            online = Bukkit.getOnlinePlayers().stream().filter(p ->
+                    !p.hasPermission("m0onlinegui.hidden") && !ess.getUser(p).isVanished())
+                    .collect(Collectors.toList());
+        }
+        else
+        {
+            online = Bukkit.getOnlinePlayers().stream().filter(p ->
+                    !p.hasPermission("m0onlinegui.hidden"))
+                    .collect(Collectors.toList());
+        }
+        
+        return online;
+    }
+    
     public static void showPlayers(Player player)
     {
-        List<Player> online =
-                Bukkit.getOnlinePlayers().stream().filter(p ->
-                !p.hasPermission("m0onlinegui.hidden"))
-                .collect(Collectors.toList());
+        List<Player> online = getOnline(Config.ESSENTIALSX_HOOK);
         
         GUIs = new ArrayList<>();
         

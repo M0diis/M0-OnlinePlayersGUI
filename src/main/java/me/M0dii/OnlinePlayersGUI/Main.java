@@ -1,5 +1,6 @@
 package me.M0dii.OnlinePlayersGUI;
 
+import net.ess3.api.IEssentials;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -26,6 +27,13 @@ public class Main extends JavaPlugin
     FileConfiguration config = null;
     File configFile = null;
     
+    private IEssentials ess = null;
+    
+    public IEssentials getEssentials()
+    {
+        return this.ess;
+    }
+    
     public void onEnable()
     {
         this.configFile = new File(getDataFolder(), "config.yml");
@@ -38,10 +46,20 @@ public class Main extends JavaPlugin
             //noinspection ResultOfMethodCallIgnored
             this.configFile.getParentFile().mkdirs();
         
-            copy(getResource("config.yml"), configFile);
+            this.copy(getResource("config.yml"), configFile);
         }
         
         Config.load(this);
+        
+        if(Config.ESSENTIALSX_HOOK)
+        {
+            this.ess = (IEssentials)this.manager.getPlugin("Essentials");
+            
+            if(ess == null)
+            {
+                this.getLogger().warning("Could not find EssentialsX.");
+            }
+        }
     
         if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") == null)
         {
@@ -50,7 +68,7 @@ public class Main extends JavaPlugin
             Bukkit.getPluginManager().disablePlugin(this);
         }
         
-        this.manager.registerEvents(new GUIListener(this), this);
+        this.manager.registerEvents(new GUIListener(this, ess), this);
         
         Objects.requireNonNull(this.getCommand("online")).setExecutor(new CommandHandler(this));
     }
