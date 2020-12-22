@@ -10,14 +10,13 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Objects;
 
 public class Main extends JavaPlugin
 {
     public static Main plugin;
     
     private final PluginManager manager;
-    
-    private boolean loaded;
     
     public Main()
     {
@@ -36,6 +35,7 @@ public class Main extends JavaPlugin
     
         if(!this.configFile.exists())
         {
+            //noinspection ResultOfMethodCallIgnored
             this.configFile.getParentFile().mkdirs();
         
             copy(getResource("config.yml"), configFile);
@@ -52,7 +52,7 @@ public class Main extends JavaPlugin
         
         this.manager.registerEvents(new GUIListener(this), this);
         
-        this.getCommand("online").setExecutor(new CommandHandler(this));
+        Objects.requireNonNull(this.getCommand("online")).setExecutor(new CommandHandler(this));
     }
     
     public static Main getInstance() {

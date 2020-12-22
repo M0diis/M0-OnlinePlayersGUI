@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@SuppressWarnings("ALL")
 public class PlayerListGUI
 {
     public static List<PlayerListGUI> GUIs;

@@ -54,8 +54,11 @@ public class Config
         GUI_SIZE = cfg.getInt("M0-OnlinePlayersGUI.GUI.Size");
     
         PREVIOUS_PAGE_MATERIAL = Material.getMaterial(cfg.getString("M0-OnlinePlayersGUI.PreviousButton.Material"));
+        if(PREVIOUS_PAGE_MATERIAL == null) PREVIOUS_PAGE_MATERIAL = Material.BOOK;
+        
         NEXT_PAGE_MATERIAL =Material.getMaterial(cfg.getString("M0-OnlinePlayersGUI.NextButton.Material"));
-    
+        if(NEXT_PAGE_MATERIAL == null) NEXT_PAGE_MATERIAL = Material.BOOK;
+        
         PREVIOUS_PAGE_LORE = cfg.getStringList("M0-OnlinePlayersGUI.PreviousButton.Lore");
         NEXT_PAGE_LORE = cfg.getStringList("M0-OnlinePlayersGUI.NextButton.Lore");
         

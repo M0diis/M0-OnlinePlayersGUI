@@ -5,8 +5,7 @@ plugins {
 
 
 group 'me.M0dii'
-version '1.8'
-description = 'M0-Pagrindai'
+version '1.10'
 sourceCompatibility = '8'
 
 repositories {

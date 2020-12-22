@@ -1,9 +1,6 @@
 package me.M0dii.OnlinePlayersGUI;
 
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
+import org.bukkit.*;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -130,16 +127,24 @@ public class GUIListener implements Listener
             if(clickedItem.getType().equals(Material.PLAYER_HEAD))
             {
                 SkullMeta sm = (SkullMeta)clickedItem.getItemMeta();
-
-                String ownerName = sm.getOwningPlayer().getName();
-    
-                Player skullOwner = Bukkit.getPlayer(ownerName);
-    
-                for(String cmd : cmds)
+                
+                OfflinePlayer owner = sm.getOwningPlayer();
+                
+                if(owner != null)
                 {
-                    String replaced = PlaceholderAPI.setPlaceholders(skullOwner, cmd);
+                    String ownerName = sm.getOwningPlayer().getName();
+    
+                    if(ownerName != null)
+                    {
+                        Player skullOwner = Bukkit.getPlayer(ownerName);
+                        
+                        for(String cmd : cmds)
+                        {
+                            String replaced = PlaceholderAPI.setPlaceholders(skullOwner, cmd);
         
-                    Bukkit.dispatchCommand(player, replaced);
+                            Bukkit.dispatchCommand(player, replaced);
+                        }
+                    }
                 }
             }
             
