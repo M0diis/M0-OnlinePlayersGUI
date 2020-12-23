@@ -26,14 +26,9 @@ public class GUIListener implements Listener
 {
     private final Main plugin;
     
-    private final IEssentials ess;
-    
-    public GUIListener(Main plugin, IEssentials ess)
+    public GUIListener(Main plugin)
     {
         this.plugin = plugin;
-        
-        this.ess = ess;
-        
         this.viewers = new ArrayList<>();
         
         currentPage = new HashMap<>();

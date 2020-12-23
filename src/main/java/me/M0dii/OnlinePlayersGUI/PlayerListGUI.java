@@ -209,6 +209,7 @@ public class PlayerListGUI
     
                 prevButtonMeta.setDisplayName(Config.PREVIOUS_PAGE_NAME);
                 prevButton.setItemMeta(prevButtonMeta);
+                
                 gui.setItem(Config.GUI_SIZE - 6, prevButton);
             }
             
@@ -223,16 +224,16 @@ public class PlayerListGUI
     private static int calculatePages(List<Player> players)
     {
         int pages = 1;
-        int size = 0;
+        int counter = 0;
         
         for(int i = 0; i < players.size(); i++)
         {
-            size++;
+            counter++;
 
-            if(size > Config.GUI_SIZE - 9)
+            if(counter > Config.GUI_SIZE - 9)
             {
                 pages++;
-                size = 0;
+                counter = 0;
             }
         }
         
