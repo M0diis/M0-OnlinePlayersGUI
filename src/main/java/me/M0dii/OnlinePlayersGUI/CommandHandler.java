@@ -31,7 +31,7 @@ public class CommandHandler implements CommandExecutor, TabCompleter
             {
                 if(args[0].equalsIgnoreCase("reload"))
                 {
-                    if(p.hasPermission("m0onlinegui.reload"))
+                    if(p.hasPermission("m0onlinegui.command.reload"))
                     {
                         this.plugin.reloadConfig();
                         this.plugin.saveConfig();
@@ -49,7 +49,7 @@ public class CommandHandler implements CommandExecutor, TabCompleter
                 }
             }
             
-            if(p.hasPermission("m0onlinegui.see"))
+            if(p.hasPermission("m0onlinegui.command.onlinegui"))
             {
                 PlayerListGUI.showPlayers(p);
             }

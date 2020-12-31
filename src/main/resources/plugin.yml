@@ -8,14 +8,14 @@ softdepend: [PlaceholderAPI]
 commands:
   online:
     description: Online gui player list command.
-    permission: m0onlinegui.see
+    permission: m0onlinegui.command.onlinegui
     usage: /<command>
     aliases: [onlinegui]
 permissions:
-  m0onlinegui.see:
+  m0onlinegui.command.onlinegui:
     description: Permission to see online player GUI.
     default: op
-  m0onlinegui.reload:
+  m0onlinegui.command.reload:
     description: Permission to see reload the configuration.
     default: op
   m0onlinegui.hidden:
