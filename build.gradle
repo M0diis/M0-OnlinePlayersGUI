@@ -5,7 +5,7 @@ plugins {
 
 
 group 'me.M0dii'
-version '1.11'
+version '1.12'
 sourceCompatibility = '8'
 
 repositories {
