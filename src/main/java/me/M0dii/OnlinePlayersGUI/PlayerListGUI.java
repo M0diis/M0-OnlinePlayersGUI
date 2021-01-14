@@ -92,10 +92,11 @@ public class PlayerListGUI
         return this.inv;
     }
     
-    public void show(HumanEntity h)
+    public void show(HumanEntity h, int onlineSize)
     {
-        Inventory inventory = Bukkit.createInventory(h, this.getInventory().getSize(), name);
-    
+        Inventory inventory = Bukkit.createInventory(h, this.getInventory().getSize(),
+                name.replaceAll("%playercount%", String.valueOf(onlineSize)));
+        
         inventory.setContents(this.getInventory().getContents());
         
         h.openInventory(inventory);
@@ -216,7 +217,7 @@ public class PlayerListGUI
             GUIs.add(gui);
         }
         
-        GUIs.get(0).show(player);
+        GUIs.get(0).show(player, online.size());
         
         GUIListener.setWatchingPage(player, 1);
     }

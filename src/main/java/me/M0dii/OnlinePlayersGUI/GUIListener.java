@@ -35,6 +35,7 @@ public class GUIListener implements Listener
     }
     
     List<HumanEntity> viewers;
+    
     private static HashMap<UUID, Integer> currentPage;
     
     public static void setWatchingPage(Player p, int page)
@@ -65,7 +66,7 @@ public class GUIListener implements Listener
     
         if(viewName.equalsIgnoreCase(ChatColor.stripColor(Config.GUI_TITLE)))
         {
-            viewers.remove(e.getPlayer());
+            this.viewers.remove(e.getPlayer());
         }
     }
     
@@ -180,7 +181,7 @@ public class GUIListener implements Listener
         
                         if(next != null)
                         {
-                            next.show(player);
+                            next.show(player, Bukkit.getOnlinePlayers().size());
                             
                             setWatchingPage((Player)player, nextPage);
                         }
