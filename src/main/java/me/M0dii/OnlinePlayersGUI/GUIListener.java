@@ -1,6 +1,6 @@
 package me.M0dii.OnlinePlayersGUI;
 
-import net.ess3.api.IEssentials;
+import com.earth2me.essentials.PlayerList;
 import org.bukkit.*;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
@@ -24,17 +24,19 @@ import java.util.UUID;
 
 public class GUIListener implements Listener
 {
-    private final Main plugin;
+    private final OnlineGUI plugin;
+    private final Config config;
     
-    public GUIListener(Main plugin)
+    public GUIListener(OnlineGUI plugin)
     {
         this.plugin = plugin;
         this.viewers = new ArrayList<>();
+        this.config = plugin.getCfg();
         
         currentPage = new HashMap<>();
     }
     
-    List<HumanEntity> viewers;
+    private final List<HumanEntity> viewers;
     
     private static HashMap<UUID, Integer> currentPage;
     
@@ -53,7 +55,7 @@ public class GUIListener implements Listener
     {
         String viewName = ChatColor.stripColor(e.getView().getTitle());
     
-        if(viewName.equalsIgnoreCase(ChatColor.stripColor(Config.GUI_TITLE)))
+        if(viewName.equalsIgnoreCase(ChatColor.stripColor(this.config.GUI_TITLE())))
         {
             viewers.add(e.getPlayer());
         }
@@ -64,7 +66,7 @@ public class GUIListener implements Listener
     {
         String viewName = ChatColor.stripColor(e.getView().getTitle());
     
-        if(viewName.equalsIgnoreCase(ChatColor.stripColor(Config.GUI_TITLE)))
+        if(viewName.equalsIgnoreCase(ChatColor.stripColor(this.config.GUI_TITLE())))
         {
             this.viewers.remove(e.getPlayer());
         }
@@ -73,12 +75,12 @@ public class GUIListener implements Listener
     @EventHandler
     public void updateOnJoin(PlayerJoinEvent e)
     {
-        if(Config.UPDATE_ON_JOIN)
+        if(this.config.UPDATE_ON_JOIN())
         {
             for(HumanEntity p : viewers)
             {
                 Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, () ->
-                        PlayerListGUI.showPlayers((Player)p), 20L);
+                        this.plugin.getGUI().showPlayers((Player)p), 20L);
             }
         }
     }
@@ -86,12 +88,12 @@ public class GUIListener implements Listener
     @EventHandler
     public void updateOnLeave(PlayerQuitEvent e)
     {
-        if(Config.UPDATE_ON_LEAVE)
+        if(this.config.UPDATE_ON_LEAVE())
         {
             for(HumanEntity p : viewers)
             {
                 Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, () ->
-                        PlayerListGUI.showPlayers((Player)p), 20L);
+                        this.plugin.getGUI().showPlayers((Player)p), 20L);
             }
         }
     }
@@ -101,16 +103,16 @@ public class GUIListener implements Listener
     {
         String viewName = ChatColor.stripColor(e.getView().getTitle());
     
-        if(viewName.equalsIgnoreCase(ChatColor.stripColor(Config.GUI_TITLE)))
+        if(viewName.equalsIgnoreCase(ChatColor.stripColor(this.config.GUI_TITLE())))
         {
             if(e.isLeftClick())
             {
-                executeClickCommands(e, Config.LEFT_CLICK_COMMANDS);
+                executeClickCommands(e, this.config.LEFT_CLICK_CMDS());
             }
     
             if(e.isRightClick())
             {
-                executeClickCommands(e, Config.RIGHT_CLICK_COMMANDS);
+                executeClickCommands(e, this.config.RIGHT_CLICK_CMDS());
             }
             
             e.setCancelled(true);
@@ -149,8 +151,8 @@ public class GUIListener implements Listener
                 }
             }
             
-            if(clickedItem.getType().equals(Config.PREVIOUS_PAGE_MATERIAL)
-            || clickedItem.getType().equals(Config.NEXT_PAGE_MATERIAL))
+            if(clickedItem.getType().equals(this.config.PREV_PAGE_MATERIAL())
+            || clickedItem.getType().equals(this.config.NEXT_PAGE_MATERIAL()))
             {
                 int page = getWatchingPage((Player)player);
     
@@ -177,7 +179,12 @@ public class GUIListener implements Listener
     
                     try
                     {
-                        PlayerListGUI next = PlayerListGUI.GUIs.get(nextPage);
+                        PlayerListGUI temp = this.plugin.getGUI();
+                        
+                        if(temp != null)
+                            return;
+                        
+                        PlayerListGUI next = temp.getGuiPages().get(nextPage);
         
                         if(next != null)
                         {

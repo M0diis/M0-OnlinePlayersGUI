@@ -12,11 +12,13 @@ import java.util.List;
 
 public class CommandHandler implements CommandExecutor, TabCompleter
 {
-    private final Main plugin;
+    private final OnlineGUI plugin;
+    private final Config config;
     
-    public CommandHandler(Main plugin)
+    public CommandHandler(OnlineGUI plugin)
     {
         this.plugin = plugin;
+        this.config = plugin.getCfg();
     }
     
     @Override
@@ -36,13 +38,13 @@ public class CommandHandler implements CommandExecutor, TabCompleter
                         this.plugin.reloadConfig();
                         this.plugin.saveConfig();
     
-                        Config.load(plugin);
+                        this.plugin.getCfg().load(this.plugin);
     
-                        p.sendMessage(Config.CONFIG_RELOADED);
+                        p.sendMessage(this.config.CONFIG_RELOAD_MSG());
                     }
                     else
                     {
-                        p.sendMessage(Config.NO_PERMISSION);
+                        p.sendMessage(this.config.NO_PERMISSION_MSG());
                     }
                     
                     return true;
@@ -51,11 +53,11 @@ public class CommandHandler implements CommandExecutor, TabCompleter
             
             if(p.hasPermission("m0onlinegui.command.onlinegui"))
             {
-                PlayerListGUI.showPlayers(p);
+                new PlayerListGUI(this.plugin, 0).showPlayers(p);
             }
             else
             {
-                p.sendMessage(Config.NO_PERMISSION);
+                p.sendMessage(this.config.NO_PERMISSION_MSG());
             }
             
             return true;

@@ -1,11 +1,12 @@
 package me.M0dii.OnlinePlayersGUI;
 
 import net.ess3.api.IEssentials;
-import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -13,21 +14,36 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Objects;
 
-public class Main extends JavaPlugin
+public class OnlineGUI extends JavaPlugin
 {
-    public static Main plugin;
+    public OnlineGUI plugin;
     
     private final PluginManager manager;
     
-    public Main()
+    public OnlineGUI()
     {
         this.manager = getServer().getPluginManager();
+        
+        this.config = new Config();
     }
     
-    FileConfiguration config = null;
+    FileConfiguration cfg = null;
     File configFile = null;
     
+    private Config config = null;
+    
     private IEssentials ess = null;
+    private PlayerListGUI playerListGUI = null;
+    
+    public PlayerListGUI getGUI()
+    {
+        return this.playerListGUI;
+    }
+    
+    public void setGUI(PlayerListGUI gui)
+    {
+        this.playerListGUI = gui;
+    }
     
     public IEssentials getEssentials()
     {
@@ -37,9 +53,9 @@ public class Main extends JavaPlugin
     public void onEnable()
     {
         this.configFile = new File(this.getDataFolder(), "config.yml");
-        this.config = YamlConfiguration.loadConfiguration(this.configFile);
+        this.cfg = YamlConfiguration.loadConfiguration(this.configFile);
         
-        plugin = this;
+        this.plugin = this;
     
         if(!this.configFile.exists())
         {
@@ -49,9 +65,9 @@ public class Main extends JavaPlugin
             this.copy(this.getResource("config.yml"), configFile);
         }
         
-        Config.load(this);
+        this.config.load(this);
         
-        if(Config.ESSENTIALSX_HOOK)
+        if(this.config.ESSX_HOOK())
         {
             this.ess = (IEssentials)this.manager.getPlugin("Essentials");
             
@@ -120,7 +136,7 @@ public class Main extends JavaPlugin
         this.getLogger().warning(message);
     }
     
-    public static Main getInstance()
+    public OnlineGUI getInstance()
     {
         return plugin;
     }
@@ -152,5 +168,21 @@ public class Main extends JavaPlugin
                 e.printStackTrace();
             }
         }
+    }
+    
+    @NotNull
+    public Config getCfg()
+    {
+        return this.config;
+    }
+    
+    public FileConfiguration getFileConfig()
+    {
+        return this.cfg;
+    }
+    
+    public void setConfig(Config config)
+    {
+        this.config = config;
     }
 }

@@ -29,3 +29,32 @@ M0-OnlinePlayersGUI:
         - 'tp %player_name%'
       Right-Click:
         - 'msg %player_name% Hello!'
+  CustomItems:
+    1:
+      Material: AIR
+      Name: ''
+      Lore: []
+    2:
+      Material: AIR
+      Name: ''
+      Lore: []
+    3:
+      Material: AIR
+      Name: ''
+      Lore: []
+    5:
+      Material: AIR
+      Name: ''
+      Lore: []
+    7:
+      Material: AIR
+      Name: ''
+      Lore: []
+    8:
+      Material: AIR
+      Name: ''
+      Lore: []
+    9:
+      Material: AIR
+      Name: ''
+      Lore: []
