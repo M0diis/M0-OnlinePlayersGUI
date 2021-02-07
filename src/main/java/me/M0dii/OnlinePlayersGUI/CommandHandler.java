@@ -42,23 +42,16 @@ public class CommandHandler implements CommandExecutor, TabCompleter
     
                         p.sendMessage(this.config.CONFIG_RELOAD_MSG());
                     }
-                    else
-                    {
-                        p.sendMessage(this.config.NO_PERMISSION_MSG());
-                    }
+                    else p.sendMessage(this.config.NO_PERMISSION_MSG());
                     
                     return true;
                 }
             }
             
             if(p.hasPermission("m0onlinegui.command.onlinegui"))
-            {
                 new PlayerListGUI(this.plugin, 0).showPlayers(p);
-            }
             else
-            {
                 p.sendMessage(this.config.NO_PERMISSION_MSG());
-            }
             
             return true;
         }

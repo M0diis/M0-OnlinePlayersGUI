@@ -1,6 +1,6 @@
 package me.M0dii.OnlinePlayersGUI;
 
-import com.earth2me.essentials.PlayerList;
+import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.*;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
@@ -13,7 +13,6 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
-import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
@@ -56,9 +55,7 @@ public class GUIListener implements Listener
         String viewName = ChatColor.stripColor(e.getView().getTitle());
     
         if(viewName.equalsIgnoreCase(ChatColor.stripColor(this.config.GUI_TITLE())))
-        {
             viewers.add(e.getPlayer());
-        }
     }
     
     @EventHandler
@@ -67,9 +64,7 @@ public class GUIListener implements Listener
         String viewName = ChatColor.stripColor(e.getView().getTitle());
     
         if(viewName.equalsIgnoreCase(ChatColor.stripColor(this.config.GUI_TITLE())))
-        {
             this.viewers.remove(e.getPlayer());
-        }
     }
     
     @EventHandler
@@ -106,14 +101,10 @@ public class GUIListener implements Listener
         if(viewName.equalsIgnoreCase(ChatColor.stripColor(this.config.GUI_TITLE())))
         {
             if(e.isLeftClick())
-            {
                 executeClickCommands(e, this.config.LEFT_CLICK_CMDS());
-            }
     
             if(e.isRightClick())
-            {
                 executeClickCommands(e, this.config.RIGHT_CLICK_CMDS());
-            }
             
             e.setCancelled(true);
         }

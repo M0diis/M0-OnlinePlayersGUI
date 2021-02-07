@@ -4,7 +4,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.entity.Item;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
@@ -40,27 +39,48 @@ public class Config
     private boolean ESSENTIALSX_HOOK;
     
     public Config() { }
+    
+    String prefix = "M0-OnlinePlayersGUI.";
+    
+    FileConfiguration cfg;
+    
+    private boolean getBool(String path)
+    {
+        return cfg.getBoolean(prefix + path);
+    }
+    
+    private String getString(String path)
+    {
+        return format(cfg.getString(prefix + path));
+    }
+    
+    private List<String> getStringList(String path)
+    {
+        return cfg.getStringList(prefix + path);
+    }
 
     public void load(OnlineGUI plugin)
     {
         FileConfiguration cfg = plugin.getFileConfig();
+        
+        this.cfg = cfg;
     
-        UPDATE_ON_JOIN = cfg.getBoolean("M0-OnlinePlayersGUI.GUI.UpdateOn.Join");
-        UPDATE_ON_LEAVE = cfg.getBoolean("M0-OnlinePlayersGUI.GUI.UpdateOn.Leave");
+        UPDATE_ON_JOIN = getBool("GUI.UpdateOn.Join");
+        UPDATE_ON_LEAVE = getBool("GUI.UpdateOn.Leave");
         
-        HIDE_BUTTONS_ON_SINGLE = cfg.getBoolean("M0-OnlinePlayersGUI.HideButtonsOnSinglePage");
+        HIDE_BUTTONS_ON_SINGLE = getBool("HideButtonsOnSinglePage");
         
-        HEAD_NAME = format(cfg.getString("M0-OnlinePlayersGUI.PlayerDisplay.Name"));
+        HEAD_NAME = getString("PlayerDisplay.Name");
         
-        HEAD_LORE = cfg.getStringList("M0-OnlinePlayersGUI.PlayerDisplay.Lore");
+        HEAD_LORE = getStringList("PlayerDisplay.Lore");
     
-        GUI_TITLE = format(cfg.getString("M0-OnlinePlayersGUI.GUI.Title"));
+        GUI_TITLE = getString("GUI.Title");
         
-        NO_PERMISSION = format(cfg.getString("M0-OnlinePlayersGUI.NoPermission"));
-        CONFIG_RELOADED = format(cfg.getString("M0-OnlinePlayersGUI.ReloadMessage"));
+        NO_PERMISSION = getString("NoPermission");
+        CONFIG_RELOADED = getString("ReloadMessage");
         
-        LEFT_CLICK_COMMANDS = cfg.getStringList("M0-OnlinePlayersGUI.PlayerDisplay.Commands.Left-Click");
-        RIGHT_CLICK_COMMANDS = cfg.getStringList("M0-OnlinePlayersGUI.PlayerDisplay.Commands.Right-Click");
+        LEFT_CLICK_COMMANDS = getStringList("PlayerDisplay.Commands.Left-Click");
+        RIGHT_CLICK_COMMANDS = getStringList("PlayerDisplay.Commands.Right-Click");
         
         GUI_SIZE = cfg.getInt("M0-OnlinePlayersGUI.GUI.Size");
     
@@ -70,20 +90,20 @@ public class Config
         NEXT_PAGE_MATERIAL = Material.getMaterial(cfg.getString("M0-OnlinePlayersGUI.NextButton.Material"));
         if(NEXT_PAGE_MATERIAL == null) NEXT_PAGE_MATERIAL = Material.BOOK;
         
-        PREVIOUS_PAGE_LORE = cfg.getStringList("M0-OnlinePlayersGUI.PreviousButton.Lore");
-        NEXT_PAGE_LORE = cfg.getStringList("M0-OnlinePlayersGUI.NextButton.Lore");
+        PREVIOUS_PAGE_LORE = getStringList("PreviousButton.Lore");
+        NEXT_PAGE_LORE = getStringList("NextButton.Lore");
         
-        PREVIOUS_PAGE_NAME = format(cfg.getString("M0-OnlinePlayersGUI.PreviousButton.Name"));
-        NEXT_PAGE_NAME = format(cfg.getString("M0-OnlinePlayersGUI.NextButton.Name"));
+        PREVIOUS_PAGE_NAME = getString("PreviousButton.Name");
+        NEXT_PAGE_NAME = getString("NextButton.Name");
         
-        ESSENTIALSX_HOOK = cfg.getBoolean("M0-OnlinePlayersGUI.EssentialsXHook");
+        ESSENTIALSX_HOOK = getBool("EssentialsXHook");
         
-        setUpCustomItems(cfg, plugin);
+        setUpCustomItems(plugin);
     }
     
     private List<ItemStack> CUSTOM_ITEMS;
     
-    private void setUpCustomItems(FileConfiguration cfg, OnlineGUI plugin)
+    private void setUpCustomItems(OnlineGUI plugin)
     {
         CUSTOM_ITEMS = new ArrayList<>();
         
@@ -98,14 +118,9 @@ public class Config
             {
                 ItemStack item = new ItemStack(CI_ITEM);
                 
-                String CI_NAME = format(cfg.getString(String.format("M0-OnlinePlayersGUI.CustomItems.%d.Name", i)));
+                String CI_NAME = getString(String.format("CustomItems.%d.Name", i));
     
-                List<String> CI_LORE = cfg.getStringList(String.format("M0-OnlinePlayersGUI.CustomItems.%d.Lore", i));
-                
-                //List<String> CI_LC_CMDS = cfg.getStringList(String.format("M0-OnlinePlayersGUI.CustomItems.%d.Commands" +
-                //    ".Left-Click", i));
-                //List<String> CI_RC_CMDS = cfg.getStringList(String.format("M0-OnlinePlayersGUI.CustomItems.%d.Commands" +
-                //    ".Right-Click", i));
+                List<String> CI_LORE = getStringList(String.format("CustomItems.%d.Lore", i));
                 
                 ItemMeta meta = item.getItemMeta();
                 
@@ -117,9 +132,7 @@ public class Config
                 if(CI_LORE.size() != 0)
                 {
                     for(String l : CI_LORE)
-                    {
                         lore.add(format(l));
-                    }
                     
                     meta.setLore(lore);
                 }
@@ -135,14 +148,14 @@ public class Config
         }
     }
     
+    private String format(String text)
+    {
+        return ChatColor.translateAlternateColorCodes('&', text);
+    }
+    
     public List<ItemStack> getCustomItems()
     {
         return this.CUSTOM_ITEMS;
-    }
-    
-    private static String format(String text)
-    {
-        return ChatColor.translateAlternateColorCodes('&', text);
     }
     
     public int GUI_SIZE()
