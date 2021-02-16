@@ -30,7 +30,7 @@ public class OnlineGUI extends JavaPlugin
     FileConfiguration cfg = null;
     File configFile = null;
     
-    private Config config = null;
+    private Config config;
     
     private IEssentials ess = null;
     private PlayerListGUI playerListGUI = null;
@@ -43,6 +43,14 @@ public class OnlineGUI extends JavaPlugin
     public void setGUI(PlayerListGUI gui)
     {
         this.playerListGUI = gui;
+    }
+    
+    public void renewConfig()
+    {
+        this.configFile = new File(this.getDataFolder(), "config.yml");
+        this.cfg = YamlConfiguration.loadConfiguration(this.configFile);
+        
+        this.config.load(this);
     }
     
     public IEssentials getEssentials()

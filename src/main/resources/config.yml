@@ -2,6 +2,7 @@ M0-OnlinePlayersGUI:
   ReloadMessage: '&2Configuration has been reloaded.'
   NoPermission: '&2You do not have permission to this command.'
   HideButtonsOnSinglePage: false
+  CloseOnClick: false
   EssentialsXHook: false
   PreviousButton:
     Material: ENCHANTED_BOOK
@@ -26,9 +27,9 @@ M0-OnlinePlayersGUI:
       - '&2Left click to &asay hi&2.'
     Commands:
       Left-Click:
-        - 'tp %player_name%'
+        - '[PLAYER] tp %player_name%'
       Right-Click:
-        - 'msg %player_name% Hello!'
+        - '[CONSOLE] msg %player_name% Hello!'
   CustomItems:
     1:
       Material: AIR

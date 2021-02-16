@@ -122,24 +122,34 @@ public class GUIListener implements Listener
             {
                 SkullMeta sm = (SkullMeta)clickedItem.getItemMeta();
                 
-                OfflinePlayer owner = sm.getOwningPlayer();
+                String ownerName = sm.getOwner();
                 
-                if(owner != null)
+                if(ownerName != null)
                 {
-                    String ownerName = sm.getOwningPlayer().getName();
-    
-                    if(ownerName != null)
+                    Player skullOwner = Bukkit.getPlayer(ownerName);
+                    
+                    for(String cmd : cmds)
                     {
-                        Player skullOwner = Bukkit.getPlayer(ownerName);
+                        String replaced = PlaceholderAPI.setPlaceholders(skullOwner, cmd);
                         
-                        for(String cmd : cmds)
+                        if(replaced.startsWith("["))
                         {
-                            String replaced = PlaceholderAPI.setPlaceholders(skullOwner, cmd);
-        
-                            Bukkit.dispatchCommand(player, replaced);
+                            String sendAs = replaced.substring(replaced.indexOf("["), replaced.indexOf("]") + 2);
+    
+                            replaced = replaced.substring(replaced.indexOf("]") + 2);
+    
+                            if(sendAs.equalsIgnoreCase("[PLAYER] "))
+                                Bukkit.dispatchCommand(player, replaced);
+                            else  if(sendAs.equalsIgnoreCase("[CONSOLE] "))
+                                Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
+                                        replaced.replace("[CONSOLE] ", ""));
                         }
+                        else Bukkit.dispatchCommand(player, replaced);
                     }
                 }
+                
+                if(this.config.CLOSE_ON_CLICK())
+                    player.closeInventory();
             }
             
             if(clickedItem.getType().equals(this.config.PREV_PAGE_MATERIAL())

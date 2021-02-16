@@ -28,6 +28,7 @@ public class Config
     private List<String> PREVIOUS_PAGE_LORE;
     private List<String> NEXT_PAGE_LORE;
     
+    private boolean CLOSE_ON_CLICK;
     private boolean UPDATE_ON_JOIN;
     private boolean UPDATE_ON_LEAVE;
     private boolean HIDE_BUTTONS_ON_SINGLE;
@@ -40,7 +41,7 @@ public class Config
     
     public Config() { }
     
-    String prefix = "M0-OnlinePlayersGUI.";
+    private String prefix = "M0-OnlinePlayersGUI.";
     
     FileConfiguration cfg;
     
@@ -51,7 +52,7 @@ public class Config
     
     private String getString(String path)
     {
-        return format(cfg.getString(prefix + path));
+        return format(cfg.getString(String.format("%s%s", prefix, path)));
     }
     
     private List<String> getStringList(String path)
@@ -63,12 +64,16 @@ public class Config
     {
         FileConfiguration cfg = plugin.getFileConfig();
         
+        this.prefix = "M0-OnlinePlayersGUI.";
+        
         this.cfg = cfg;
     
         UPDATE_ON_JOIN = getBool("GUI.UpdateOn.Join");
         UPDATE_ON_LEAVE = getBool("GUI.UpdateOn.Leave");
         
         HIDE_BUTTONS_ON_SINGLE = getBool("HideButtonsOnSinglePage");
+        
+        HIDE_BUTTONS_ON_SINGLE = getBool("CloseOnClick");
         
         HEAD_NAME = getString("PlayerDisplay.Name");
         
@@ -151,6 +156,11 @@ public class Config
     private String format(String text)
     {
         return ChatColor.translateAlternateColorCodes('&', text);
+    }
+    
+    public boolean CLOSE_ON_CLICK()
+    {
+        return this.CLOSE_ON_CLICK;
     }
     
     public List<ItemStack> getCustomItems()

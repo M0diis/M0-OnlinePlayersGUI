@@ -38,7 +38,7 @@ public class CommandHandler implements CommandExecutor, TabCompleter
                         this.plugin.reloadConfig();
                         this.plugin.saveConfig();
     
-                        this.plugin.getCfg().load(this.plugin);
+                        this.plugin.renewConfig();
     
                         p.sendMessage(this.config.CONFIG_RELOAD_MSG());
                     }

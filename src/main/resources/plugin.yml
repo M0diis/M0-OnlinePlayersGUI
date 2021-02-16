@@ -1,7 +1,7 @@
 name: M0-OnlinePlayersGUI
 main: me.M0dii.OnlinePlayersGUI.OnlineGUI
 description: M0-OnlinePlayersGUI
-version: 2.1
+version: 2.3
 api-version: 1.16
 author: M0dii
 softdepend: [PlaceholderAPI]
