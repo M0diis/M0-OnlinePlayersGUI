@@ -28,7 +28,8 @@ public class Config
     private List<String> PREVIOUS_PAGE_LORE;
     private List<String> NEXT_PAGE_LORE;
     
-    private boolean CLOSE_ON_CLICK;
+    private boolean CLOSE_ON_LEFT_CLICK;
+    private boolean CLOSE_ON_RIGHT_CLICK;
     private boolean UPDATE_ON_JOIN;
     private boolean UPDATE_ON_LEAVE;
     private boolean HIDE_BUTTONS_ON_SINGLE;
@@ -41,18 +42,20 @@ public class Config
     
     public Config() { }
     
-    private String prefix = "M0-OnlinePlayersGUI.";
-    
     FileConfiguration cfg;
+    
+    private static String prefix = "M0-OnlinePlayersGUI.";
     
     private boolean getBool(String path)
     {
         return cfg.getBoolean(prefix + path);
     }
     
-    private String getString(String path)
+    private OnlineGUI pl;
+    
+    private String getStringf(String path)
     {
-        return format(cfg.getString(String.format("%s%s", prefix, path)));
+        return format(cfg.getString(prefix + path));
     }
     
     private List<String> getStringList(String path)
@@ -60,46 +63,56 @@ public class Config
         return cfg.getStringList(prefix + path);
     }
 
-    public void load(OnlineGUI plugin)
+    public void load(OnlineGUI plugin, FileConfiguration cfg)
     {
-        FileConfiguration cfg = plugin.getFileConfig();
-        
-        this.prefix = "M0-OnlinePlayersGUI.";
-        
         this.cfg = cfg;
+        
+        this.pl = plugin;
     
         UPDATE_ON_JOIN = getBool("GUI.UpdateOn.Join");
         UPDATE_ON_LEAVE = getBool("GUI.UpdateOn.Leave");
+        
+        CLOSE_ON_LEFT_CLICK = getBool("CloseOnLeftClick");
+        CLOSE_ON_RIGHT_CLICK = getBool("CloseOnRightClick");
         
         HIDE_BUTTONS_ON_SINGLE = getBool("HideButtonsOnSinglePage");
         
         HIDE_BUTTONS_ON_SINGLE = getBool("CloseOnClick");
         
-        HEAD_NAME = getString("PlayerDisplay.Name");
+        HEAD_NAME = getStringf("PlayerDisplay.Name");
         
         HEAD_LORE = getStringList("PlayerDisplay.Lore");
     
-        GUI_TITLE = getString("GUI.Title");
+        GUI_TITLE = getStringf("GUI.Title");
         
-        NO_PERMISSION = getString("NoPermission");
-        CONFIG_RELOADED = getString("ReloadMessage");
+        NO_PERMISSION = getStringf("NoPermission");
+        CONFIG_RELOADED = getStringf("ReloadMessage");
         
         LEFT_CLICK_COMMANDS = getStringList("PlayerDisplay.Commands.Left-Click");
         RIGHT_CLICK_COMMANDS = getStringList("PlayerDisplay.Commands.Right-Click");
         
         GUI_SIZE = cfg.getInt("M0-OnlinePlayersGUI.GUI.Size");
     
-        PREVIOUS_PAGE_MATERIAL = Material.getMaterial(cfg.getString("M0-OnlinePlayersGUI.PreviousButton.Material"));
+        String mat1 = cfg.getString("NextButton.Material");
+        String mat2 = cfg.getString("PreviousButton.Material");
+        
+        if(mat1 == null)
+            mat1 = "ENCHANTED_BOOK";
+    
+        if(mat2 == null)
+            mat2 = "ENCHANTED_BOOK";
+        
+        PREVIOUS_PAGE_MATERIAL = Material.getMaterial(mat1);
         if(PREVIOUS_PAGE_MATERIAL == null) PREVIOUS_PAGE_MATERIAL = Material.BOOK;
         
-        NEXT_PAGE_MATERIAL = Material.getMaterial(cfg.getString("M0-OnlinePlayersGUI.NextButton.Material"));
+        NEXT_PAGE_MATERIAL = Material.getMaterial(mat2);
         if(NEXT_PAGE_MATERIAL == null) NEXT_PAGE_MATERIAL = Material.BOOK;
         
         PREVIOUS_PAGE_LORE = getStringList("PreviousButton.Lore");
         NEXT_PAGE_LORE = getStringList("NextButton.Lore");
         
-        PREVIOUS_PAGE_NAME = getString("PreviousButton.Name");
-        NEXT_PAGE_NAME = getString("NextButton.Name");
+        PREVIOUS_PAGE_NAME = getStringf("PreviousButton.Name");
+        NEXT_PAGE_NAME = getStringf("NextButton.Name");
         
         ESSENTIALSX_HOOK = getBool("EssentialsXHook");
         
@@ -123,7 +136,7 @@ public class Config
             {
                 ItemStack item = new ItemStack(CI_ITEM);
                 
-                String CI_NAME = getString(String.format("CustomItems.%d.Name", i));
+                String CI_NAME = getStringf(String.format("CustomItems.%d.Name", i));
     
                 List<String> CI_LORE = getStringList(String.format("CustomItems.%d.Lore", i));
                 
@@ -155,12 +168,20 @@ public class Config
     
     private String format(String text)
     {
+        if(text.isEmpty() || text == null)
+            return text;
+        
         return ChatColor.translateAlternateColorCodes('&', text);
     }
     
-    public boolean CLOSE_ON_CLICK()
+    public boolean CLOSE_ON_LEFT_CLICK()
     {
-        return this.CLOSE_ON_CLICK;
+        return this.CLOSE_ON_LEFT_CLICK;
+    }
+    
+    public boolean CLOSE_ON_RIGHT_CLICK()
+    {
+        return this.CLOSE_ON_RIGHT_CLICK;
     }
     
     public List<ItemStack> getCustomItems()

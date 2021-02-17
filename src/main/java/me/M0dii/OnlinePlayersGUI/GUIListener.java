@@ -24,13 +24,13 @@ import java.util.UUID;
 public class GUIListener implements Listener
 {
     private final OnlineGUI plugin;
-    private final Config config;
+    private final Config cfg;
     
     public GUIListener(OnlineGUI plugin)
     {
         this.plugin = plugin;
         this.viewers = new ArrayList<>();
-        this.config = plugin.getCfg();
+        this.cfg = plugin.getCfg();
         
         currentPage = new HashMap<>();
     }
@@ -52,25 +52,37 @@ public class GUIListener implements Listener
     @EventHandler
     public void openGUI(InventoryOpenEvent e)
     {
-        String viewName = ChatColor.stripColor(e.getView().getTitle());
+        String viewName = strip(e.getView().getTitle())
+                .replaceAll("\\d", "")
+                .trim();
     
-        if(viewName.equalsIgnoreCase(ChatColor.stripColor(this.config.GUI_TITLE())))
-            viewers.add(e.getPlayer());
+        String title = strip(this.cfg.GUI_TITLE())
+                .replace("%playercount%", "")
+                .trim();
+        
+        if(viewName.contains(title))
+            this.viewers.add(e.getPlayer());
     }
     
     @EventHandler
     public void closeGUI(InventoryCloseEvent e)
     {
-        String viewName = ChatColor.stripColor(e.getView().getTitle());
+        String viewName = strip(e.getView().getTitle())
+                .replaceAll("\\d", "")
+                .trim();
     
-        if(viewName.equalsIgnoreCase(ChatColor.stripColor(this.config.GUI_TITLE())))
+        String title = strip(this.cfg.GUI_TITLE())
+                .replace("%playercount%", "")
+                .trim();
+        
+        if(viewName.contains(title))
             this.viewers.remove(e.getPlayer());
     }
     
     @EventHandler
     public void updateOnJoin(PlayerJoinEvent e)
     {
-        if(this.config.UPDATE_ON_JOIN())
+        if(this.cfg.UPDATE_ON_JOIN())
         {
             for(HumanEntity p : viewers)
             {
@@ -80,10 +92,15 @@ public class GUIListener implements Listener
         }
     }
     
+    private String strip(String text)
+    {
+        return ChatColor.stripColor(text);
+    }
+    
     @EventHandler
     public void updateOnLeave(PlayerQuitEvent e)
     {
-        if(this.config.UPDATE_ON_LEAVE())
+        if(this.cfg.UPDATE_ON_LEAVE())
         {
             for(HumanEntity p : viewers)
             {
@@ -96,15 +113,31 @@ public class GUIListener implements Listener
     @EventHandler
     public void cancelClick(InventoryClickEvent e)
     {
-        String viewName = ChatColor.stripColor(e.getView().getTitle());
+        String viewName = strip(e.getView().getTitle())
+                .replaceAll("\\d", "")
+                .trim();
     
-        if(viewName.equalsIgnoreCase(ChatColor.stripColor(this.config.GUI_TITLE())))
+        String title = strip(this.cfg.GUI_TITLE())
+                .replace("%playercount%", "")
+                .trim();
+    
+        if(viewName.contains(title))
         {
             if(e.isLeftClick())
-                executeClickCommands(e, this.config.LEFT_CLICK_CMDS());
+            {
+                executeClickCommands(e, this.cfg.LEFT_CLICK_CMDS());
+                
+                if(this.cfg.CLOSE_ON_LEFT_CLICK())
+                    e.getView().getPlayer().closeInventory();
+            }
     
             if(e.isRightClick())
-                executeClickCommands(e, this.config.RIGHT_CLICK_CMDS());
+            {
+                executeClickCommands(e, this.cfg.RIGHT_CLICK_CMDS());
+    
+                if(this.cfg.CLOSE_ON_RIGHT_CLICK())
+                    e.getView().getPlayer().closeInventory();
+            }
             
             e.setCancelled(true);
         }
@@ -116,88 +149,85 @@ public class GUIListener implements Listener
         
         ItemStack clickedItem = e.getCurrentItem();
         
-        if(clickedItem != null)
+        if(clickedItem != null
+        && clickedItem.getType().equals(Material.PLAYER_HEAD))
         {
-            if(clickedItem.getType().equals(Material.PLAYER_HEAD))
+            SkullMeta sm = (SkullMeta)clickedItem.getItemMeta();
+            
+            String ownerName = sm.getOwner();
+            
+            if(ownerName != null)
             {
-                SkullMeta sm = (SkullMeta)clickedItem.getItemMeta();
+                Player skullOwner = Bukkit.getPlayer(ownerName);
                 
-                String ownerName = sm.getOwner();
-                
-                if(ownerName != null)
+                for(String cmd : cmds)
                 {
-                    Player skullOwner = Bukkit.getPlayer(ownerName);
+                    String replaced = PlaceholderAPI.setPlaceholders(skullOwner, cmd);
                     
-                    for(String cmd : cmds)
+                    if(replaced.startsWith("["))
                     {
-                        String replaced = PlaceholderAPI.setPlaceholders(skullOwner, cmd);
+                        String sendAs = replaced.substring(replaced.indexOf("["),
+                                replaced.indexOf("]") + 2);
+
+                        replaced = replaced.substring(replaced.indexOf("]") + 2);
+
+                        if(sendAs.equalsIgnoreCase("[PLAYER] "))
+                            Bukkit.dispatchCommand(player, replaced);
+                        else  if(sendAs.equalsIgnoreCase("[CONSOLE] "))
+                            Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
+                                    replaced.replace("[CONSOLE] ", ""));
+                    }
+                    else Bukkit.dispatchCommand(player, replaced);
+                }
+            }
+        }
+        
+        if((clickedItem != null) &&
+          (clickedItem.getType().equals(this.cfg.PREV_PAGE_MATERIAL())
+        || clickedItem.getType().equals(this.cfg.NEXT_PAGE_MATERIAL())))
+        {
+            int page = getWatchingPage((Player)player);
+
+            NamespacedKey key = new NamespacedKey(this.plugin, "Button");
+            PersistentDataContainer cont = clickedItem.getItemMeta().getPersistentDataContainer();
+
+            if(cont.has(key, PersistentDataType.STRING))
+            {
+                String buttonType = cont.get(key, PersistentDataType.STRING);
+                
+                int nextPage = page;
+                
+                if(buttonType == null) return;
+                
+                if(buttonType.equalsIgnoreCase("Next"))
+                {
+                    nextPage = page + 1;
+                }
+                else if(buttonType.equalsIgnoreCase("Previous"))
+                {
+                    nextPage = page - 1;
+
+                }
+
+                try
+                {
+                    PlayerListGUI temp = this.plugin.getGUI();
+                    
+                    if(temp != null)
+                        return;
+                    
+                    PlayerListGUI next = temp.getGuiPages().get(nextPage);
+    
+                    if(next != null)
+                    {
+                        next.show(player, Bukkit.getOnlinePlayers().size());
                         
-                        if(replaced.startsWith("["))
-                        {
-                            String sendAs = replaced.substring(replaced.indexOf("["), replaced.indexOf("]") + 2);
-    
-                            replaced = replaced.substring(replaced.indexOf("]") + 2);
-    
-                            if(sendAs.equalsIgnoreCase("[PLAYER] "))
-                                Bukkit.dispatchCommand(player, replaced);
-                            else  if(sendAs.equalsIgnoreCase("[CONSOLE] "))
-                                Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
-                                        replaced.replace("[CONSOLE] ", ""));
-                        }
-                        else Bukkit.dispatchCommand(player, replaced);
+                        setWatchingPage((Player)player, nextPage);
                     }
                 }
-                
-                if(this.config.CLOSE_ON_CLICK())
-                    player.closeInventory();
-            }
-            
-            if(clickedItem.getType().equals(this.config.PREV_PAGE_MATERIAL())
-            || clickedItem.getType().equals(this.config.NEXT_PAGE_MATERIAL()))
-            {
-                int page = getWatchingPage((Player)player);
-    
-                NamespacedKey key = new NamespacedKey(this.plugin, "Button");
-                PersistentDataContainer cont = clickedItem.getItemMeta().getPersistentDataContainer();
-    
-                if(cont.has(key, PersistentDataType.STRING))
+                catch(IndexOutOfBoundsException ex)
                 {
-                    String buttonType = cont.get(key, PersistentDataType.STRING);
-                    
-                    int nextPage = page;
-                    
-                    if(buttonType == null) return;
-                    
-                    if(buttonType.equalsIgnoreCase("Next"))
-                    {
-                        nextPage = page + 1;
-                    }
-                    else if(buttonType.equalsIgnoreCase("Previous"))
-                    {
-                        nextPage = page - 1;
-
-                    }
-    
-                    try
-                    {
-                        PlayerListGUI temp = this.plugin.getGUI();
-                        
-                        if(temp != null)
-                            return;
-                        
-                        PlayerListGUI next = temp.getGuiPages().get(nextPage);
-        
-                        if(next != null)
-                        {
-                            next.show(player, Bukkit.getOnlinePlayers().size());
-                            
-                            setWatchingPage((Player)player, nextPage);
-                        }
-                    }
-                    catch(IndexOutOfBoundsException ex)
-                    {
-                        // Handle
-                    }
+                    // Handle
                 }
             }
         }

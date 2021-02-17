@@ -2,7 +2,8 @@ M0-OnlinePlayersGUI:
   ReloadMessage: '&2Configuration has been reloaded.'
   NoPermission: '&2You do not have permission to this command.'
   HideButtonsOnSinglePage: false
-  CloseOnClick: false
+  CloseOnLeftClick: false
+  CloseOnRightClick: false
   EssentialsXHook: false
   PreviousButton:
     Material: ENCHANTED_BOOK

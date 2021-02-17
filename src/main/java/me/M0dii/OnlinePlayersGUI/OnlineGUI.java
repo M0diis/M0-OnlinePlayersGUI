@@ -3,7 +3,6 @@ package me.M0dii.OnlinePlayersGUI;
 import net.ess3.api.IEssentials;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
@@ -50,7 +49,7 @@ public class OnlineGUI extends JavaPlugin
         this.configFile = new File(this.getDataFolder(), "config.yml");
         this.cfg = YamlConfiguration.loadConfiguration(this.configFile);
         
-        this.config.load(this);
+        this.config.load(this, this.cfg);
     }
     
     public IEssentials getEssentials()
@@ -61,7 +60,6 @@ public class OnlineGUI extends JavaPlugin
     public void onEnable()
     {
         this.configFile = new File(this.getDataFolder(), "config.yml");
-        this.cfg = YamlConfiguration.loadConfiguration(this.configFile);
         
         this.plugin = this;
     
@@ -73,7 +71,9 @@ public class OnlineGUI extends JavaPlugin
             this.copy(this.getResource("config.yml"), configFile);
         }
         
-        this.config.load(this);
+        this.cfg = YamlConfiguration.loadConfiguration(this.configFile);
+        
+        this.config.load(this, this.cfg);
         
         if(this.config.ESSX_HOOK())
         {
@@ -118,13 +118,6 @@ public class OnlineGUI extends JavaPlugin
         info("");
         info("+-----------------------------------------+");
         info(" ");
-        info("  __  __  ___  ");
-        info(" |  \\/  |/ _ \\ ");
-        info(" | \\  / | | | |");
-        info(" | |\\/| | | | |");
-        info(" | |  | | |_| |");
-        info(" |_|  |_|\\___/");
-        info(" ");
         info("M0-OnlinePlayersGUI has been successfully disabled!");
         info(" ");
         info("+-----------------------------------------+");
@@ -142,11 +135,6 @@ public class OnlineGUI extends JavaPlugin
     private void warning(String message)
     {
         this.getLogger().warning(message);
-    }
-    
-    public OnlineGUI getInstance()
-    {
-        return plugin;
     }
     
     private void copy(InputStream in, File file)
@@ -187,10 +175,5 @@ public class OnlineGUI extends JavaPlugin
     public FileConfiguration getFileConfig()
     {
         return this.cfg;
-    }
-    
-    public void setConfig(Config config)
-    {
-        this.config = config;
     }
 }

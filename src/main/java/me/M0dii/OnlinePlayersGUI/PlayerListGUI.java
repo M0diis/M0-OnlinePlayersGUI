@@ -37,7 +37,7 @@ public class PlayerListGUI
     private final int size;
     private final IEssentials ess;
     private final Config config;
-
+    
     public PlayerListGUI(OnlineGUI plugin, int page)
     {
         this.plugin = plugin;
@@ -48,9 +48,9 @@ public class PlayerListGUI
         
         this.name = this.config.GUI_TITLE();
         
-        this.size = initializeSize();
+        this.size = this.initializeSize();
 
-        this.inv = Bukkit.createInventory(null, this.size, this.name);
+        this.inv = Bukkit.createInventory(null, this.size, this.config.GUI_TITLE());
         
         this.plugin.setGUI(this);
     }
