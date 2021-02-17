@@ -36,27 +36,48 @@ M0-OnlinePlayersGUI:
       Material: AIR
       Name: ''
       Lore: []
+      Commands:
+        Left-Click: []
+        Right-Click: []
     2:
       Material: AIR
       Name: ''
       Lore: []
+      Commands:
+        Left-Click: []
+        Right-Click: []
     3:
       Material: AIR
       Name: ''
       Lore: []
+      Commands:
+        Left-Click: []
+        Right-Click: []
     5:
       Material: AIR
       Name: ''
       Lore: []
+      Commands:
+        Left-Click: []
+        Right-Click: []
     7:
       Material: AIR
       Name: ''
       Lore: []
+      Commands:
+        Left-Click: []
+        Right-Click: []
     8:
       Material: AIR
       Name: ''
       Lore: []
+      Commands:
+        Left-Click: []
+        Right-Click: []
     9:
       Material: AIR
       Name: ''
       Lore: []
+      Commands:
+        Left-Click: []
+        Right-Click: []

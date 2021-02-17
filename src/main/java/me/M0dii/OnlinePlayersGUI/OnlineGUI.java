@@ -5,7 +5,6 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -29,7 +28,7 @@ public class OnlineGUI extends JavaPlugin
     FileConfiguration cfg = null;
     File configFile = null;
     
-    private Config config;
+    private final Config config;
     
     private IEssentials ess = null;
     private PlayerListGUI playerListGUI = null;
@@ -80,9 +79,7 @@ public class OnlineGUI extends JavaPlugin
             this.ess = (IEssentials)this.manager.getPlugin("Essentials");
             
             if(ess == null)
-            {
                 this.warning("Could not find EssentialsX.");
-            }
         }
     
         if (this.manager.getPlugin("PlaceholderAPI") == null)
@@ -150,9 +147,7 @@ public class OnlineGUI extends JavaPlugin
                 int len;
         
                 while((len = in.read(buf)) > 0)
-                {
                     out.write(buf, 0, len);
-                }
         
                 out.close();
                 in.close();
@@ -166,14 +161,8 @@ public class OnlineGUI extends JavaPlugin
         }
     }
     
-    @NotNull
     public Config getCfg()
     {
         return this.config;
-    }
-    
-    public FileConfiguration getFileConfig()
-    {
-        return this.cfg;
     }
 }

@@ -44,14 +44,12 @@ public class Config
     
     FileConfiguration cfg;
     
-    private static String prefix = "M0-OnlinePlayersGUI.";
+    private static final String prefix = "M0-OnlinePlayersGUI.";
     
     private boolean getBool(String path)
     {
         return cfg.getBoolean(prefix + path);
     }
-    
-    private OnlineGUI pl;
     
     private String getStringf(String path)
     {
@@ -66,8 +64,6 @@ public class Config
     public void load(OnlineGUI plugin, FileConfiguration cfg)
     {
         this.cfg = cfg;
-        
-        this.pl = plugin;
     
         UPDATE_ON_JOIN = getBool("GUI.UpdateOn.Join");
         UPDATE_ON_LEAVE = getBool("GUI.UpdateOn.Leave");
@@ -119,7 +115,7 @@ public class Config
         setUpCustomItems(plugin);
     }
     
-    private List<ItemStack> CUSTOM_ITEMS;
+    private List<CustomItem> CUSTOM_ITEMS;
     
     private void setUpCustomItems(OnlineGUI plugin)
     {
@@ -155,13 +151,25 @@ public class Config
                     meta.setLore(lore);
                 }
                 
+                List<String> lcc = cfg.getStringList(
+                        String.format("M0-OnlinePlayersGUI.CustomItems.%d.Commands.Left-Click", i));
+    
+                List<String> rcc = cfg.getStringList(
+                        String.format("M0-OnlinePlayersGUI.CustomItems.%d.Commands.Right-Click", i));
+                
                 meta.getPersistentDataContainer().set(
                         new NamespacedKey(plugin, "Slot"),
                         PersistentDataType.INTEGER, i);
+    
+                meta.getPersistentDataContainer().set(
+                        new NamespacedKey(plugin, "IsCustom"),
+                        PersistentDataType.STRING, "true");
                 
                 item.setItemMeta(meta);
                 
-                CUSTOM_ITEMS.add(item);
+                CustomItem ci = new CustomItem(item, i, lcc, rcc);
+                
+                this.CUSTOM_ITEMS.add(ci);
             }
         }
     }
@@ -184,7 +192,7 @@ public class Config
         return this.CLOSE_ON_RIGHT_CLICK;
     }
     
-    public List<ItemStack> getCustomItems()
+    public List<CustomItem> getCustomItems()
     {
         return this.CUSTOM_ITEMS;
     }

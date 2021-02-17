@@ -163,26 +163,12 @@ public class GUIListener implements Listener
                 for(String cmd : cmds)
                 {
                     String replaced = PlaceholderAPI.setPlaceholders(skullOwner, cmd);
-                    
-                    if(replaced.startsWith("["))
-                    {
-                        String sendAs = replaced.substring(replaced.indexOf("["),
-                                replaced.indexOf("]") + 2);
-
-                        replaced = replaced.substring(replaced.indexOf("]") + 2);
-
-                        if(sendAs.equalsIgnoreCase("[PLAYER] "))
-                            Bukkit.dispatchCommand(player, replaced);
-                        else  if(sendAs.equalsIgnoreCase("[CONSOLE] "))
-                            Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
-                                    replaced.replace("[CONSOLE] ", ""));
-                    }
-                    else Bukkit.dispatchCommand(player, replaced);
+    
+                    findSender(player, replaced);
                 }
             }
         }
-        
-        if((clickedItem != null) &&
+        else if((clickedItem != null) &&
           (clickedItem.getType().equals(this.cfg.PREV_PAGE_MATERIAL())
         || clickedItem.getType().equals(this.cfg.NEXT_PAGE_MATERIAL())))
         {
@@ -200,14 +186,9 @@ public class GUIListener implements Listener
                 if(buttonType == null) return;
                 
                 if(buttonType.equalsIgnoreCase("Next"))
-                {
                     nextPage = page + 1;
-                }
                 else if(buttonType.equalsIgnoreCase("Previous"))
-                {
                     nextPage = page - 1;
-
-                }
 
                 try
                 {
@@ -231,5 +212,70 @@ public class GUIListener implements Listener
                 }
             }
         }
+        else if(clickedItem != null)
+        {
+            NamespacedKey key = new NamespacedKey(this.plugin, "IsCustom");
+            PersistentDataContainer cont = clickedItem.getItemMeta().getPersistentDataContainer();
+            
+            if(cont.has(key, PersistentDataType.STRING))
+            {
+                key = new NamespacedKey(this.plugin, "Slot");
+                
+                if(cont.has(key, PersistentDataType.INTEGER))
+                {
+                    int slot = cont.get(key, PersistentDataType.INTEGER);
+                    
+                    CustomItem c = this.getCustomItemBySlot(slot);
+                    
+                    if(c != null)
+                    {
+                        List<String> cicmds = new ArrayList<>();
+    
+                        if(e.isLeftClick())
+                            cicmds = c.getLeftClickCommands();
+    
+                        if(e.isRightClick())
+                            cicmds = c.getRightClickCommands();
+    
+                        for(String cmd : cicmds)
+                            findSender(player, cmd);
+                    }
+                }
+            }
+        }
+    }
+    
+    private void findSender(HumanEntity player, String cmd)
+    {
+        if(cmd.startsWith("["))
+        {
+            plugin.getLogger().info(cmd);
+            
+            String sendAs = cmd.substring(cmd.indexOf("["), cmd.indexOf("]") + 2);
+
+            cmd = cmd.substring(cmd.indexOf("]") + 2);
+
+            if(sendAs.equalsIgnoreCase("[PLAYER] "))
+                Bukkit.dispatchCommand(player, cmd);
+            else if(sendAs.equalsIgnoreCase("[CONSOLE] "))
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
+                        cmd.replace("[CONSOLE] ", ""));
+        }
+        else Bukkit.dispatchCommand(player, cmd);
+    }
+    
+    private CustomItem getCustomItemBySlot(int slot)
+    {
+        List<CustomItem> customItems = this.cfg.getCustomItems();
+        
+        CustomItem custom = null;
+        
+        for(CustomItem c : customItems)
+        {
+            if(c.getItemSlot() == slot)
+                custom = c;
+        }
+        
+        return custom;
     }
 }

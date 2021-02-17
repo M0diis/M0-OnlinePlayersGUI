@@ -27,6 +27,9 @@ public class PlayerListGUI
     
     public List<PlayerListGUI> getGuiPages()
     {
+        if(guiPages == null)
+            this.guiPages = new ArrayList<>();
+    
         return this.guiPages;
     }
     
@@ -227,18 +230,20 @@ public class PlayerListGUI
                 gui.setItem(config.GUI_SIZE() - 6, prevButton);
             }
             
-            List<ItemStack> customItems = this.config.getCustomItems();
+            List<CustomItem> customItems = this.config.getCustomItems();
     
-            for(ItemStack c : customItems)
+            for(CustomItem c : customItems)
             {
+                ItemStack i = c.getItem();
+                
                 NamespacedKey key = new NamespacedKey(this.plugin, "Slot");
-                PersistentDataContainer cont = c.getItemMeta().getPersistentDataContainer();
+                PersistentDataContainer cont = i.getItemMeta().getPersistentDataContainer();
     
                 if(cont.has(key, PersistentDataType.INTEGER))
                 {
                     int slot = cont.get(key, PersistentDataType.INTEGER);
     
-                    gui.setItem(this.size - 10 + slot, c);
+                    gui.setItem(this.size - 10 + slot, i);
                 }
             }
             

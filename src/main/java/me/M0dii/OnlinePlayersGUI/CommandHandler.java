@@ -6,7 +6,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 
-import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,8 +21,8 @@ public class CommandHandler implements CommandExecutor, TabCompleter
     }
     
     @Override
-    public boolean onCommand(@Nonnull CommandSender sender, @Nonnull Command cmd,
-                             @Nonnull String alias, @Nonnull String[] args)
+    public boolean onCommand(CommandSender sender, Command cmd,
+                             String alias, String[] args)
     {
         if(sender instanceof Player)
         {
@@ -60,8 +59,8 @@ public class CommandHandler implements CommandExecutor, TabCompleter
     }
     
     @Override
-    public List<String> onTabComplete(@Nonnull CommandSender sender, @Nonnull Command cmd,
-                                      @Nonnull String label, @Nonnull String[] args)
+    public List<String> onTabComplete(CommandSender sender, Command cmd,
+                                      String label, String[] args)
     {
         List<String> completes = new ArrayList<>();
         
