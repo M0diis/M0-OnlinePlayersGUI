@@ -1,10 +1,10 @@
 name: M0-OnlinePlayersGUI
 main: me.M0dii.OnlinePlayersGUI.OnlineGUI
 description: M0-OnlinePlayersGUI
-version: 2.7
+version: 2.8
 api-version: 1.16
 author: M0dii
-softdepend: [PlaceholderAPI]
+softdepend: [PlaceholderAPI, EssentialsX]
 commands:
   online:
     description: Online gui player list command.

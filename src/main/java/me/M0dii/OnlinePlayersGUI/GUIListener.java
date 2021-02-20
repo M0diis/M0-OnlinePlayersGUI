@@ -16,10 +16,7 @@ import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class GUIListener implements Listener
 {
@@ -86,7 +83,7 @@ public class GUIListener implements Listener
         {
             for(HumanEntity p : viewers)
             {
-                Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, () ->
+                Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, () ->
                         this.plugin.getGUI().showPlayers((Player)p), 20L);
             }
         }
@@ -164,7 +161,7 @@ public class GUIListener implements Listener
                 {
                     String replaced = PlaceholderAPI.setPlaceholders(skullOwner, cmd);
     
-                    findSender(player, replaced);
+                    sendCommand(player, replaced);
                 }
             }
         }
@@ -215,7 +212,8 @@ public class GUIListener implements Listener
         else if(clickedItem != null)
         {
             NamespacedKey key = new NamespacedKey(this.plugin, "IsCustom");
-            PersistentDataContainer cont = clickedItem.getItemMeta().getPersistentDataContainer();
+            PersistentDataContainer cont = clickedItem.getItemMeta()
+                    .getPersistentDataContainer();
             
             if(cont.has(key, PersistentDataType.STRING))
             {
@@ -230,27 +228,40 @@ public class GUIListener implements Listener
                     if(c != null)
                     {
                         List<String> cicmds = new ArrayList<>();
+                        
+                        boolean close = false;
     
                         if(e.isLeftClick())
+                        {
                             cicmds = c.getLeftClickCommands();
+                            
+                            if(c.closeOnLeft())
+                                close = true;
+                        }
     
                         if(e.isRightClick())
+                        {
                             cicmds = c.getRightClickCommands();
     
+                            if(c.closeOnRight())
+                                close = true;
+                        }
+    
                         for(String cmd : cicmds)
-                            findSender(player, cmd);
+                            sendCommand(player, cmd);
+                        
+                        if(close)
+                            player.closeInventory();
                     }
                 }
             }
         }
     }
     
-    private void findSender(HumanEntity player, String cmd)
+    private void sendCommand(HumanEntity player, String cmd)
     {
         if(cmd.startsWith("["))
         {
-            plugin.getLogger().info(cmd);
-            
             String sendAs = cmd.substring(cmd.indexOf("["), cmd.indexOf("]") + 2);
 
             cmd = cmd.substring(cmd.indexOf("]") + 2);

@@ -39,28 +39,28 @@ public class PlayerListGUI
     private final OnlineGUI plugin;
     private final int size;
     private final IEssentials ess;
-    private final Config config;
+    private final Config cfg;
     
     public PlayerListGUI(OnlineGUI plugin, int page)
     {
         this.plugin = plugin;
         this.ess = this.plugin.getEssentials();
-        this.config = this.plugin.getCfg();
+        this.cfg = this.plugin.getCfg();
         
         this.page = page + 1;
         
-        this.name = this.config.GUI_TITLE();
+        this.name = this.cfg.GUI_TITLE();
         
         this.size = this.initializeSize();
 
-        this.inv = Bukkit.createInventory(null, this.size, this.config.GUI_TITLE());
+        this.inv = Bukkit.createInventory(null, this.size, this.cfg.GUI_TITLE());
         
         this.plugin.setGUI(this);
     }
     
     private int initializeSize()
     {
-        int size = config.GUI_SIZE();
+        int size = cfg.GUI_SIZE();
         
         if(size % 9 == 0)
         {
@@ -140,7 +140,7 @@ public class PlayerListGUI
     
     public void showPlayers(Player player)
     {
-        List<Player> online = getOnline(config.ESSX_HOOK());
+        List<Player> online = getOnline(cfg.ESSX_HOOK());
         
         this.guiPages = new ArrayList<>();
         
@@ -152,7 +152,7 @@ public class PlayerListGUI
         {
             PlayerListGUI gui = new PlayerListGUI(this.plugin, page);
             
-            for(int slot = 0; slot < Math.min(config.GUI_SIZE() - 9, online.size()); slot++)
+            for(int slot = 0; slot < Math.min(cfg.GUI_SIZE() - 9, online.size()); slot++)
             {
                 if(curr < online.size())
                 {
@@ -166,12 +166,10 @@ public class PlayerListGUI
     
                     List<String> lore = new ArrayList<>();
     
-                    for(String s : config.HEAD_LORE())
-                    {
+                    for(String s : cfg.HEAD_LORE())
                         lore.add(format(PlaceholderAPI.setPlaceholders(p, s)));
-                    }
     
-                    meta.setDisplayName(format(PlaceholderAPI.setPlaceholders(p, config.HEAD_DISPLAY_NAME())));
+                    meta.setDisplayName(format(PlaceholderAPI.setPlaceholders(p, cfg.HEAD_DISPLAY_NAME())));
     
                     meta.setLore(lore);
     
@@ -185,14 +183,14 @@ public class PlayerListGUI
                 }
             }
             
-            if(!config.HIDE_BUTTONS_SINGLE_PAGE())
+            if(!cfg.HIDE_BUTTONS_SINGLE_PAGE())
             {
-                ItemStack nextButton = new ItemStack(config.NEXT_PAGE_MATERIAL());
+                ItemStack nextButton = new ItemStack(cfg.NEXT_PAGE_MATERIAL());
                 ItemMeta nextButtonMeta = nextButton.getItemMeta();
     
                 List<String> nextLore = new ArrayList<>();
     
-                for(String m : config.NEXT_PAGE_LORE())
+                for(String m : cfg.NEXT_PAGE_LORE())
                 {
                     nextLore.add(format(m));
                 }
@@ -203,20 +201,18 @@ public class PlayerListGUI
                         new NamespacedKey(plugin, "Button"),
                         PersistentDataType.STRING, "Next");
     
-                nextButtonMeta.setDisplayName(config.NEXT_PAGE_BUTTON_NAME());
+                nextButtonMeta.setDisplayName(cfg.NEXT_PAGE_BUTTON_NAME());
                 nextButton.setItemMeta(nextButtonMeta);
     
-                gui.setItem(config.GUI_SIZE() - 4, nextButton);
+                gui.setItem(cfg.GUI_SIZE() - 4, nextButton);
     
-                ItemStack prevButton = new ItemStack(config.PREV_PAGE_MATERIAL());
+                ItemStack prevButton = new ItemStack(cfg.PREV_PAGE_MATERIAL());
                 ItemMeta prevButtonMeta = prevButton.getItemMeta();
                 
                 List<String> prevLore = new ArrayList<>();
                 
-                for(String m : config.PREV_PAGE_LORE())
-                {
+                for(String m : cfg.PREV_PAGE_LORE())
                     prevLore.add(format(m));
-                }
                 
                 prevButtonMeta.setLore(prevLore);
     
@@ -224,17 +220,18 @@ public class PlayerListGUI
                         new NamespacedKey(plugin, "Button"),
                         PersistentDataType.STRING, "Previous");
     
-                prevButtonMeta.setDisplayName(config.PREV_PAGE_BUTTON_NAME());
+                prevButtonMeta.setDisplayName(cfg.PREV_PAGE_BUTTON_NAME());
                 prevButton.setItemMeta(prevButtonMeta);
                 
-                gui.setItem(config.GUI_SIZE() - 6, prevButton);
+                gui.setItem(cfg.GUI_SIZE() - 6, prevButton);
             }
             
-            List<CustomItem> customItems = this.config.getCustomItems();
+            List<CustomItem> customItems = this.cfg.getCustomItems();
     
             for(CustomItem c : customItems)
             {
                 ItemStack i = c.getItem();
+                ItemMeta m = i.getItemMeta();
                 
                 NamespacedKey key = new NamespacedKey(this.plugin, "Slot");
                 PersistentDataContainer cont = i.getItemMeta().getPersistentDataContainer();
@@ -243,14 +240,28 @@ public class PlayerListGUI
                 {
                     int slot = cont.get(key, PersistentDataType.INTEGER);
     
+                    List<String> lore = c.getLore();
+                    
+                    List<String> newLore = new ArrayList<>();
+                    
+                    for(String l : lore)
+                    {
+                        newLore.add(
+                                PlaceholderAPI.setPlaceholders(player, l));
+                    }
+
+                    
+                    m.setLore(newLore);
+                    
+                    i.setItemMeta(m);
+                    
                     gui.setItem(this.size - 10 + slot, i);
                 }
             }
             
             this.guiPages.add(gui);
         }
-
-    
+        
         this.guiPages.get(0).show(player, online.size());
         
         GUIListener.setWatchingPage(player, 1);
@@ -265,7 +276,7 @@ public class PlayerListGUI
         {
             counter++;
 
-            if(counter > this.config.GUI_SIZE() - 9)
+            if(counter > this.cfg.GUI_SIZE() - 9)
             {
                 pages++;
                 counter = 0;

@@ -1,9 +1,8 @@
 M0-OnlinePlayersGUI:
+  config-version: '1.0'
   ReloadMessage: '&2Configuration has been reloaded.'
   NoPermission: '&2You do not have permission to this command.'
   HideButtonsOnSinglePage: false
-  CloseOnLeftClick: false
-  CloseOnRightClick: false
   EssentialsXHook: false
   PreviousButton:
     Material: ENCHANTED_BOOK
@@ -37,47 +36,61 @@ M0-OnlinePlayersGUI:
       Name: ''
       Lore: []
       Commands:
+        CloseOnLeftClick: false
         Left-Click: []
+        CloseOnRightClick: false
         Right-Click: []
     2:
       Material: AIR
       Name: ''
       Lore: []
       Commands:
+        CloseOnLeftClick: false
         Left-Click: []
+        CloseOnRightClick: false
         Right-Click: []
     3:
       Material: AIR
       Name: ''
       Lore: []
       Commands:
+        CloseOnLeftClick: false
         Left-Click: []
+        CloseOnRightClick: false
         Right-Click: []
     5:
       Material: AIR
       Name: ''
       Lore: []
       Commands:
+        CloseOnLeftClick: false
         Left-Click: []
+        CloseOnRightClick: false
         Right-Click: []
     7:
       Material: AIR
       Name: ''
       Lore: []
       Commands:
+        CloseOnLeftClick: false
         Left-Click: []
+        CloseOnRightClick: false
         Right-Click: []
     8:
       Material: AIR
       Name: ''
       Lore: []
       Commands:
+        CloseOnLeftClick: false
         Left-Click: []
+        CloseOnRightClick: false
         Right-Click: []
     9:
       Material: AIR
       Name: ''
       Lore: []
       Commands:
+        CloseOnLeftClick: false
         Left-Click: []
+        CloseOnRightClick: false
         Right-Click: []

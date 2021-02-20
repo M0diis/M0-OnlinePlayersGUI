@@ -1,16 +1,14 @@
 package me.M0dii.OnlinePlayersGUI;
 
 import net.ess3.api.IEssentials;
+import org.bukkit.Bukkit;
+import org.bukkit.command.PluginCommand;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.Objects;
+import java.io.*;
 
 public class OnlineGUI extends JavaPlugin
 {
@@ -58,41 +56,21 @@ public class OnlineGUI extends JavaPlugin
     
     public void onEnable()
     {
-        this.configFile = new File(this.getDataFolder(), "config.yml");
-        
-        this.plugin = this;
+        this.prepareConfig();
     
-        if(!this.configFile.exists())
-        {
-            //noinspection ResultOfMethodCallIgnored
-            this.configFile.getParentFile().mkdirs();
-        
-            this.copy(this.getResource("config.yml"), configFile);
-        }
-        
-        this.cfg = YamlConfiguration.loadConfiguration(this.configFile);
-        
+        this.removeOldKeys();
+    
         this.config.load(this, this.cfg);
-        
-        if(this.config.ESSX_HOOK())
-        {
-            this.ess = (IEssentials)this.manager.getPlugin("Essentials");
-            
-            if(ess == null)
-                this.warning("Could not find EssentialsX.");
-        }
     
-        if (this.manager.getPlugin("PlaceholderAPI") == null)
-        {
-            this.warning("Could not find PlaceholderAPI! This plugin is required.");
-            
-            this.manager.disablePlugin(this);
-        }
-        
+        registerHooks();
+    
         this.manager.registerEvents(new GUIListener(this), this);
-        
-        Objects.requireNonNull(this.getCommand("online")).setExecutor(new CommandHandler(this));
     
+        PluginCommand cmd = this.getCommand("online");
+        
+        if(cmd != null)
+            cmd.setExecutor(new CommandHandler(this));
+        
         info("");
         info("+-----------------------------------------+");
         info(" ");
@@ -109,6 +87,23 @@ public class OnlineGUI extends JavaPlugin
         info("");
     }
     
+    private void registerHooks()
+    {
+        if(this.config.ESSX_HOOK())
+        {
+            this.ess = (IEssentials)this.manager.getPlugin("Essentials");
+            
+            if(this.ess == null)
+                this.warning("Could not find EssentialsX.");
+        }
+        
+        if (this.manager.getPlugin("PlaceholderAPI") == null)
+        {
+            this.warning("Could not find PlaceholderAPI! This plugin is required.");
+            
+            this.manager.disablePlugin(this);
+        }
+    }
     
     public void onDisable()
     {
@@ -123,6 +118,71 @@ public class OnlineGUI extends JavaPlugin
         this.manager.disablePlugin(this);
     }
     
+    private void prepareConfig()
+    {
+        this.configFile = new File(this.getDataFolder(), "config.yml");
+        this.plugin = this;
+        
+        if(!this.configFile.exists())
+        {
+            //noinspection ResultOfMethodCallIgnored
+            this.configFile.getParentFile().mkdirs();
+            
+            this.copy(this.getResource("config.yml"), this.configFile);
+        }
+        
+        try
+        {
+            this.getConfig().options().copyDefaults(true);
+            this.getConfig().save(this.configFile);
+        }
+        catch(IOException e)
+        {
+            e.printStackTrace();
+        }
+        
+        this.cfg = YamlConfiguration.loadConfiguration(this.configFile);
+    }
+    
+    public void removeOldKeys()
+    {
+        Bukkit.getScheduler().scheduleSyncDelayedTask(this, () -> {
+            
+            String cfgV = getConfig().getString(
+                    "M0-OnlinePlayersGUI.config-version");
+            
+            String curr = "1.1";
+    
+            if(cfgV == null || !cfgV.equalsIgnoreCase(curr))
+            {
+                boolean prevLC = getConfig().getBoolean(
+                        "M0-OnlinePlayersGUI.CloseOnLeftClick");
+    
+                boolean prevRC = getConfig().getBoolean(
+                        "M0-OnlinePlayersGUI.CloseOnRightClick");
+                
+                getConfig().set("M0-OnlinePlayersGUI.CloseOnLeftClick", "unused");
+                getConfig().set("M0-OnlinePlayersGUI.CloseOnRightClick", "unused");
+    
+                getConfig().set("M0-OnlinePlayersGUI.CloseOnLeftClick", null);
+                getConfig().set("M0-OnlinePlayersGUI.CloseOnRightClick", null);
+    
+                getConfig().set("M0-OnlinePlayersGUI.GUI.CloseOn.LeftClick", prevLC);
+                getConfig().set("M0-OnlinePlayersGUI.GUI.CloseOn.RightClick", prevRC);
+    
+                getConfig().set("M0-OnlinePlayersGUI.config-version", curr);
+    
+                try
+                {
+                    getConfig().save(configFile);
+                }
+                catch(IOException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        },20L);
+    }
     
     private void info(String message)
     {

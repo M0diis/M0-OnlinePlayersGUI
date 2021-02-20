@@ -1,5 +1,6 @@
 package me.M0dii.OnlinePlayersGUI;
 
+import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -44,6 +45,8 @@ public class Config
     
     FileConfiguration cfg;
     
+    private OnlineGUI plugin;
+    
     private static final String prefix = "M0-OnlinePlayersGUI.";
     
     private boolean getBool(String path)
@@ -64,16 +67,15 @@ public class Config
     public void load(OnlineGUI plugin, FileConfiguration cfg)
     {
         this.cfg = cfg;
+        this.plugin = plugin;
     
         UPDATE_ON_JOIN = getBool("GUI.UpdateOn.Join");
         UPDATE_ON_LEAVE = getBool("GUI.UpdateOn.Leave");
         
-        CLOSE_ON_LEFT_CLICK = getBool("CloseOnLeftClick");
-        CLOSE_ON_RIGHT_CLICK = getBool("CloseOnRightClick");
+        CLOSE_ON_LEFT_CLICK = getBool("GUI.CloseOn.LeftClick");
+        CLOSE_ON_RIGHT_CLICK = getBool("GUI.CloseOn.RightClick");
         
         HIDE_BUTTONS_ON_SINGLE = getBool("HideButtonsOnSinglePage");
-        
-        HIDE_BUTTONS_ON_SINGLE = getBool("CloseOnClick");
         
         HEAD_NAME = getStringf("PlayerDisplay.Name");
         
@@ -166,8 +168,14 @@ public class Config
                         PersistentDataType.STRING, "true");
                 
                 item.setItemMeta(meta);
+    
+                boolean colc = cfg.getBoolean(
+                        String.format("M0-OnlinePlayersGUI.CustomItems.%d.Commands.CloseOnLeftClick", i));
+    
+                boolean corc = cfg.getBoolean(
+                        String.format("M0-OnlinePlayersGUI.CustomItems.%d.Commands.CloseOnRightClick", i));
                 
-                CustomItem ci = new CustomItem(item, i, lcc, rcc);
+                CustomItem ci = new CustomItem(item, i, lcc, rcc, colc, corc, lore);
                 
                 this.CUSTOM_ITEMS.add(ci);
             }
@@ -274,6 +282,9 @@ public class Config
     
     public boolean ESSX_HOOK()
     {
+        if(this.plugin.getEssentials() == null)
+            return false;
+            
         return ESSENTIALSX_HOOK;
     }
     
