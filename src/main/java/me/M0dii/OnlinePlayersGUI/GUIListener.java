@@ -142,7 +142,7 @@ public class GUIListener implements Listener
     
     private void executeClickCommands(InventoryClickEvent e, List<String> cmds)
     {
-        HumanEntity player = e.getWhoClicked();
+        Player player = (Player)e.getWhoClicked();
         
         ItemStack clickedItem = e.getCurrentItem();
         
@@ -158,11 +158,7 @@ public class GUIListener implements Listener
                 Player skullOwner = Bukkit.getPlayer(ownerName);
                 
                 for(String cmd : cmds)
-                {
-                    String replaced = PlaceholderAPI.setPlaceholders(skullOwner, cmd);
-    
-                    sendCommand(player, replaced);
-                }
+                    sendCommand(player, cmd);
             }
         }
         else if((clickedItem != null) &&
@@ -258,8 +254,10 @@ public class GUIListener implements Listener
         }
     }
     
-    private void sendCommand(HumanEntity player, String cmd)
+    private void sendCommand(Player player, String cmd)
     {
+        cmd = PlaceholderAPI.setPlaceholders(player, cmd);
+        
         if(cmd.startsWith("["))
         {
             String sendAs = cmd.substring(cmd.indexOf("["), cmd.indexOf("]") + 2);
