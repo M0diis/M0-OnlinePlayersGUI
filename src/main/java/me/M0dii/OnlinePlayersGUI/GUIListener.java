@@ -8,6 +8,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -47,46 +48,39 @@ public class GUIListener implements Listener
     }
     
     @EventHandler
-    public void openGUI(InventoryOpenEvent e)
+    public void addViewer(InventoryOpenEvent e)
     {
-        String viewName = strip(e.getView().getTitle())
-                .replaceAll("\\d", "")
-                .trim();
-    
-        String title = strip(this.cfg.GUI_TITLE())
-                .replace("%playercount%", "")
-                .trim();
-        
-        if(viewName.contains(title))
+        if(isOnlineGUI(e))
             this.viewers.add(e.getPlayer());
     }
     
     @EventHandler
-    public void closeGUI(InventoryCloseEvent e)
+    public void removeViewer(InventoryCloseEvent e)
+    {
+        if(isOnlineGUI(e))
+            this.viewers.remove(e.getPlayer());
+    }
+    
+    private boolean isOnlineGUI(InventoryEvent e)
     {
         String viewName = strip(e.getView().getTitle())
                 .replaceAll("\\d", "")
                 .trim();
-    
+        
         String title = strip(this.cfg.GUI_TITLE())
                 .replace("%playercount%", "")
                 .trim();
         
-        if(viewName.contains(title))
-            this.viewers.remove(e.getPlayer());
+        return viewName.contains(title);
     }
     
     @EventHandler
     public void updateOnJoin(PlayerJoinEvent e)
     {
         if(this.cfg.UPDATE_ON_JOIN())
-        {
             for(HumanEntity p : viewers)
-            {
                 Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, () ->
                         this.plugin.getGUI().showPlayers((Player)p), 20L);
-            }
-        }
     }
     
     private String strip(String text)
@@ -98,13 +92,9 @@ public class GUIListener implements Listener
     public void updateOnLeave(PlayerQuitEvent e)
     {
         if(this.cfg.UPDATE_ON_LEAVE())
-        {
             for(HumanEntity p : viewers)
-            {
                 Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, () ->
                         this.plugin.getGUI().showPlayers((Player)p), 20L);
-            }
-        }
     }
     
     @EventHandler
@@ -158,14 +148,14 @@ public class GUIListener implements Listener
                 Player skullOwner = Bukkit.getPlayer(ownerName);
                 
                 for(String cmd : cmds)
-                    sendCommand(player, cmd);
+                    sendCommand(player, skullOwner, cmd);
             }
         }
         else if((clickedItem != null) &&
           (clickedItem.getType().equals(this.cfg.PREV_PAGE_MATERIAL())
         || clickedItem.getType().equals(this.cfg.NEXT_PAGE_MATERIAL())))
         {
-            int page = getWatchingPage((Player)player);
+            int page = getWatchingPage(player);
 
             NamespacedKey key = new NamespacedKey(this.plugin, "Button");
             PersistentDataContainer cont = clickedItem.getItemMeta().getPersistentDataContainer();
@@ -244,7 +234,7 @@ public class GUIListener implements Listener
                         }
     
                         for(String cmd : cicmds)
-                            sendCommand(player, cmd);
+                            sendCommand(player, player, cmd);
                         
                         if(close)
                             player.closeInventory();
@@ -254,9 +244,10 @@ public class GUIListener implements Listener
         }
     }
     
-    private void sendCommand(Player player, String cmd)
+    private void sendCommand(Player sender, Player placeholderHolder, String cmd)
     {
-        cmd = PlaceholderAPI.setPlaceholders(player, cmd);
+        cmd = PlaceholderAPI.setPlaceholders(placeholderHolder, cmd);
+        cmd = cmd.replace("%sender_name%", sender.getName());
         
         if(cmd.startsWith("["))
         {
@@ -265,12 +256,12 @@ public class GUIListener implements Listener
             cmd = cmd.substring(cmd.indexOf("]") + 2);
 
             if(sendAs.equalsIgnoreCase("[PLAYER] "))
-                Bukkit.dispatchCommand(player, cmd);
+                Bukkit.dispatchCommand(sender, cmd);
             else if(sendAs.equalsIgnoreCase("[CONSOLE] "))
                 Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
                         cmd.replace("[CONSOLE] ", ""));
         }
-        else Bukkit.dispatchCommand(player, cmd);
+        else Bukkit.dispatchCommand(sender, cmd);
     }
     
     private CustomItem getCustomItemBySlot(int slot)

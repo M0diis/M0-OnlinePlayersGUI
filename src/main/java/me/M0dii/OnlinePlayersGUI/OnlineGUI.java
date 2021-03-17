@@ -12,21 +12,24 @@ import java.io.*;
 
 public class OnlineGUI extends JavaPlugin
 {
-    public OnlineGUI plugin;
-    
     private final PluginManager manager;
     
     public OnlineGUI()
     {
         this.manager = getServer().getPluginManager();
         
-        this.config = new Config();
+        this.cfg = new Config(this);
     }
     
-    FileConfiguration cfg = null;
-    File configFile = null;
+    private FileConfiguration fileCfg = null;
+    private File configFile = null;
     
-    private final Config config;
+    private final Config cfg;
+    
+    public Config getCfg()
+    {
+        return this.cfg;
+    }
     
     private IEssentials ess = null;
     private PlayerListGUI playerListGUI = null;
@@ -44,9 +47,9 @@ public class OnlineGUI extends JavaPlugin
     public void renewConfig()
     {
         this.configFile = new File(this.getDataFolder(), "config.yml");
-        this.cfg = YamlConfiguration.loadConfiguration(this.configFile);
+        this.fileCfg = YamlConfiguration.loadConfiguration(this.configFile);
         
-        this.config.load(this, this.cfg);
+        this.cfg.reload();
     }
     
     public IEssentials getEssentials()
@@ -60,7 +63,7 @@ public class OnlineGUI extends JavaPlugin
     
         this.removeOldKeys();
     
-        this.config.load(this, this.cfg);
+        this.cfg.load();
     
         registerHooks();
     
@@ -71,9 +74,6 @@ public class OnlineGUI extends JavaPlugin
         if(cmd != null)
             cmd.setExecutor(new CommandHandler(this));
         
-        info("");
-        info("+-----------------------------------------+");
-        info(" ");
         info("  __  __  ___  ");
         info(" |  \\/  |/ _ \\ ");
         info(" | \\  / | | | |");
@@ -82,14 +82,12 @@ public class OnlineGUI extends JavaPlugin
         info(" |_|  |_|\\___/");
         info(" ");
         info("M0-OnlinePlayersGUI has been successfully enabled!");
-        info(" ");
-        info("+-----------------------------------------+");
         info("");
     }
     
     private void registerHooks()
     {
-        if(this.config.ESSX_HOOK())
+        if(this.cfg.ESSX_HOOK())
         {
             this.ess = (IEssentials)this.manager.getPlugin("Essentials");
             
@@ -100,6 +98,7 @@ public class OnlineGUI extends JavaPlugin
         if (this.manager.getPlugin("PlaceholderAPI") == null)
         {
             this.warning("Could not find PlaceholderAPI! This plugin is required.");
+            this.warning("Disabling M0-OnlinePlayersGUI..");
             
             this.manager.disablePlugin(this);
         }
@@ -108,20 +107,16 @@ public class OnlineGUI extends JavaPlugin
     public void onDisable()
     {
         info("");
-        info("+-----------------------------------------+");
-        info(" ");
         info("M0-OnlinePlayersGUI has been successfully disabled!");
-        info(" ");
-        info("+-----------------------------------------+");
         info("");
         
-        this.manager.disablePlugin(this);
+        if(this.isEnabled())
+            this.manager.disablePlugin(this);
     }
     
     private void prepareConfig()
     {
         this.configFile = new File(this.getDataFolder(), "config.yml");
-        this.plugin = this;
         
         if(!this.configFile.exists())
         {
@@ -141,7 +136,7 @@ public class OnlineGUI extends JavaPlugin
             e.printStackTrace();
         }
         
-        this.cfg = YamlConfiguration.loadConfiguration(this.configFile);
+        this.fileCfg = YamlConfiguration.loadConfiguration(this.configFile);
     }
     
     public void removeOldKeys()
@@ -219,10 +214,5 @@ public class OnlineGUI extends JavaPlugin
                 e.printStackTrace();
             }
         }
-    }
-    
-    public Config getCfg()
-    {
-        return this.config;
     }
 }

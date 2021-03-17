@@ -27,9 +27,9 @@ M0-OnlinePlayersGUI:
       - '&2Left click to &asay hi&2.'
     Commands:
       Left-Click:
-        - '[PLAYER] tp %player_name%'
+        - '[PLAYER] msg %player_name% Hello, my name is %sender_name%.'
       Right-Click:
-        - '[CONSOLE] msg %player_name% Hello!'
+        - '[CONSOLE] msg %player_name% Hello! '
   CustomItems:
     1:
       Material: AIR

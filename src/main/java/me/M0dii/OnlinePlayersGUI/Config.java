@@ -1,6 +1,5 @@
 package me.M0dii.OnlinePlayersGUI;
 
-import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -41,11 +40,23 @@ public class Config
     
     private boolean ESSENTIALSX_HOOK;
     
-    public Config() { }
+    private final OnlineGUI plugin;
+    
+    public Config(OnlineGUI plugin)
+    {
+        this.plugin = plugin;
+        this.cfg = plugin.getConfig();
+    }
+    
+    public void reload()
+    {
+        plugin.reloadConfig();
+        this.cfg = plugin.getConfig();
+        
+        this.load();
+    }
     
     FileConfiguration cfg;
-    
-    private OnlineGUI plugin;
     
     private static final String prefix = "M0-OnlinePlayersGUI.";
     
@@ -64,11 +75,8 @@ public class Config
         return cfg.getStringList(prefix + path);
     }
 
-    public void load(OnlineGUI plugin, FileConfiguration cfg)
+    public void load()
     {
-        this.cfg = cfg;
-        this.plugin = plugin;
-    
         UPDATE_ON_JOIN = getBool("GUI.UpdateOn.Join");
         UPDATE_ON_LEAVE = getBool("GUI.UpdateOn.Leave");
         
@@ -91,19 +99,13 @@ public class Config
         
         GUI_SIZE = cfg.getInt("M0-OnlinePlayersGUI.GUI.Size");
     
-        String mat1 = cfg.getString("NextButton.Material");
-        String mat2 = cfg.getString("PreviousButton.Material");
+        String mat1 = cfg.getString("NextButton.Material", "ENCHANTED_BOOK");
+        String mat2 = cfg.getString("PreviousButton.Material", "ENCHANTED_BOOK");
         
-        if(mat1 == null)
-            mat1 = "ENCHANTED_BOOK";
-    
-        if(mat2 == null)
-            mat2 = "ENCHANTED_BOOK";
-        
-        PREVIOUS_PAGE_MATERIAL = Material.getMaterial(mat1);
+        PREVIOUS_PAGE_MATERIAL = Material.getMaterial(mat1 != null ? mat1 : "ENCHANTED_BOOK");
         if(PREVIOUS_PAGE_MATERIAL == null) PREVIOUS_PAGE_MATERIAL = Material.BOOK;
         
-        NEXT_PAGE_MATERIAL = Material.getMaterial(mat2);
+        NEXT_PAGE_MATERIAL = Material.getMaterial(mat2 != null ? mat2 : "ENCHANTED_BOOK");
         if(NEXT_PAGE_MATERIAL == null) NEXT_PAGE_MATERIAL = Material.BOOK;
         
         PREVIOUS_PAGE_LORE = getStringList("PreviousButton.Lore");
@@ -127,57 +129,61 @@ public class Config
         
         for(int i : slots)
         {
-            Material CI_ITEM = Material.getMaterial(
-                    cfg.getString(String.format("M0-OnlinePlayersGUI.CustomItems.%d.Material", i)));
+            String itemName = cfg.getString(
+                    String.format("M0-OnlinePlayersGUI.CustomItems.%d.Material", i), "BOOK");
             
-            if(CI_ITEM != null && !CI_ITEM.equals(Material.AIR))
+            if(itemName != null)
             {
-                ItemStack item = new ItemStack(CI_ITEM);
-                
-                String CI_NAME = getStringf(String.format("CustomItems.%d.Name", i));
+                Material CI_ITEM = Material.getMaterial(itemName);
     
-                List<String> CI_LORE = getStringList(String.format("CustomItems.%d.Lore", i));
-                
-                ItemMeta meta = item.getItemMeta();
-                
-                if(CI_NAME.length() != 0)
-                    meta.setDisplayName(CI_NAME);
-                
-                List<String> lore = new ArrayList<>();
-                
-                if(CI_LORE.size() != 0)
+                if(CI_ITEM != null && !CI_ITEM.equals(Material.AIR))
                 {
-                    for(String l : CI_LORE)
-                        lore.add(format(l));
-                    
-                    meta.setLore(lore);
+                    ItemStack item = new ItemStack(CI_ITEM);
+    
+                    String CI_NAME = getStringf(
+                            String.format("CustomItems.%d.Name", i));
+    
+                    List<String> CI_LORE = getStringList(
+                            String.format("CustomItems.%d.Lore", i));
+    
+                    ItemMeta meta = item.getItemMeta();
+    
+                    if(CI_NAME.length() != 0) meta.setDisplayName(CI_NAME);
+    
+                    List<String> lore = new ArrayList<>();
+    
+                    if(CI_LORE.size() != 0)
+                    {
+                        for(String l : CI_LORE)
+                            lore.add(format(l));
+    
+                        meta.setLore(lore);
+                    }
+    
+                    List<String> lcc = cfg.getStringList(
+                            String.format(prefix + "CustomItems.%d.Commands.Left-Click", i));
+    
+                    List<String> rcc = cfg.getStringList(
+                            String.format(prefix + "CustomItems.%d.Commands.Right-Click", i));
+    
+                    meta.getPersistentDataContainer().set(
+                            new NamespacedKey(plugin, "Slot"), PersistentDataType.INTEGER, i);
+    
+                    meta.getPersistentDataContainer().set(
+                            new NamespacedKey(plugin, "IsCustom"), PersistentDataType.STRING, "true");
+    
+                    item.setItemMeta(meta);
+    
+                    boolean colc = cfg.getBoolean(
+                            String.format(prefix + "CustomItems.%d.Commands.CloseOnLeftClick", i));
+    
+                    boolean corc = cfg.getBoolean(
+                            String.format(prefix + "CustomItems.%d.Commands.CloseOnRightClick", i));
+    
+                    CustomItem ci = new CustomItem(item, i, lcc, rcc, colc, corc, lore);
+    
+                    this.CUSTOM_ITEMS.add(ci);
                 }
-                
-                List<String> lcc = cfg.getStringList(
-                        String.format("M0-OnlinePlayersGUI.CustomItems.%d.Commands.Left-Click", i));
-    
-                List<String> rcc = cfg.getStringList(
-                        String.format("M0-OnlinePlayersGUI.CustomItems.%d.Commands.Right-Click", i));
-                
-                meta.getPersistentDataContainer().set(
-                        new NamespacedKey(plugin, "Slot"),
-                        PersistentDataType.INTEGER, i);
-    
-                meta.getPersistentDataContainer().set(
-                        new NamespacedKey(plugin, "IsCustom"),
-                        PersistentDataType.STRING, "true");
-                
-                item.setItemMeta(meta);
-    
-                boolean colc = cfg.getBoolean(
-                        String.format("M0-OnlinePlayersGUI.CustomItems.%d.Commands.CloseOnLeftClick", i));
-    
-                boolean corc = cfg.getBoolean(
-                        String.format("M0-OnlinePlayersGUI.CustomItems.%d.Commands.CloseOnRightClick", i));
-                
-                CustomItem ci = new CustomItem(item, i, lcc, rcc, colc, corc, lore);
-                
-                this.CUSTOM_ITEMS.add(ci);
             }
         }
     }
@@ -288,11 +294,13 @@ public class Config
         return ESSENTIALSX_HOOK;
     }
     
-    public Material NEXT_PAGE_MATERIAL() {
+    public Material NEXT_PAGE_MATERIAL()
+    {
         return this.NEXT_PAGE_MATERIAL;
     }
     
-    public Material PREV_PAGE_MATERIAL() {
+    public Material PREV_PAGE_MATERIAL()
+    {
         return this.PREVIOUS_PAGE_MATERIAL;
     }
 }

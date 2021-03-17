@@ -24,28 +24,28 @@ public class CommandHandler implements CommandExecutor, TabCompleter
     public boolean onCommand(CommandSender sender, Command cmd,
                              String alias, String[] args)
     {
+        if(args.length == 1)
+        {
+            if(args[0].equalsIgnoreCase("reload"))
+            {
+                if(sender.hasPermission("m0onlinegui.command.reload"))
+                {
+                    this.plugin.reloadConfig();
+                    this.plugin.saveConfig();
+                
+                    this.plugin.renewConfig();
+    
+                    sender.sendMessage(this.config.CONFIG_RELOAD_MSG());
+                }
+                else sender.sendMessage(this.config.NO_PERMISSION_MSG());
+            
+                return true;
+            }
+        }
+        
         if(sender instanceof Player)
         {
             Player p = (Player)sender;
-            
-            if(args.length == 1)
-            {
-                if(args[0].equalsIgnoreCase("reload"))
-                {
-                    if(p.hasPermission("m0onlinegui.command.reload"))
-                    {
-                        this.plugin.reloadConfig();
-                        this.plugin.saveConfig();
-    
-                        this.plugin.renewConfig();
-    
-                        p.sendMessage(this.config.CONFIG_RELOAD_MSG());
-                    }
-                    else p.sendMessage(this.config.NO_PERMISSION_MSG());
-                    
-                    return true;
-                }
-            }
             
             if(p.hasPermission("m0onlinegui.command.onlinegui"))
                 new PlayerListGUI(this.plugin, 0).showPlayers(p);

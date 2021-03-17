@@ -6,8 +6,9 @@ import java.util.List;
 
 public class CustomItem
 {
-    private final ItemStack itemStack;
     private final int itemSlot;
+    private final ItemStack itemStack;
+    
     private final List<String> leftClickCommands;
     private final List<String> rightClickCommands;
     

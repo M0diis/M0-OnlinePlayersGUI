@@ -35,46 +35,38 @@ public class PlayerListGUI
     
     private final Inventory inv;
     private final String name;
-    private final int page;
+    private final int displayPage;
     private final OnlineGUI plugin;
     private final int size;
-    private final IEssentials ess;
     private final Config cfg;
     
     public PlayerListGUI(OnlineGUI plugin, int page)
     {
         this.plugin = plugin;
-        this.ess = this.plugin.getEssentials();
         this.cfg = this.plugin.getCfg();
         
-        this.page = page + 1;
+        this.displayPage = page + 1;
         
         this.name = this.cfg.GUI_TITLE();
         
-        this.size = this.initializeSize();
+        this.size = this.getCorrectSize();
 
         this.inv = Bukkit.createInventory(null, this.size, this.cfg.GUI_TITLE());
         
         this.plugin.setGUI(this);
     }
     
-    private int initializeSize()
+    private int getCorrectSize()
     {
         int size = cfg.GUI_SIZE();
         
         if(size % 9 == 0)
-        {
             return size;
-        }
         else if (size < 18)
-        {
             return 18;
-        }
         else if (size > 54)
-        {
             return 54;
-        }
-        
+
         return 54;
     }
     
@@ -83,9 +75,9 @@ public class PlayerListGUI
         this.inv.setItem(slot, item);
     }
     
-    public int getPage()
+    public int getDisplayPage()
     {
-        return this.page;
+        return this.displayPage;
     }
     
     public PlayerListGUI getGUI()
@@ -125,7 +117,8 @@ public class PlayerListGUI
         if(hook)
         {
             online = Bukkit.getOnlinePlayers().stream().filter(p ->
-                    !p.hasPermission("m0onlinegui.hidden") && !ess.getUser(p).isVanished())
+                    !p.hasPermission("m0onlinegui.hidden")
+                            && !plugin.getEssentials().getUser(p).isVanished())
                     .collect(Collectors.toList());
         }
         else
@@ -140,11 +133,11 @@ public class PlayerListGUI
     
     public void showPlayers(Player player)
     {
-        List<Player> online = getOnline(cfg.ESSX_HOOK());
+        List<Player> online = getOnline(this.cfg.ESSX_HOOK());
         
         this.guiPages = new ArrayList<>();
         
-        int requiredPages = calculatePages(online);
+        int requiredPages = getRequiredPages(online);
         
         int curr = 0;
         
@@ -160,8 +153,6 @@ public class PlayerListGUI
     
                     Player p = online.get(curr);
                     
-                    curr++;
-    
                     ItemMeta meta = head.getItemMeta();
     
                     List<String> lore = new ArrayList<>();
@@ -169,7 +160,8 @@ public class PlayerListGUI
                     for(String s : cfg.HEAD_LORE())
                         lore.add(format(PlaceholderAPI.setPlaceholders(p, s)));
     
-                    meta.setDisplayName(format(PlaceholderAPI.setPlaceholders(p, cfg.HEAD_DISPLAY_NAME())));
+                    meta.setDisplayName(
+                            format(PlaceholderAPI.setPlaceholders(p, cfg.HEAD_DISPLAY_NAME())));
     
                     meta.setLore(lore);
     
@@ -180,6 +172,8 @@ public class PlayerListGUI
                     head.setItemMeta(sm);
     
                     gui.setItem(slot, head);
+    
+                    curr++;
                 }
             }
             
@@ -191,9 +185,7 @@ public class PlayerListGUI
                 List<String> nextLore = new ArrayList<>();
     
                 for(String m : cfg.NEXT_PAGE_LORE())
-                {
                     nextLore.add(format(m));
-                }
     
                 nextButtonMeta.setLore(nextLore);
     
@@ -230,11 +222,11 @@ public class PlayerListGUI
     
             for(CustomItem c : customItems)
             {
-                ItemStack i = c.getItem();
-                ItemMeta m = i.getItemMeta();
+                ItemStack item = c.getItem();
+                ItemMeta m = item.getItemMeta();
                 
                 NamespacedKey key = new NamespacedKey(this.plugin, "Slot");
-                PersistentDataContainer cont = i.getItemMeta().getPersistentDataContainer();
+                PersistentDataContainer cont = item.getItemMeta().getPersistentDataContainer();
     
                 if(cont.has(key, PersistentDataType.INTEGER))
                 {
@@ -245,17 +237,13 @@ public class PlayerListGUI
                     List<String> newLore = new ArrayList<>();
                     
                     for(String l : lore)
-                    {
-                        newLore.add(
-                                PlaceholderAPI.setPlaceholders(player, l));
-                    }
-
+                        newLore.add(PlaceholderAPI.setPlaceholders(player, l));
                     
                     m.setLore(newLore);
                     
-                    i.setItemMeta(m);
+                    item.setItemMeta(m);
                     
-                    gui.setItem(this.size - 10 + slot, i);
+                    gui.setItem(this.size - 10 + slot, item);
                 }
             }
             
@@ -267,7 +255,7 @@ public class PlayerListGUI
         GUIListener.setWatchingPage(player, 1);
     }
     
-    private int calculatePages(List<Player> players)
+    private int getRequiredPages(List<Player> players)
     {
         int pages = 1;
         int counter = 0;
