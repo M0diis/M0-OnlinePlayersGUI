@@ -1,14 +1,21 @@
 package me.M0dii.OnlinePlayersGUI;
 
 import net.ess3.api.IEssentials;
+import org.bstats.charts.CustomChart;
+import org.bstats.charts.MultiLineChart;
+import org.bstats.charts.SingleLineChart;
 import org.bukkit.Bukkit;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bstats.bukkit.Metrics;
 
 import java.io.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.Callable;
 
 public class OnlineGUI extends JavaPlugin
 {
@@ -73,6 +80,20 @@ public class OnlineGUI extends JavaPlugin
         
         if(cmd != null)
             cmd.setExecutor(new CommandHandler(this));
+        
+        Metrics metrics = new Metrics(this, 10924);
+    
+        CustomChart c = new MultiLineChart("players_and_servers", () ->
+        {
+            Map<String, Integer> valueMap = new HashMap<>();
+            
+            valueMap.put("servers", 1);
+            valueMap.put("players", Bukkit.getOnlinePlayers().size());
+            
+            return valueMap;
+        });
+        
+        metrics.addCustomChart(c);
         
         info("  __  __  ___  ");
         info(" |  \\/  |/ _ \\ ");

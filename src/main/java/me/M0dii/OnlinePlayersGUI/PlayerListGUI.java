@@ -158,10 +158,10 @@ public class PlayerListGUI
                     List<String> lore = new ArrayList<>();
     
                     for(String s : cfg.HEAD_LORE())
-                        lore.add(format(PlaceholderAPI.setPlaceholders(p, s)));
+                        lore.add(Utils.format(PlaceholderAPI.setPlaceholders(p, s)));
     
                     meta.setDisplayName(
-                            format(PlaceholderAPI.setPlaceholders(p, cfg.HEAD_DISPLAY_NAME())));
+                            Utils.format(PlaceholderAPI.setPlaceholders(p, cfg.HEAD_DISPLAY_NAME())));
     
                     meta.setLore(lore);
     
@@ -185,7 +185,7 @@ public class PlayerListGUI
                 List<String> nextLore = new ArrayList<>();
     
                 for(String m : cfg.NEXT_PAGE_LORE())
-                    nextLore.add(format(m));
+                    nextLore.add(Utils.format(m));
     
                 nextButtonMeta.setLore(nextLore);
     
@@ -204,7 +204,7 @@ public class PlayerListGUI
                 List<String> prevLore = new ArrayList<>();
                 
                 for(String m : cfg.PREV_PAGE_LORE())
-                    prevLore.add(format(m));
+                    prevLore.add(Utils.format(m));
                 
                 prevButtonMeta.setLore(prevLore);
     
@@ -272,10 +272,5 @@ public class PlayerListGUI
         }
         
         return pages;
-    }
-    
-    private static String format(String text)
-    {
-        return ChatColor.translateAlternateColorCodes('&', text);
     }
 }

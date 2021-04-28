@@ -1,5 +1,6 @@
 package me.M0dii.OnlinePlayersGUI;
 
+import net.kyori.adventure.text.Component;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -8,6 +9,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -148,7 +150,8 @@ public class Config
     
                     ItemMeta meta = item.getItemMeta();
     
-                    if(CI_NAME.length() != 0) meta.setDisplayName(CI_NAME);
+                    if(CI_NAME.length() != 0)
+                        meta.setDisplayName(CI_NAME);
     
                     List<String> lore = new ArrayList<>();
     
@@ -156,7 +159,7 @@ public class Config
                     {
                         for(String l : CI_LORE)
                             lore.add(format(l));
-    
+
                         meta.setLore(lore);
                     }
     
@@ -188,9 +191,9 @@ public class Config
         }
     }
     
-    private String format(String text)
+    private String format(@Nullable String text)
     {
-        if(text.isEmpty() || text == null)
+        if(text == null || text.isEmpty())
             return text;
         
         return ChatColor.translateAlternateColorCodes('&', text);
