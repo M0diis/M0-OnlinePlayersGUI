@@ -1,8 +1,7 @@
 package me.M0dii.OnlinePlayersGUI;
 
-import net.ess3.api.IEssentials;
+import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.HumanEntity;
@@ -11,8 +10,6 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
-
-import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
@@ -128,7 +125,24 @@ public class PlayerListGUI
                     .collect(Collectors.toList());
         }
         
-        return online;
+        return cfg.isConditionRequired() ? filterByCondition(online) : online;
+    }
+    
+    private List<Player> filterByCondition(List<Player> players)
+    {
+        List<Player> filtered = new ArrayList<>();
+        
+        String condition = cfg.getCondition();
+    
+        for(Player p : players)
+        {
+            String result = PlaceholderAPI.setPlaceholders(p, condition).toLowerCase();
+        
+            if(result.equals("yes") || result.equals("true"))
+                filtered.add(p);
+        }
+        
+        return filtered;
     }
     
     public void showPlayers(Player player)

@@ -4,11 +4,13 @@ plugins {
 }
 
 group 'me.M0dii'
-version '2.10'
+version '2.11'
 sourceCompatibility = '8'
 
 shadowJar {
     relocate 'org.bstats', 'me.M0dii.OnlinePlayersGUI'
+
+    archiveFileName = "M0-OnlinePlayersGUI-${version}.jar"
 }
 
 repositories {

@@ -4,6 +4,9 @@ M0-OnlinePlayersGUI:
   NoPermission: '&2You do not have permission to this command.'
   HideButtonsOnSinglePage: false
   EssentialsXHook: false
+  Condition:
+    Required: false
+    Placeholder: "%checkitem_mat:DIRT%"
   PreviousButton:
     Material: ENCHANTED_BOOK
     Name: '&cPrevious Page'

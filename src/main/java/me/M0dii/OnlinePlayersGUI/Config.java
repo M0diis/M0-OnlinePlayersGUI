@@ -16,31 +16,24 @@ import java.util.List;
 public class Config
 {
     private String HEAD_NAME;
-    private String CONFIG_RELOADED;
-    private String NO_PERMISSION;
+    private String CONFIG_RELOADED, NO_PERMISSION;
     
-    private String PREVIOUS_PAGE_NAME;
-    private String NEXT_PAGE_NAME;
+    private String NEXT_PAGE_NAME, PREVIOUS_PAGE_NAME;
     private String GUI_TITLE;
     
-    private List<String> HEAD_LORE;
-    private List<String> LEFT_CLICK_COMMANDS;
-    private List<String> RIGHT_CLICK_COMMANDS;
+    private List<String> HEAD_LORE, NEXT_PAGE_LORE, PREVIOUS_PAGE_LORE;
+    private List<String> LEFT_CLICK_COMMANDS, RIGHT_CLICK_COMMANDS;
     
-    private List<String> PREVIOUS_PAGE_LORE;
-    private List<String> NEXT_PAGE_LORE;
-    
-    private boolean CLOSE_ON_LEFT_CLICK;
-    private boolean CLOSE_ON_RIGHT_CLICK;
-    private boolean UPDATE_ON_JOIN;
-    private boolean UPDATE_ON_LEAVE;
-    private boolean HIDE_BUTTONS_ON_SINGLE;
+    private boolean CLOSE_ON_LEFT_CLICK, CLOSE_ON_RIGHT_CLICK;
+    private boolean UPDATE_ON_JOIN, UPDATE_ON_LEAVE, HIDE_BUTTONS_ON_SINGLE;
     private int GUI_SIZE;
     
-    private Material PREVIOUS_PAGE_MATERIAL;
-    private Material NEXT_PAGE_MATERIAL;
+    private Material NEXT_PAGE_MATERIAL, PREVIOUS_PAGE_MATERIAL;
     
     private boolean ESSENTIALSX_HOOK;
+    
+    private boolean CONDITION_REQUIRED;
+    private String CONDITION;
     
     private final OnlineGUI plugin;
     
@@ -117,6 +110,9 @@ public class Config
         NEXT_PAGE_NAME = getStringf("NextButton.Name");
         
         ESSENTIALSX_HOOK = getBool("EssentialsXHook");
+        
+        CONDITION_REQUIRED = cfg.getBoolean("M0-OnlinePlayersGUI.Condition.Required", false);
+        CONDITION = cfg.getString("M0-OnlinePlayersGUI.Condition.Placeholder");
         
         setUpCustomItems(plugin);
     }
@@ -305,5 +301,15 @@ public class Config
     public Material PREV_PAGE_MATERIAL()
     {
         return this.PREVIOUS_PAGE_MATERIAL;
+    }
+    
+    public boolean isConditionRequired()
+    {
+        return this.CONDITION_REQUIRED;
+    }
+    
+    public String getCondition()
+    {
+        return this.CONDITION;
     }
 }
