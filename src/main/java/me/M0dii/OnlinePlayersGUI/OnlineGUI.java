@@ -104,6 +104,22 @@ public class OnlineGUI extends JavaPlugin
         info(" ");
         info("M0-OnlinePlayersGUI has been successfully enabled!");
         info("");
+        
+        checkForUpdates();
+    }
+    
+    private void checkForUpdates()
+    {
+        new UpdateChecker(this, 86813).getVersion(ver ->
+        {
+            if (!this.getDescription().getVersion().equalsIgnoreCase(
+                    ver.replace("v", "")))
+            {
+                info("You are running an outdated version of M0-CoreCord.");
+                info("You can download the latest version on Spigot:");
+                info("https://www.spigotmc.org/resources/m0-onlineplayersgui.86813/");
+            }
+        });
     }
     
     private void registerHooks()
