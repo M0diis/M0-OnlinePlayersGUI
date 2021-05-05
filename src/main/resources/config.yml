@@ -1,9 +1,18 @@
 M0-OnlinePlayersGUI:
+  # Do not modify this
   config-version: '1.0'
   ReloadMessage: '&2Configuration has been reloaded.'
   NoPermission: '&2You do not have permission to this command.'
+  # Whether to hide buttons if there are not enough players
+  # to fill up more than one page
   HideButtonsOnSinglePage: false
+  # Hook to EssentialsX which will hide players
+  # in the GUI if they are vanished
   EssentialsXHook: false
+  # Conditional display
+  # It will check whether the placeholder applies (is true) for the
+  # player and if not, it will exclude the player from the GUI
+  # https://github.com/PlaceholderAPI/PlaceholderAPI/wiki/Placeholders
   Condition:
     Required: false
     Placeholder: "%checkitem_mat:DIRT%"
@@ -17,12 +26,17 @@ M0-OnlinePlayersGUI:
     Name: '&aNext Page'
     Lore:
       - '&7Click to open next page.'
+  # Size should be in increments of 9 and not
+  # lower than 9 or higher than 54
+  # 9 slots is one row
   GUI:
     Size: 18
     Title: '&2Online Players'
     UpdateOn:
       Join: true
       Leave: true
+  # Player display configuration
+  # Every section supports placeholders
   PlayerDisplay:
     Name: '&6%player_name%'
     Lore:
@@ -33,6 +47,9 @@ M0-OnlinePlayersGUI:
         - '[PLAYER] msg %player_name% Hello, my name is %sender_name%.'
       Right-Click:
         - '[CONSOLE] msg %player_name% Hello! '
+  # Custom Items
+  # These items will be displayed in the same row as
+  # the previous and next buttons are
   CustomItems:
     1:
       Material: AIR
