@@ -3,6 +3,7 @@ M0-OnlinePlayersGUI:
   config-version: '1.0'
   ReloadMessage: '&2Configuration has been reloaded.'
   NoPermission: '&2You do not have permission to this command.'
+  ToggleMessage: '&2You have toggled your visibility in Online GUI.'
   # Whether to hide buttons if there are not enough players
   # to fill up more than one page
   HideButtonsOnSinglePage: false

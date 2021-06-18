@@ -111,17 +111,21 @@ public class PlayerListGUI
     {
         List<Player> online = new ArrayList<>();
         
+        List<Player> toggled = plugin.getHiddenPlayersToggled();
+        
         if(hook)
         {
             online = Bukkit.getOnlinePlayers().stream().filter(p ->
                     !p.hasPermission("m0onlinegui.hidden")
-                            && !plugin.getEssentials().getUser(p).isVanished())
+                    || !plugin.getEssentials().getUser(p).isVanished()
+                    || !toggled.contains(p))
                     .collect(Collectors.toList());
         }
         else
         {
             online = Bukkit.getOnlinePlayers().stream().filter(p ->
-                    !p.hasPermission("m0onlinegui.hidden"))
+                    !p.hasPermission("m0onlinegui.hidden")
+                    || !toggled.contains(p))
                     .collect(Collectors.toList());
         }
         

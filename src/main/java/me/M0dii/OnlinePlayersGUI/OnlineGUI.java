@@ -1,21 +1,22 @@
 package me.M0dii.OnlinePlayersGUI;
 
 import net.ess3.api.IEssentials;
+import org.bstats.bukkit.Metrics;
 import org.bstats.charts.CustomChart;
 import org.bstats.charts.MultiLineChart;
-import org.bstats.charts.SingleLineChart;
 import org.bukkit.Bukkit;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bstats.bukkit.Metrics;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Callable;
 
 public class OnlineGUI extends JavaPlugin
 {
@@ -25,10 +26,28 @@ public class OnlineGUI extends JavaPlugin
     {
         this.manager = getServer().getPluginManager();
         
+        this.hiddenPlayersToggled = new ArrayList<>();
+        
         this.cfg = new Config(this);
     }
     
-    private FileConfiguration fileCfg = null;
+    private List<Player> hiddenPlayersToggled;
+    
+    public void toggleHiddenPlayer(Player p)
+    {
+        if(hiddenPlayersToggled == null)
+            this.hiddenPlayersToggled = new ArrayList<>();
+            
+        if(hiddenPlayersToggled.contains(p))
+            hiddenPlayersToggled.remove(p);
+        else hiddenPlayersToggled.add(p);
+    }
+    
+    public List<Player> getHiddenPlayersToggled()
+    {
+        return this.hiddenPlayersToggled;
+    }
+    
     private File configFile = null;
     
     private final Config cfg;
@@ -54,7 +73,7 @@ public class OnlineGUI extends JavaPlugin
     public void renewConfig()
     {
         this.configFile = new File(this.getDataFolder(), "config.yml");
-        this.fileCfg = YamlConfiguration.loadConfiguration(this.configFile);
+        YamlConfiguration.loadConfiguration(this.configFile);
         
         this.cfg.reload();
     }
@@ -172,8 +191,8 @@ public class OnlineGUI extends JavaPlugin
         {
             e.printStackTrace();
         }
-        
-        this.fileCfg = YamlConfiguration.loadConfiguration(this.configFile);
+    
+        YamlConfiguration.loadConfiguration(this.configFile);
     }
     
     public void removeOldKeys()

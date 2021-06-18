@@ -1,7 +1,7 @@
 name: M0-OnlinePlayersGUI
 main: me.M0dii.OnlinePlayersGUI.OnlineGUI
 description: M0-OnlinePlayersGUI
-version: 2.11
+version: 2.12
 api-version: 1.16
 author: M0dii
 softdepend: [PlaceholderAPI, EssentialsX]
@@ -17,6 +17,9 @@ permissions:
     default: op
   m0onlinegui.command.reload:
     description: Permission to see reload the configuration.
+    default: op
+  m0onlinegui.command.toggleself:
+    description: Permission to toggle self visibility in Online GUI.
     default: op
   m0onlinegui.hidden:
     description: Hide players from the GUI with this permission.

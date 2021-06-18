@@ -186,7 +186,7 @@ public class GUIListener implements Listener
                     {
                         next.show(player, Bukkit.getOnlinePlayers().size());
                         
-                        setWatchingPage((Player)player, nextPage);
+                        setWatchingPage(player, nextPage);
                     }
                 }
                 catch(IndexOutOfBoundsException ex)

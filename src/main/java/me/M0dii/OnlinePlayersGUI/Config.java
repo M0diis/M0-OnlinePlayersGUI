@@ -21,6 +21,8 @@ public class Config
     private String NEXT_PAGE_NAME, PREVIOUS_PAGE_NAME;
     private String GUI_TITLE;
     
+    private String TOGGLE_MESSAGE;
+    
     private List<String> HEAD_LORE, NEXT_PAGE_LORE, PREVIOUS_PAGE_LORE;
     private List<String> LEFT_CLICK_COMMANDS, RIGHT_CLICK_COMMANDS;
     
@@ -88,6 +90,8 @@ public class Config
         
         NO_PERMISSION = getStringf("NoPermission");
         CONFIG_RELOADED = getStringf("ReloadMessage");
+        
+        TOGGLE_MESSAGE = getStringf("ToggleMessage");
         
         LEFT_CLICK_COMMANDS = getStringList("PlayerDisplay.Commands.Left-Click");
         RIGHT_CLICK_COMMANDS = getStringList("PlayerDisplay.Commands.Right-Click");
@@ -311,5 +315,10 @@ public class Config
     public String getCondition()
     {
         return this.CONDITION;
+    }
+    
+    public String TOGGLE_MESSAGE()
+    {
+        return TOGGLE_MESSAGE;
     }
 }
