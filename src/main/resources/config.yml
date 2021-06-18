@@ -1,6 +1,4 @@
 M0-OnlinePlayersGUI:
-  # Do not modify this
-  config-version: '1.0'
   ReloadMessage: '&2Configuration has been reloaded.'
   NoPermission: '&2You do not have permission to this command.'
   ToggleMessage: '&2You have toggled your visibility in Online GUI.'

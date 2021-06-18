@@ -1,5 +1,6 @@
-package me.M0dii.OnlinePlayersGUI;
+package me.M0dii.OnlinePlayersGUI.Utils;
 
+import me.M0dii.OnlinePlayersGUI.OnlineGUI;
 import org.bukkit.Bukkit;
 import org.bukkit.util.Consumer;
 

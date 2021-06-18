@@ -1,6 +1,5 @@
 package me.M0dii.OnlinePlayersGUI;
 
-import net.kyori.adventure.text.Component;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -101,10 +100,10 @@ public class Config
         String mat1 = cfg.getString("NextButton.Material", "ENCHANTED_BOOK");
         String mat2 = cfg.getString("PreviousButton.Material", "ENCHANTED_BOOK");
         
-        PREVIOUS_PAGE_MATERIAL = Material.getMaterial(mat1 != null ? mat1 : "ENCHANTED_BOOK");
+        PREVIOUS_PAGE_MATERIAL = Material.getMaterial(mat1);
         if(PREVIOUS_PAGE_MATERIAL == null) PREVIOUS_PAGE_MATERIAL = Material.BOOK;
         
-        NEXT_PAGE_MATERIAL = Material.getMaterial(mat2 != null ? mat2 : "ENCHANTED_BOOK");
+        NEXT_PAGE_MATERIAL = Material.getMaterial(mat2);
         if(NEXT_PAGE_MATERIAL == null) NEXT_PAGE_MATERIAL = Material.BOOK;
         
         PREVIOUS_PAGE_LORE = getStringList("PreviousButton.Lore");
@@ -133,60 +132,57 @@ public class Config
         {
             String itemName = cfg.getString(
                     String.format("M0-OnlinePlayersGUI.CustomItems.%d.Material", i), "BOOK");
-            
-            if(itemName != null)
+    
+            Material CI_ITEM = Material.getMaterial(itemName);
+    
+            if(CI_ITEM != null && !CI_ITEM.equals(Material.AIR))
             {
-                Material CI_ITEM = Material.getMaterial(itemName);
-    
-                if(CI_ITEM != null && !CI_ITEM.equals(Material.AIR))
-                {
-                    ItemStack item = new ItemStack(CI_ITEM);
-    
-                    String CI_NAME = getStringf(
-                            String.format("CustomItems.%d.Name", i));
-    
-                    List<String> CI_LORE = getStringList(
-                            String.format("CustomItems.%d.Lore", i));
-    
-                    ItemMeta meta = item.getItemMeta();
-    
-                    if(CI_NAME.length() != 0)
-                        meta.setDisplayName(CI_NAME);
-    
-                    List<String> lore = new ArrayList<>();
-    
-                    if(CI_LORE.size() != 0)
-                    {
-                        for(String l : CI_LORE)
-                            lore.add(format(l));
+                ItemStack item = new ItemStack(CI_ITEM);
 
-                        meta.setLore(lore);
-                    }
-    
-                    List<String> lcc = cfg.getStringList(
-                            String.format(prefix + "CustomItems.%d.Commands.Left-Click", i));
-    
-                    List<String> rcc = cfg.getStringList(
-                            String.format(prefix + "CustomItems.%d.Commands.Right-Click", i));
-    
-                    meta.getPersistentDataContainer().set(
-                            new NamespacedKey(plugin, "Slot"), PersistentDataType.INTEGER, i);
-    
-                    meta.getPersistentDataContainer().set(
-                            new NamespacedKey(plugin, "IsCustom"), PersistentDataType.STRING, "true");
-    
-                    item.setItemMeta(meta);
-    
-                    boolean colc = cfg.getBoolean(
-                            String.format(prefix + "CustomItems.%d.Commands.CloseOnLeftClick", i));
-    
-                    boolean corc = cfg.getBoolean(
-                            String.format(prefix + "CustomItems.%d.Commands.CloseOnRightClick", i));
-    
-                    CustomItem ci = new CustomItem(item, i, lcc, rcc, colc, corc, lore);
-    
-                    this.CUSTOM_ITEMS.add(ci);
+                String CI_NAME = getStringf(
+                        String.format("CustomItems.%d.Name", i));
+
+                List<String> CI_LORE = getStringList(
+                        String.format("CustomItems.%d.Lore", i));
+
+                ItemMeta meta = item.getItemMeta();
+
+                if(CI_NAME.length() != 0)
+                    meta.setDisplayName(CI_NAME);
+
+                List<String> lore = new ArrayList<>();
+
+                if(CI_LORE.size() != 0)
+                {
+                    for(String l : CI_LORE)
+                        lore.add(format(l));
+
+                    meta.setLore(lore);
                 }
+
+                List<String> lcc = cfg.getStringList(
+                        String.format(prefix + "CustomItems.%d.Commands.Left-Click", i));
+
+                List<String> rcc = cfg.getStringList(
+                        String.format(prefix + "CustomItems.%d.Commands.Right-Click", i));
+
+                meta.getPersistentDataContainer().set(
+                        new NamespacedKey(plugin, "Slot"), PersistentDataType.INTEGER, i);
+
+                meta.getPersistentDataContainer().set(
+                        new NamespacedKey(plugin, "IsCustom"), PersistentDataType.STRING, "true");
+
+                item.setItemMeta(meta);
+
+                boolean colc = cfg.getBoolean(
+                        String.format(prefix + "CustomItems.%d.Commands.CloseOnLeftClick", i));
+
+                boolean corc = cfg.getBoolean(
+                        String.format(prefix + "CustomItems.%d.Commands.CloseOnRightClick", i));
+
+                CustomItem ci = new CustomItem(item, i, lcc, rcc, colc, corc, lore);
+
+                this.CUSTOM_ITEMS.add(ci);
             }
         }
     }

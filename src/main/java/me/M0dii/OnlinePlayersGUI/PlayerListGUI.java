@@ -1,5 +1,6 @@
 package me.M0dii.OnlinePlayersGUI;
 
+import me.M0dii.OnlinePlayersGUI.Utils.Utils;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -155,7 +156,7 @@ public class PlayerListGUI
         
         this.guiPages = new ArrayList<>();
         
-        int requiredPages = getRequiredPages(online);
+        int requiredPages = calculatePages(online);
         
         int curr = 0;
         
@@ -200,10 +201,8 @@ public class PlayerListGUI
                 ItemStack nextButton = new ItemStack(cfg.NEXT_PAGE_MATERIAL());
                 ItemMeta nextButtonMeta = nextButton.getItemMeta();
     
-                List<String> nextLore = new ArrayList<>();
-    
-                for(String m : cfg.NEXT_PAGE_LORE())
-                    nextLore.add(Utils.format(m));
+                List<String> nextLore = cfg.NEXT_PAGE_LORE().stream().map(Utils::format)
+                        .collect(Collectors.toList());
     
                 nextButtonMeta.setLore(nextLore);
     
@@ -219,11 +218,9 @@ public class PlayerListGUI
                 ItemStack prevButton = new ItemStack(cfg.PREV_PAGE_MATERIAL());
                 ItemMeta prevButtonMeta = prevButton.getItemMeta();
                 
-                List<String> prevLore = new ArrayList<>();
-                
-                for(String m : cfg.PREV_PAGE_LORE())
-                    prevLore.add(Utils.format(m));
-                
+                List<String> prevLore = cfg.PREV_PAGE_LORE().stream().map(Utils::format)
+                        .collect(Collectors.toList());
+    
                 prevButtonMeta.setLore(prevLore);
     
                 prevButtonMeta.getPersistentDataContainer().set(
@@ -273,7 +270,7 @@ public class PlayerListGUI
         GUIListener.setWatchingPage(player, 1);
     }
     
-    private int getRequiredPages(List<Player> players)
+    private int calculatePages(List<Player> players)
     {
         int pages = 1;
         int counter = 0;

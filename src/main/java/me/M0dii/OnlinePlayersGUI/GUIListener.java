@@ -1,5 +1,6 @@
 package me.M0dii.OnlinePlayersGUI;
 
+import me.M0dii.OnlinePlayersGUI.Utils.Utils;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.*;
 import org.bukkit.entity.HumanEntity;
@@ -63,11 +64,11 @@ public class GUIListener implements Listener
     
     private boolean isOnlineGUI(InventoryEvent e)
     {
-        String viewName = strip(e.getView().getTitle())
+        String viewName = Utils.clearFormat(e.getView().getTitle())
                 .replaceAll("\\d", "")
                 .trim();
         
-        String title = strip(this.cfg.GUI_TITLE())
+        String title = Utils.clearFormat(this.cfg.GUI_TITLE())
                 .replace("%playercount%", "")
                 .trim();
         
@@ -83,11 +84,6 @@ public class GUIListener implements Listener
                         this.plugin.getGUI().showPlayers((Player)p), 20L);
     }
     
-    private String strip(String text)
-    {
-        return ChatColor.stripColor(text);
-    }
-    
     @EventHandler
     public void updateOnLeave(PlayerQuitEvent e)
     {
@@ -100,11 +96,11 @@ public class GUIListener implements Listener
     @EventHandler
     public void cancelClick(InventoryClickEvent e)
     {
-        String viewName = strip(e.getView().getTitle())
+        String viewName = Utils.clearFormat(e.getView().getTitle())
                 .replaceAll("\\d", "")
                 .trim();
     
-        String title = strip(this.cfg.GUI_TITLE())
+        String title = Utils.clearFormat(this.cfg.GUI_TITLE())
                 .replace("%playercount%", "")
                 .trim();
     
@@ -136,8 +132,8 @@ public class GUIListener implements Listener
         
         ItemStack clickedItem = e.getCurrentItem();
         
-        if(clickedItem != null
-        && clickedItem.getType().equals(Material.PLAYER_HEAD))
+        if(clickedItem != null && clickedItem.getType()
+                .equals(Material.PLAYER_HEAD))
         {
             SkullMeta sm = (SkullMeta)clickedItem.getItemMeta();
             
@@ -178,20 +174,21 @@ public class GUIListener implements Listener
                     PlayerListGUI temp = this.plugin.getGUI();
                     
                     if(temp != null)
-                        return;
-                    
-                    PlayerListGUI next = temp.getGuiPages().get(nextPage);
-    
-                    if(next != null)
                     {
-                        next.show(player, Bukkit.getOnlinePlayers().size());
-                        
-                        setWatchingPage(player, nextPage);
+                        PlayerListGUI next = temp.getGuiPages().get(nextPage);
+    
+                        if(next != null)
+                        {
+                            next.show(player, Bukkit.getOnlinePlayers().size());
+        
+                            setWatchingPage(player, nextPage);
+                        }
                     }
                 }
                 catch(IndexOutOfBoundsException ex)
                 {
-                    // Handle
+                    // TODO
+                    // Logger?
                 }
             }
         }
@@ -219,7 +216,7 @@ public class GUIListener implements Listener
     
                         if(e.isLeftClick())
                         {
-                            cicmds = c.getLeftClickCommands();
+                            cicmds = c.getLCC();
                             
                             if(c.closeOnLeft())
                                 close = true;
@@ -227,14 +224,13 @@ public class GUIListener implements Listener
     
                         if(e.isRightClick())
                         {
-                            cicmds = c.getRightClickCommands();
+                            cicmds = c.getRCC();
     
                             if(c.closeOnRight())
                                 close = true;
                         }
     
-                        for(String cmd : cicmds)
-                            sendCommand(player, player, cmd);
+                        cicmds.forEach(cmd -> sendCommand(player, player, cmd));
                         
                         if(close)
                             player.closeInventory();
@@ -246,8 +242,8 @@ public class GUIListener implements Listener
     
     private void sendCommand(Player sender, Player placeholderHolder, String cmd)
     {
-        cmd = PlaceholderAPI.setPlaceholders(placeholderHolder, cmd);
-        cmd = cmd.replace("%sender_name%", sender.getName());
+        cmd = PlaceholderAPI.setPlaceholders(placeholderHolder, cmd)
+                .replace("%sender_name%", sender.getName());
         
         if(cmd.startsWith("["))
         {
@@ -271,10 +267,8 @@ public class GUIListener implements Listener
         CustomItem custom = null;
         
         for(CustomItem c : customItems)
-        {
             if(c.getItemSlot() == slot)
                 custom = c;
-        }
         
         return custom;
     }

@@ -1,12 +1,12 @@
 package me.M0dii.OnlinePlayersGUI;
 
+import me.M0dii.OnlinePlayersGUI.Utils.UpdateChecker;
 import net.ess3.api.IEssentials;
 import org.bstats.bukkit.Metrics;
 import org.bstats.charts.CustomChart;
 import org.bstats.charts.MultiLineChart;
 import org.bukkit.Bukkit;
 import org.bukkit.command.PluginCommand;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
@@ -86,9 +86,7 @@ public class OnlineGUI extends JavaPlugin
     public void onEnable()
     {
         this.prepareConfig();
-    
-        this.removeOldKeys();
-    
+        
         this.cfg.load();
     
         registerHooks();
@@ -193,46 +191,6 @@ public class OnlineGUI extends JavaPlugin
         }
     
         YamlConfiguration.loadConfiguration(this.configFile);
-    }
-    
-    public void removeOldKeys()
-    {
-        Bukkit.getScheduler().scheduleSyncDelayedTask(this, () -> {
-            
-            String cfgV = getConfig().getString(
-                    "M0-OnlinePlayersGUI.config-version");
-            
-            String curr = "1.1";
-    
-            if(cfgV == null || !cfgV.equalsIgnoreCase(curr))
-            {
-                boolean prevLC = getConfig().getBoolean(
-                        "M0-OnlinePlayersGUI.CloseOnLeftClick");
-    
-                boolean prevRC = getConfig().getBoolean(
-                        "M0-OnlinePlayersGUI.CloseOnRightClick");
-                
-                getConfig().set("M0-OnlinePlayersGUI.CloseOnLeftClick", "unused");
-                getConfig().set("M0-OnlinePlayersGUI.CloseOnRightClick", "unused");
-    
-                getConfig().set("M0-OnlinePlayersGUI.CloseOnLeftClick", null);
-                getConfig().set("M0-OnlinePlayersGUI.CloseOnRightClick", null);
-    
-                getConfig().set("M0-OnlinePlayersGUI.GUI.CloseOn.LeftClick", prevLC);
-                getConfig().set("M0-OnlinePlayersGUI.GUI.CloseOn.RightClick", prevRC);
-    
-                getConfig().set("M0-OnlinePlayersGUI.config-version", curr);
-    
-                try
-                {
-                    getConfig().save(configFile);
-                }
-                catch(IOException e)
-                {
-                    e.printStackTrace();
-                }
-            }
-        },20L);
     }
     
     private void info(String message)

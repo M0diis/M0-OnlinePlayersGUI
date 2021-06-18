@@ -1,4 +1,4 @@
-package me.M0dii.OnlinePlayersGUI;
+package me.M0dii.OnlinePlayersGUI.Utils;
 
 import org.bukkit.ChatColor;
 

@@ -50,12 +50,12 @@ public class CustomItem
         return this.itemSlot;
     }
     
-    public List<String> getLeftClickCommands()
+    public List<String> getLCC()
     {
         return this.leftClickCommands;
     }
     
-    public List<String> getRightClickCommands()
+    public List<String> getRCC()
     {
         return this.rightClickCommands;
     }
