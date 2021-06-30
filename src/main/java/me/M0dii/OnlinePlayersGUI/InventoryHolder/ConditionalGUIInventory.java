@@ -1,7 +1,7 @@
 package me.M0dii.OnlinePlayersGUI.InventoryHolder;
 
-import me.M0dii.OnlinePlayersGUI.ConditionalConfig;
-import me.M0dii.OnlinePlayersGUI.Config;
+import me.M0dii.OnlinePlayersGUI.Utils.ConditionalConfig;
+import me.M0dii.OnlinePlayersGUI.Utils.Config;
 import me.M0dii.OnlinePlayersGUI.CustomItem;
 import me.M0dii.OnlinePlayersGUI.OnlineGUI;
 import me.M0dii.OnlinePlayersGUI.Utils.Utils;

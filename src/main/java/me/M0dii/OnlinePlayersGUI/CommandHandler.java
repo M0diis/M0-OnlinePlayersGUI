@@ -1,6 +1,7 @@
 package me.M0dii.OnlinePlayersGUI;
 
 import me.M0dii.OnlinePlayersGUI.InventoryHolder.OnlineGUIInventory;
+import me.M0dii.OnlinePlayersGUI.Utils.Config;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -103,6 +104,8 @@ public class CommandHandler implements CommandExecutor, TabCompleter
         {
             completes.add("reload");
             completes.add("hideself");
+    
+            completes.addAll(new ConditionalGUIs(this.plugin).getConditionalNames());
         }
         
         return completes;

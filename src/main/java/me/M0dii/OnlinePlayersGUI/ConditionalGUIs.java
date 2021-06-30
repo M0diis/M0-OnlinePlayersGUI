@@ -12,6 +12,11 @@ public class ConditionalGUIs
     private final OnlineGUI plugin;
     private final ArrayList<String> conditionalNames;
     
+    public ArrayList<String> getConditionalNames()
+    {
+        return this.conditionalNames;
+    }
+    
     public ConditionalGUIs(OnlineGUI plugin)
     {
         this.conditionalNames = new ArrayList<>();

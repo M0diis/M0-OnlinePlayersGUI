@@ -1,5 +1,7 @@
-package me.M0dii.OnlinePlayersGUI;
+package me.M0dii.OnlinePlayersGUI.Utils;
 
+import me.M0dii.OnlinePlayersGUI.CustomItem;
+import me.M0dii.OnlinePlayersGUI.OnlineGUI;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -12,12 +14,15 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ConditionalConfig
+public class Config
 {
     private String HEAD_NAME;
+    private String CONFIG_RELOADED, NO_PERMISSION;
     
     private String NEXT_PAGE_NAME, PREVIOUS_PAGE_NAME;
     private String GUI_TITLE;
+    
+    private String TOGGLE_MESSAGE;
     
     private List<String> HEAD_LORE, NEXT_PAGE_LORE, PREVIOUS_PAGE_LORE;
     private List<String> LEFT_CLICK_COMMANDS, RIGHT_CLICK_COMMANDS;
@@ -30,16 +35,15 @@ public class ConditionalConfig
     
     private boolean ESSENTIALSX_HOOK;
     
+    private boolean CONDITION_REQUIRED;
     private String CONDITION;
     
     private final OnlineGUI plugin;
     
-    public ConditionalConfig(OnlineGUI plugin, FileConfiguration cfg)
+    public Config(OnlineGUI plugin)
     {
         this.plugin = plugin;
-        this.cfg = cfg;
-        
-        this.load();
+        this.cfg = plugin.getConfig();
     }
     
     public void reload()
@@ -52,7 +56,7 @@ public class ConditionalConfig
     
     FileConfiguration cfg;
     
-    private static final String prefix = "";
+    private static final String prefix = "M0-OnlinePlayersGUI.";
     
     private boolean getBool(String path)
     {
@@ -85,10 +89,15 @@ public class ConditionalConfig
     
         GUI_TITLE = getStringf("GUI.Title");
         
+        NO_PERMISSION = getStringf("NoPermission");
+        CONFIG_RELOADED = getStringf("ReloadMessage");
+        
+        TOGGLE_MESSAGE = getStringf("ToggleMessage");
+        
         LEFT_CLICK_COMMANDS = getStringList("PlayerDisplay.Commands.Left-Click");
         RIGHT_CLICK_COMMANDS = getStringList("PlayerDisplay.Commands.Right-Click");
         
-        GUI_SIZE = cfg.getInt("GUI.Size");
+        GUI_SIZE = cfg.getInt("M0-OnlinePlayersGUI.GUI.Size");
     
         String mat1 = cfg.getString("NextButton.Material", "ENCHANTED_BOOK");
         String mat2 = cfg.getString("PreviousButton.Material", "ENCHANTED_BOOK");
@@ -107,7 +116,8 @@ public class ConditionalConfig
         
         ESSENTIALSX_HOOK = getBool("EssentialsXHook");
         
-        CONDITION = cfg.getString("Condition.Placeholder");
+        CONDITION_REQUIRED = cfg.getBoolean("M0-OnlinePlayersGUI.Condition.Required", false);
+        CONDITION = cfg.getString("M0-OnlinePlayersGUI.Condition.Placeholder");
         
         setUpCustomItems(plugin);
     }
@@ -123,7 +133,7 @@ public class ConditionalConfig
         for(int i : slots)
         {
             String itemName = cfg.getString(
-                    String.format("CustomItems.%d.Material", i), "BOOK");
+                    String.format("M0-OnlinePlayersGUI.CustomItems.%d.Material", i), "BOOK");
     
             Material CI_ITEM = Material.getMaterial(itemName);
     
@@ -148,7 +158,7 @@ public class ConditionalConfig
                 {
                     for(String l : CI_LORE)
                         lore.add(format(l));
-
+                    
                     meta.setLore(lore);
                 }
 
@@ -262,6 +272,16 @@ public class ConditionalConfig
         return PREVIOUS_PAGE_NAME;
     }
     
+    public String NO_PERMISSION_MSG()
+    {
+        return NO_PERMISSION;
+    }
+    
+    public String CONFIG_RELOAD_MSG()
+    {
+        return CONFIG_RELOADED;
+    }
+    
     public String HEAD_DISPLAY_NAME()
     {
         return HEAD_NAME;
@@ -285,8 +305,18 @@ public class ConditionalConfig
         return this.PREVIOUS_PAGE_MATERIAL;
     }
     
+    public boolean isConditionEnabled()
+    {
+        return this.CONDITION_REQUIRED;
+    }
+    
     public String getCondition()
     {
         return this.CONDITION;
+    }
+    
+    public String TOGGLE_MESSAGE()
+    {
+        return TOGGLE_MESSAGE;
     }
 }

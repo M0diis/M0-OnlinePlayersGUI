@@ -1,6 +1,7 @@
 package me.M0dii.OnlinePlayersGUI;
 
 import me.M0dii.OnlinePlayersGUI.Listeners.InventoryListener;
+import me.M0dii.OnlinePlayersGUI.Utils.Config;
 import me.M0dii.OnlinePlayersGUI.Utils.UpdateChecker;
 import net.ess3.api.IEssentials;
 import org.bstats.bukkit.Metrics;
@@ -66,18 +67,7 @@ public class OnlineGUI extends JavaPlugin
     }
     
     private IEssentials ess = null;
-    private PlayerListGUI playerListGUI = null;
-    
-    public PlayerListGUI getGUI()
-    {
-        return this.playerListGUI;
-    }
-    
-    public void setGUI(PlayerListGUI gui)
-    {
-        this.playerListGUI = gui;
-    }
-    
+
     public void renewConfig()
     {
         this.configFile = new File(this.getDataFolder(), "config.yml");

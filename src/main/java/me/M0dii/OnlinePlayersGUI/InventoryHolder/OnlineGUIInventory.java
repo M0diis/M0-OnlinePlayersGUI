@@ -1,6 +1,6 @@
 package me.M0dii.OnlinePlayersGUI.InventoryHolder;
 
-import me.M0dii.OnlinePlayersGUI.Config;
+import me.M0dii.OnlinePlayersGUI.Utils.Config;
 import me.M0dii.OnlinePlayersGUI.CustomItem;
 import me.M0dii.OnlinePlayersGUI.OnlineGUI;
 import me.M0dii.OnlinePlayersGUI.Utils.Utils;
@@ -234,14 +234,39 @@ public class OnlineGUIInventory implements InventoryHolder
         return inv;
     }
     
+    public void refresh()
+    {
+        initByPage(this.page);
+    }
+    
+    private List<Player> getOnline(boolean hook)
+    {
+        List<Player> online;
+        
+        List<Player> toggled = plugin.getHiddenPlayersToggled();
+        
+        if(hook)
+        {
+            online = Bukkit.getOnlinePlayers().stream().filter(p ->
+                    !p.hasPermission("m0onlinegui.hidden")
+                            || !plugin.getEssentials().getUser(p).isVanished()
+                            || !toggled.contains(p))
+                    .collect(Collectors.toList());
+        }
+        else
+        {
+            online = Bukkit.getOnlinePlayers().stream().filter(p ->
+                    !p.hasPermission("m0onlinegui.hidden")
+                            || !toggled.contains(p))
+                    .collect(Collectors.toList());
+        }
+        
+        return plugin.getCfg().isConditionEnabled() ? filterByCondition(online) : online;
+    }
+    
     private void initByPage(int page)
     {
-        List<Player> online = Bukkit.getOnlinePlayers().stream().filter(p ->
-                !p.hasPermission("m0onlinegui.hidden"))
-                .collect(Collectors.toList());
-    
-        if(plugin.getCfg().isConditionEnabled())
-            online = filterByCondition(online);
+        List<Player> online = getOnline(plugin.getCfg().ESSX_HOOK());
     
         List<Player> byPage = new ArrayList<>();
         
