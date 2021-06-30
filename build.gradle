@@ -7,6 +7,7 @@ group 'me.M0dii'
 version '2.12'
 sourceCompatibility = '8'
 
+
 shadowJar {
     relocate 'org.bstats', 'me.M0dii.OnlinePlayersGUI'
 

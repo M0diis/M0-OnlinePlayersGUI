@@ -47,14 +47,14 @@ public class PlayerListGUI
         
         this.name = this.cfg.GUI_TITLE();
         
-        this.size = this.getCorrectSize();
+        this.size = this.adjustSize();
 
-        this.inv = Bukkit.createInventory(null, this.size, this.cfg.GUI_TITLE());
+        this.inv = Bukkit.createInventory(null, this.size, this.name);
         
         this.plugin.setGUI(this);
     }
     
-    private int getCorrectSize()
+    private int adjustSize()
     {
         int size = cfg.GUI_SIZE();
         
@@ -130,18 +130,17 @@ public class PlayerListGUI
                     .collect(Collectors.toList());
         }
         
-        return cfg.isConditionRequired() ? filterByCondition(online) : online;
+        return cfg.isConditionEnabled() ? filterByCondition(online) : online;
     }
     
     private List<Player> filterByCondition(List<Player> players)
     {
         List<Player> filtered = new ArrayList<>();
         
-        String condition = cfg.getCondition();
-    
         for(Player p : players)
         {
-            String result = PlaceholderAPI.setPlaceholders(p, condition).toLowerCase();
+            String result = PlaceholderAPI.setPlaceholders(p, cfg.getCondition())
+                    .toLowerCase();
         
             if(result.equals("yes") || result.equals("true"))
                 filtered.add(p);
@@ -164,7 +163,7 @@ public class PlayerListGUI
         {
             PlayerListGUI gui = new PlayerListGUI(this.plugin, page);
             
-            for(int slot = 0; slot < Math.min(cfg.GUI_SIZE() - 9, online.size()); slot++)
+            for(int slot = 0; slot < Math.min(this.size - 9, online.size()); slot++)
             {
                 if(curr < online.size())
                 {

@@ -1,5 +1,6 @@
 package me.M0dii.OnlinePlayersGUI;
 
+import me.M0dii.OnlinePlayersGUI.InventoryHolder.OnlineGUIInventory;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -26,6 +27,19 @@ public class CommandHandler implements CommandExecutor, TabCompleter
     {
         if(args.length == 1)
         {
+            ConditionalGUIs cgis = plugin.getCgis();
+            
+            boolean is = cgis.isConditional(args[0]);
+            
+            plugin.getLogger().info(String.valueOf(is));
+            
+            if(is)
+            {
+                cgis.displayConditional(args[0], (Player)sender);
+                
+                return true;
+            }
+            
             if(canUse(args[0], "reload", "m0onlinegui.command.reload", sender))
             {
                 this.plugin.reloadConfig();
@@ -56,12 +70,19 @@ public class CommandHandler implements CommandExecutor, TabCompleter
         {
             Player p = (Player)sender;
             
-            if(p.hasPermission("m0onlinegui.command.onlinegui"))
-                new PlayerListGUI(this.plugin, 0).showPlayers(p);
-            else
-                p.sendMessage(this.config.NO_PERMISSION_MSG());
+            OnlineGUIInventory ogi = new OnlineGUIInventory(this.plugin, this.plugin.getCfg().GUI_TITLE(), 0);
+            ogi.setCustomItems(p);
             
+            p.openInventory(ogi.getInventory());
+    
             return true;
+            
+//            if(p.hasPermission("m0onlinegui.command.onlinegui"))
+//                new PlayerListGUI(this.plugin, 0).showPlayers(p);
+//            else
+//                p.sendMessage(this.config.NO_PERMISSION_MSG());
+//
+//            return true;
         }
 
         return true;

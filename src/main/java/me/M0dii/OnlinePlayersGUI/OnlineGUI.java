@@ -1,5 +1,6 @@
 package me.M0dii.OnlinePlayersGUI;
 
+import me.M0dii.OnlinePlayersGUI.Listeners.InventoryListener;
 import me.M0dii.OnlinePlayersGUI.Utils.UpdateChecker;
 import net.ess3.api.IEssentials;
 import org.bstats.bukkit.Metrics;
@@ -21,7 +22,7 @@ import java.util.Map;
 public class OnlineGUI extends JavaPlugin
 {
     private final PluginManager manager;
-    
+
     public OnlineGUI()
     {
         this.manager = getServer().getPluginManager();
@@ -29,6 +30,13 @@ public class OnlineGUI extends JavaPlugin
         this.hiddenPlayersToggled = new ArrayList<>();
         
         this.cfg = new Config(this);
+    }
+    
+    private ConditionalGUIs cgis;
+    
+    public ConditionalGUIs getCgis()
+    {
+        return this.cgis;
     }
     
     private List<Player> hiddenPlayersToggled;
@@ -88,10 +96,14 @@ public class OnlineGUI extends JavaPlugin
         this.prepareConfig();
         
         this.cfg.load();
+        
+        cgis = new ConditionalGUIs(this);
     
         registerHooks();
     
-        this.manager.registerEvents(new GUIListener(this), this);
+        //this.manager.registerEvents(new GUIListener(this), this);
+        
+        this.manager.registerEvents(new InventoryListener(this), this);
     
         PluginCommand cmd = this.getCommand("online");
         
