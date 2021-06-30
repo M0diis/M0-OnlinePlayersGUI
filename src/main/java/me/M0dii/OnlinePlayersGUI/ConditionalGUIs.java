@@ -42,11 +42,7 @@ public class ConditionalGUIs
                 String name = file.getName();
                 
                 if (file.isFile() && name.endsWith(".yml") && !name.startsWith("config"))
-                {
-                    plugin.getLogger().info(file.getName());
-                    
                     conditionalNames.add(file.getName().replace(".yml", ""));
-                }
             }
         }
     }
@@ -59,6 +55,7 @@ public class ConditionalGUIs
                 YamlConfiguration.loadConfiguration(file);
     
         ConditionalGUIInventory cgi = new ConditionalGUIInventory(plugin, name, 0, cfg);
+        cgi.setCustomItems(p);
         
         p.openInventory(cgi.getInventory());
     }

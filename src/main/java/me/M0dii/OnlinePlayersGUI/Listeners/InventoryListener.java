@@ -1,18 +1,19 @@
 package me.M0dii.OnlinePlayersGUI.Listeners;
 
-import me.M0dii.OnlinePlayersGUI.InventoryHolder.ConditionalGUIInventory;
-import me.M0dii.OnlinePlayersGUI.InventoryHolder.OnlineGUIInventory;
+import me.M0dii.OnlinePlayersGUI.InventoryHolder.CustomGUI;
 import me.M0dii.OnlinePlayersGUI.OnlineGUI;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.*;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryMoveItemEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.InventoryView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,23 +26,23 @@ public class InventoryListener implements Listener
     {
         this.plugin = plugin;
         
-        this.viewers = new ArrayList<>();
+        this.guiViewers = new ArrayList<>();
     }
     
-    private final List<HumanEntity> viewers;
+    private final List<HumanEntity> guiViewers;
     
     @EventHandler
     public void addViewer(InventoryOpenEvent e)
     {
-        if(e.getInventory().getHolder() instanceof OnlineGUIInventory)
-            this.viewers.add(e.getPlayer());
+        if(e.getInventory().getHolder() instanceof CustomGUI)
+            this.guiViewers.add(e.getPlayer());
     }
     
     @EventHandler
     public void removeViewer(InventoryCloseEvent e)
     {
-        if(e.getInventory().getHolder() instanceof OnlineGUIInventory)
-            this.viewers.remove(e.getPlayer());
+        if(e.getInventory().getHolder() instanceof CustomGUI)
+            this.guiViewers.remove(e.getPlayer());
     }
     
     @EventHandler
@@ -49,8 +50,7 @@ public class InventoryListener implements Listener
     {
         Inventory inv = e.getSource();
         
-        if(inv.getHolder() instanceof OnlineGUIInventory
-            || inv.getHolder() instanceof ConditionalGUIInventory)
+        if(inv.getHolder() instanceof CustomGUI)
             e.setCancelled(true);
     }
     
@@ -70,20 +70,13 @@ public class InventoryListener implements Listener
     
     private void updateView()
     {
-        for(HumanEntity p : viewers)
+        for(HumanEntity p : guiViewers)
             Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, () ->
             {
-                InventoryView curr = p.getOpenInventory();
-                Inventory inv = curr.getTopInventory();
+                Inventory inv = p.getOpenInventory().getTopInventory();
                 
-                if(inv.getHolder() instanceof OnlineGUIInventory)
-                {
-                    OnlineGUIInventory ogi = (OnlineGUIInventory)inv.getHolder();
-                    
-                    ogi.refresh();
-                    
-                    p.openInventory(ogi.getInventory());
-                }
+                if(inv.getHolder() instanceof CustomGUI)
+                    ((CustomGUI)inv.getHolder()).refresh((Player)p);
             }, 20L);
     }
     
@@ -92,21 +85,12 @@ public class InventoryListener implements Listener
     {
         Inventory inv = e.getClickedInventory();
         
-        if(inv != null && inv.getHolder() instanceof OnlineGUIInventory)
-        {
-            e.setCancelled(true);
-            
-            OnlineGUIInventory guiInv = (OnlineGUIInventory)inv.getHolder();
-            
-            guiInv.execute((Player)e.getWhoClicked(), e.getCurrentItem(), e.isLeftClick());
-        }
-    
-        if(inv != null && inv.getHolder() instanceof ConditionalGUIInventory)
+        if(inv != null && inv.getHolder() instanceof CustomGUI)
         {
             e.setCancelled(true);
     
-            ConditionalGUIInventory guiInv = (ConditionalGUIInventory)inv.getHolder();
-        
+            CustomGUI guiInv = (CustomGUI)inv.getHolder();
+            
             guiInv.execute((Player)e.getWhoClicked(), e.getCurrentItem(), e.isLeftClick());
         }
     }

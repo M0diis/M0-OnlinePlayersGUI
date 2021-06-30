@@ -5,6 +5,7 @@ import me.M0dii.OnlinePlayersGUI.CustomItem;
 import me.M0dii.OnlinePlayersGUI.OnlineGUI;
 import me.M0dii.OnlinePlayersGUI.Utils.Utils;
 import me.clip.placeholderapi.PlaceholderAPI;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -22,9 +23,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class OnlineGUIInventory implements InventoryHolder
+public class OnlineGUIInventory implements InventoryHolder, CustomGUI
 {
-    private final Inventory inv;
+    private Inventory inv;
     private final String name;
     private final int size, page;
     private final OnlineGUI plugin;
@@ -234,9 +235,14 @@ public class OnlineGUIInventory implements InventoryHolder
         return inv;
     }
     
-    public void refresh()
+    public void refresh(Player p)
     {
-        initByPage(this.page);
+        this.inv = Bukkit.createInventory(this, this.size, Component.text(this.name));
+        
+        this.initByPage(this.page);
+        this.setCustomItems(p);
+        
+        p.openInventory(this.inv);
     }
     
     private List<Player> getOnline(boolean hook)

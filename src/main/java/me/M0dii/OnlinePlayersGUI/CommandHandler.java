@@ -30,11 +30,7 @@ public class CommandHandler implements CommandExecutor, TabCompleter
         {
             ConditionalGUIs cgis = plugin.getCgis();
             
-            boolean is = cgis.isConditional(args[0]);
-            
-            plugin.getLogger().info(String.valueOf(is));
-            
-            if(is)
+            if(cgis.isConditional(args[0]))
             {
                 cgis.displayConditional(args[0], (Player)sender);
                 

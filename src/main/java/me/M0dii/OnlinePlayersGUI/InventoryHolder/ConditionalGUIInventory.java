@@ -6,6 +6,7 @@ import me.M0dii.OnlinePlayersGUI.CustomItem;
 import me.M0dii.OnlinePlayersGUI.OnlineGUI;
 import me.M0dii.OnlinePlayersGUI.Utils.Utils;
 import me.clip.placeholderapi.PlaceholderAPI;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -24,20 +25,22 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class ConditionalGUIInventory implements InventoryHolder
+public class ConditionalGUIInventory implements InventoryHolder, CustomGUI
 {
-    private final Inventory inv;
+    private Inventory inv;
     private final String name;
     private final int size, page;
     private final OnlineGUI plugin;
-    private ConditionalConfig cfg;
-    private FileConfiguration fileCfg;
+    
+    private final ConditionalConfig cfg;
+    private final FileConfiguration fileCfg;
     
     public ConditionalGUIInventory(OnlineGUI plugin, String name, int page, FileConfiguration cfg)
     {
-        this.size = this.adjustSize(plugin.getCfg());
-        
         this.cfg = new ConditionalConfig(plugin, cfg);
+        
+        this.size = this.adjustSize(this.cfg);
+        
         this.fileCfg = cfg;
         
         this.name = name;
@@ -45,7 +48,7 @@ public class ConditionalGUIInventory implements InventoryHolder
         
         this.plugin = plugin;
         
-        this.inv = Bukkit.createInventory(this, this.size, name);
+        this.inv = Bukkit.createInventory(this, this.size, Component.text(name));
         
         initByPage(page);
     }
@@ -77,8 +80,8 @@ public class ConditionalGUIInventory implements InventoryHolder
         }
     
         if((clickedItem != null) &&
-        (clickedItem.getType().equals(this.cfg.PREV_PAGE_MATERIAL())
-        || clickedItem.getType().equals(this.cfg.NEXT_PAGE_MATERIAL())))
+            (clickedItem.getType().equals(this.cfg.PREV_PAGE_MATERIAL())
+            || clickedItem.getType().equals(this.cfg.NEXT_PAGE_MATERIAL())))
         {
             NamespacedKey key = new NamespacedKey(this.plugin, "Button");
             PersistentDataContainer cont = clickedItem.getItemMeta().getPersistentDataContainer();
@@ -157,6 +160,16 @@ public class ConditionalGUIInventory implements InventoryHolder
         }
     }
     
+    public void refresh(Player p)
+    {
+        this.inv = Bukkit.createInventory(this, this.size, Component.text(this.name));
+    
+        this.initByPage(this.page);
+        this.setCustomItems(p);
+    
+        p.openInventory(this.inv);
+    }
+    
     private CustomItem getCustomItemBySlot(int slot)
     {
         List<CustomItem> customItems = this.cfg.getCustomItems();
@@ -222,7 +235,7 @@ public class ConditionalGUIInventory implements InventoryHolder
         else Bukkit.dispatchCommand(sender, cmd);
     }
     
-    private int adjustSize(Config cfg)
+    private int adjustSize(ConditionalConfig cfg)
     {
         int size = cfg.GUI_SIZE();
         
@@ -247,9 +260,8 @@ public class ConditionalGUIInventory implements InventoryHolder
         List<Player> online = Bukkit.getOnlinePlayers().stream().filter(p ->
                 !p.hasPermission("m0onlinegui.hidden"))
                 .collect(Collectors.toList());
-    
-        if(plugin.getCfg().isConditionEnabled())
-            online = filterByCondition(online);
+        
+        online = filterByCondition(online);
     
         List<Player> byPage = new ArrayList<>();
         
@@ -276,11 +288,11 @@ public class ConditionalGUIInventory implements InventoryHolder
         
             List<String> lore = new ArrayList<>();
         
-            for(String s : plugin.getCfg().HEAD_LORE())
+            for(String s : this.cfg.HEAD_LORE())
                 lore.add(Utils.format(PlaceholderAPI.setPlaceholders(p, s)));
 
-            meta.setDisplayName(
-                    Utils.format(PlaceholderAPI.setPlaceholders(p, plugin.getCfg()
+            meta.setLocalizedName(
+                    Utils.format(PlaceholderAPI.setPlaceholders(p, this.cfg
                             .HEAD_DISPLAY_NAME())));
         
             meta.setLore(lore);
@@ -300,12 +312,12 @@ public class ConditionalGUIInventory implements InventoryHolder
     
     private void setButtons()
     {
-        if(!plugin.getCfg().HIDE_BUTTONS_SINGLE_PAGE())
+        if(!this.cfg.HIDE_BUTTONS_SINGLE_PAGE())
         {
-            ItemStack nextButton = new ItemStack(plugin.getCfg().NEXT_PAGE_MATERIAL());
+            ItemStack nextButton = new ItemStack(this.cfg.NEXT_PAGE_MATERIAL());
             ItemMeta nextButtonMeta = nextButton.getItemMeta();
         
-            List<String> nextLore = plugin.getCfg().NEXT_PAGE_LORE().stream().map(Utils::format)
+            List<String> nextLore = this.cfg.NEXT_PAGE_LORE().stream().map(Utils::format)
                     .collect(Collectors.toList());
         
             nextButtonMeta.setLore(nextLore);
@@ -314,15 +326,15 @@ public class ConditionalGUIInventory implements InventoryHolder
                     new NamespacedKey(plugin, "Button"),
                     PersistentDataType.STRING, "Next");
         
-            nextButtonMeta.setDisplayName(plugin.getCfg().NEXT_PAGE_BUTTON_NAME());
+            nextButtonMeta.setDisplayName(this.cfg.NEXT_PAGE_BUTTON_NAME());
             nextButton.setItemMeta(nextButtonMeta);
         
-            inv.setItem(plugin.getCfg().GUI_SIZE() - 4, nextButton);
+            inv.setItem(this.cfg.GUI_SIZE() - 4, nextButton);
             
-            ItemStack prevButton = new ItemStack(plugin.getCfg().PREV_PAGE_MATERIAL());
+            ItemStack prevButton = new ItemStack(this.cfg.PREV_PAGE_MATERIAL());
             ItemMeta prevButtonMeta = prevButton.getItemMeta();
         
-            List<String> prevLore = plugin.getCfg().PREV_PAGE_LORE().stream().map(Utils::format)
+            List<String> prevLore = this.cfg.PREV_PAGE_LORE().stream().map(Utils::format)
                     .collect(Collectors.toList());
         
             prevButtonMeta.setLore(prevLore);
@@ -331,10 +343,10 @@ public class ConditionalGUIInventory implements InventoryHolder
                     new NamespacedKey(plugin, "Button"),
                     PersistentDataType.STRING, "Previous");
         
-            prevButtonMeta.setDisplayName(plugin.getCfg().PREV_PAGE_BUTTON_NAME());
+            prevButtonMeta.setDisplayName(this.cfg.PREV_PAGE_BUTTON_NAME());
             prevButton.setItemMeta(prevButtonMeta);
         
-            inv.setItem(plugin.getCfg().GUI_SIZE() - 6, prevButton);
+            inv.setItem(this.cfg.GUI_SIZE() - 6, prevButton);
         }
     }
     
