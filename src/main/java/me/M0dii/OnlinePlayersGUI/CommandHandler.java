@@ -7,6 +7,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,8 +24,8 @@ public class CommandHandler implements CommandExecutor, TabCompleter
     }
     
     @Override
-    public boolean onCommand(CommandSender sender, Command cmd,
-                             String alias, String[] args)
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd,
+                             @NotNull String alias, @NotNull String[] args)
     {
         if(args.length == 1)
         {
@@ -37,26 +38,34 @@ public class CommandHandler implements CommandExecutor, TabCompleter
                 return true;
             }
             
-            if(canUse(args[0], "reload", "m0onlinegui.command.reload", sender))
+            if(isCommand(args[0], "reload"))
             {
-                this.plugin.reloadConfig();
-                this.plugin.saveConfig();
-            
-                this.plugin.renewConfig();
-
-                sender.sendMessage(this.config.CONFIG_RELOAD_MSG());
-            }
-            else sender.sendMessage(this.config.NO_PERMISSION_MSG());
+                if(sender.hasPermission("m0onlinegui.command.reload"))
+                {
+                    this.plugin.reloadConfig();
+                    this.plugin.saveConfig();
     
+                    this.plugin.renewConfig();
+                    
+                    cgis.loadGUIs();
+    
+                    sender.sendMessage(this.config.CONFIG_RELOAD_MSG());
+                }
+                else sender.sendMessage(this.config.NO_PERMISSION_MSG());
+            }
             if(sender instanceof Player)
             {
                 Player p = (Player)sender;
-                
-                if(canUse(args[0], "toggleself", "m0onlinegui.command.toggleself", p))
-                {
-                    this.plugin.toggleHiddenPlayer(p);
     
-                    p.sendMessage(this.config.TOGGLE_MESSAGE());
+                if(isCommand(args[0], "toggleself"))
+                {
+                    if(sender.hasPermission("m0onlinegui.command.toggleself"))
+                    {
+                        this.plugin.toggleHiddenPlayer(p);
+            
+                        p.sendMessage(this.config.TOGGLE_MESSAGE());
+                    }
+                    else sender.sendMessage(this.config.NO_PERMISSION_MSG());
                 }
             }
         
@@ -73,33 +82,26 @@ public class CommandHandler implements CommandExecutor, TabCompleter
             p.openInventory(ogi.getInventory());
     
             return true;
-            
-//            if(p.hasPermission("m0onlinegui.command.onlinegui"))
-//                new PlayerListGUI(this.plugin, 0).showPlayers(p);
-//            else
-//                p.sendMessage(this.config.NO_PERMISSION_MSG());
-//
-//            return true;
         }
 
         return true;
     }
     
-    private boolean canUse(String arg, String cmd, String perm, CommandSender p)
+    private boolean isCommand(String arg, String cmd)
     {
-        return arg.equalsIgnoreCase(cmd) && p.hasPermission(perm);
+        return arg.equalsIgnoreCase(cmd);
     }
     
     @Override
-    public List<String> onTabComplete(CommandSender sender, Command cmd,
-                                      String label, String[] args)
+    public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command cmd,
+                                      @NotNull String label, @NotNull String[] args)
     {
         List<String> completes = new ArrayList<>();
         
         if(args.length == 1)
         {
             completes.add("reload");
-            completes.add("hideself");
+            completes.add("toggleself");
     
             completes.addAll(new ConditionalGUIs(this.plugin).getConditionalNames());
         }

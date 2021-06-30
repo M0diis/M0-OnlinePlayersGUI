@@ -1,6 +1,7 @@
 package me.M0dii.OnlinePlayersGUI;
 
 import me.M0dii.OnlinePlayersGUI.InventoryHolder.ConditionalGUIInventory;
+import me.M0dii.OnlinePlayersGUI.Utils.Utils;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
@@ -19,10 +20,10 @@ public class ConditionalGUIs
     
     public ConditionalGUIs(OnlineGUI plugin)
     {
-        this.conditionalNames = new ArrayList<>();
-        
         this.plugin = plugin;
-        
+    
+        this.conditionalNames = new ArrayList<>();
+    
         this.loadGUIs();
     }
     
@@ -33,28 +34,36 @@ public class ConditionalGUIs
     
     public void loadGUIs()
     {
-        File folder = plugin.getDataFolder();
+        File folder = new File(plugin.getDataFolder() + File.separator + "Custom");
+    
+        if(!folder.exists())
+            folder.mkdirs();
         
-        if(folder != null)
+        File[] files = folder.listFiles();
+    
+        if(files != null)
         {
-            for (File file : folder.listFiles())
+            for (File file : files)
             {
                 String name = file.getName();
-                
-                if (file.isFile() && name.endsWith(".yml") && !name.startsWith("config"))
+    
+                if (file.isFile() && name.endsWith(".yml") && !name.startsWith("config")
+                && !conditionalNames.contains(file.getName().replace(".yml", "")))
                     conditionalNames.add(file.getName().replace(".yml", ""));
             }
         }
+    
     }
     
     public void displayConditional(String name, Player p)
     {
-        File file = new File(plugin.getDataFolder() + File.separator + name + ".yml");
+        File file = new File(plugin.getDataFolder() + File.separator
+                + "Custom" + File.separator + name + ".yml");
         
         YamlConfiguration cfg =
                 YamlConfiguration.loadConfiguration(file);
-    
-        ConditionalGUIInventory cgi = new ConditionalGUIInventory(plugin, name, 0, cfg);
+        
+        ConditionalGUIInventory cgi = new ConditionalGUIInventory(plugin, Utils.format(cfg.getString("GUI.Title")), 0, cfg);
         cgi.setCustomItems(p);
         
         p.openInventory(cgi.getInventory());

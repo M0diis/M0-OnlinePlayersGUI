@@ -1,7 +1,6 @@
 package me.M0dii.OnlinePlayersGUI.InventoryHolder;
 
 import me.M0dii.OnlinePlayersGUI.Utils.ConditionalConfig;
-import me.M0dii.OnlinePlayersGUI.Utils.Config;
 import me.M0dii.OnlinePlayersGUI.CustomItem;
 import me.M0dii.OnlinePlayersGUI.OnlineGUI;
 import me.M0dii.OnlinePlayersGUI.Utils.Utils;
@@ -124,6 +123,7 @@ public class ConditionalGUIInventory implements InventoryHolder, CustomGUI
             
                 if(cont.has(key, PersistentDataType.INTEGER))
                 {
+                    //noinspection ConstantConditions
                     int slot = cont.get(key, PersistentDataType.INTEGER);
                 
                     CustomItem c = this.getCustomItemBySlot(slot);
@@ -197,6 +197,7 @@ public class ConditionalGUIInventory implements InventoryHolder, CustomGUI
         
             if(cont.has(key, PersistentDataType.INTEGER))
             {
+                //noinspection ConstantConditions
                 int slot = cont.get(key, PersistentDataType.INTEGER);
             
                 List<String> lore = c.getLore();
@@ -291,9 +292,9 @@ public class ConditionalGUIInventory implements InventoryHolder, CustomGUI
             for(String s : this.cfg.HEAD_LORE())
                 lore.add(Utils.format(PlaceholderAPI.setPlaceholders(p, s)));
 
-            meta.setLocalizedName(
-                    Utils.format(PlaceholderAPI.setPlaceholders(p, this.cfg
-                            .HEAD_DISPLAY_NAME())));
+            meta.displayName(
+                    Component.text(Utils.format(PlaceholderAPI.setPlaceholders(p, this.cfg
+                            .HEAD_DISPLAY_NAME()))));
         
             meta.setLore(lore);
         

@@ -5,7 +5,7 @@ import org.bukkit.inventory.ItemStack;
 
 public interface CustomGUI
 {
-    public void refresh(Player p);
+    void refresh(Player p);
     
-    public void execute(Player p, ItemStack item, boolean left);
+    void execute(Player p, ItemStack item, boolean left);
 }

@@ -6,6 +6,9 @@ public class Utils
 {
     public static String format(String text)
     {
+        if(text == null || text.isEmpty())
+            return text;
+        
         return ChatColor.translateAlternateColorCodes('&', text);
     }
     

@@ -40,7 +40,7 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI
         
         this.plugin = plugin;
     
-        this.inv = Bukkit.createInventory(this, this.size, name);
+        this.inv = Bukkit.createInventory(this, this.size, Component.text(name));
         
         initByPage(page);
     }
@@ -114,6 +114,7 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI
             
                 if(cont.has(key, PersistentDataType.INTEGER))
                 {
+                    //noinspection ConstantConditions
                     int slot = cont.get(key, PersistentDataType.INTEGER);
                 
                     CustomItem c = this.getCustomItemBySlot(slot);
@@ -177,6 +178,7 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI
         
             if(cont.has(key, PersistentDataType.INTEGER))
             {
+                //noinspection ConstantConditions
                 int slot = cont.get(key, PersistentDataType.INTEGER);
             
                 List<String> lore = c.getLore();
@@ -302,9 +304,9 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI
             for(String s : plugin.getCfg().HEAD_LORE())
                 lore.add(Utils.format(PlaceholderAPI.setPlaceholders(p, s)));
 
-            meta.setDisplayName(
-                    Utils.format(PlaceholderAPI.setPlaceholders(p, plugin.getCfg()
-                            .HEAD_DISPLAY_NAME())));
+            meta.displayName(Component.text(Utils.format(
+                    PlaceholderAPI.setPlaceholders(p, plugin.getCfg()
+                            .HEAD_DISPLAY_NAME()))));
         
             meta.setLore(lore);
         
@@ -336,13 +338,13 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI
             nextButtonMeta.getPersistentDataContainer().set(
                     new NamespacedKey(plugin, "Button"),
                     PersistentDataType.STRING, "Next");
-        
-            nextButtonMeta.setDisplayName(plugin.getCfg().NEXT_PAGE_BUTTON_NAME());
+            
+            nextButtonMeta.displayName(Component.text(plugin.getCfg().NEXT_PAGE_BUTTON_NAME()));
+            
             nextButton.setItemMeta(nextButtonMeta);
         
             inv.setItem(plugin.getCfg().GUI_SIZE() - 4, nextButton);
             
-        
             ItemStack prevButton = new ItemStack(plugin.getCfg().PREV_PAGE_MATERIAL());
             ItemMeta prevButtonMeta = prevButton.getItemMeta();
         
@@ -355,7 +357,7 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI
                     new NamespacedKey(plugin, "Button"),
                     PersistentDataType.STRING, "Previous");
         
-            prevButtonMeta.setDisplayName(plugin.getCfg().PREV_PAGE_BUTTON_NAME());
+            prevButtonMeta.displayName(Component.text(plugin.getCfg().PREV_PAGE_BUTTON_NAME()));
             prevButton.setItemMeta(prevButtonMeta);
         
             inv.setItem(plugin.getCfg().GUI_SIZE() - 6, prevButton);

@@ -85,6 +85,8 @@ public class OnlineGUI extends JavaPlugin
     {
         this.prepareConfig();
         
+       
+        
         this.cfg.load();
         
         cgis = new ConditionalGUIs(this);

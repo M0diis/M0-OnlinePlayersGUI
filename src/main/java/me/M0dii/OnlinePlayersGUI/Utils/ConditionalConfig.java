@@ -46,9 +46,6 @@ public class ConditionalConfig
     
     public void reload()
     {
-        plugin.reloadConfig();
-        this.cfg = plugin.getConfig();
-        
         this.load();
     }
     

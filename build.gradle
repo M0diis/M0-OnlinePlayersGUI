@@ -4,9 +4,8 @@ plugins {
 }
 
 group 'me.M0dii'
-version '2.12'
+version '3.0'
 sourceCompatibility = '8'
-
 
 shadowJar {
     relocate 'org.bstats', 'me.M0dii.OnlinePlayersGUI'
