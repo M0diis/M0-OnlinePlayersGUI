@@ -59,13 +59,14 @@ public class ConditionalGUIInventory implements InventoryHolder, CustomGUI
         if(clickedItem != null && clickedItem.getType().equals(Material.PLAYER_HEAD))
         {
             SkullMeta sm = (SkullMeta)clickedItem.getItemMeta();
-            
-            String ownerName = sm.getOwner();
-
-            if(ownerName != null)
-            {
-                Player skullOwner = Bukkit.getPlayer(ownerName);
     
+            Player skullOwner = sm.getOwningPlayer().getPlayer();
+    
+            if(skullOwner == null)
+                skullOwner = Bukkit.getPlayer(sm.getOwner());
+    
+            if(skullOwner != null)
+            {
                 for(String cmd : left ? this.cfg.LEFT_CLICK_CMDS() :
                         this.cfg.RIGHT_CLICK_CMDS())
                     sendCommand(clickee, skullOwner, cmd);
@@ -265,16 +266,16 @@ public class ConditionalGUIInventory implements InventoryHolder, CustomGUI
         online = filterByCondition(online);
     
         List<Player> byPage = new ArrayList<>();
-        
-        int lowBound = this.size * page;
-        int highBound = this.size * page + this.size;
-        
+    
+        int lowBound = (this.size - 9) * page;
+        int highBound = (this.size - 9) * (page == 0 ? 1 : page + 1);
+    
         for(int i = lowBound; i < highBound; i++)
         {
             if(lowBound < online.size() && i < online.size())
                 byPage.add(online.get(i));
         }
-        
+    
         displayedHeads = byPage.size();
         
         int curr = 0;
@@ -283,7 +284,7 @@ public class ConditionalGUIInventory implements InventoryHolder, CustomGUI
         {
             ItemStack head = new ItemStack(Material.PLAYER_HEAD);
         
-            Player p = online.get(curr);
+            Player p = byPage.get(curr);
             
             ItemMeta meta = head.getItemMeta();
         

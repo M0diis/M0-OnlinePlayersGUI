@@ -63,7 +63,9 @@ public class ConditionalGUIs
         YamlConfiguration cfg =
                 YamlConfiguration.loadConfiguration(file);
         
-        ConditionalGUIInventory cgi = new ConditionalGUIInventory(plugin, Utils.format(cfg.getString("GUI.Title")), 0, cfg);
+        ConditionalGUIInventory cgi = new ConditionalGUIInventory(plugin,
+                Utils.format(cfg.getString("GUI.Title")), 0, cfg);
+        
         cgi.setCustomItems(p);
         
         p.openInventory(cgi.getInventory());

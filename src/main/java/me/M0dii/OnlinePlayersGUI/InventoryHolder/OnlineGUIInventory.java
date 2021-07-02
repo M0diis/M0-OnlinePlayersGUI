@@ -9,6 +9,7 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
@@ -50,13 +51,14 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI
         if(clickedItem != null && clickedItem.getType().equals(Material.PLAYER_HEAD))
         {
             SkullMeta sm = (SkullMeta)clickedItem.getItemMeta();
-            
-            String ownerName = sm.getOwner();
-
-            if(ownerName != null)
-            {
-                Player skullOwner = Bukkit.getPlayer(ownerName);
     
+            Player skullOwner = sm.getOwningPlayer().getPlayer();
+            
+            if(skullOwner == null)
+                skullOwner = Bukkit.getPlayer(sm.getOwner());
+            
+            if(skullOwner != null)
+            {
                 for(String cmd : left ? this.plugin.getCfg().LEFT_CLICK_CMDS() :
                         this.plugin.getCfg().RIGHT_CLICK_CMDS())
                     sendCommand(clickee, skullOwner, cmd);
@@ -281,8 +283,8 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI
     
         List<Player> byPage = new ArrayList<>();
         
-        int lowBound = (this.size / 2) * page;
-        int highBound = (this.size / 2) * (page == 0 ? 1 : page + 1);
+        int lowBound = (this.size - 9) * page;
+        int highBound = (this.size - 9) * (page == 0 ? 1 : page + 1);
         
         for(int i = lowBound; i < highBound; i++)
         {
