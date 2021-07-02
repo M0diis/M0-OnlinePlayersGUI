@@ -90,6 +90,9 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI
                 try
                 {
                     OnlineGUIInventory newinv = new OnlineGUIInventory(this.plugin, this.name, nextPage);
+                    newinv.setCustomItems(clickee);
+                    
+                    plugin.getLogger().info(String.valueOf(nextPage));
                     
                     if(newinv.displayedHeads != 0)
                         clickee.openInventory(newinv.getInventory());
@@ -278,8 +281,8 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI
     
         List<Player> byPage = new ArrayList<>();
         
-        int lowBound = this.size * page;
-        int highBound = this.size * page + this.size;
+        int lowBound = (this.size / 2) * page;
+        int highBound = (this.size / 2) * (page == 0 ? 1 : page + 1);
         
         for(int i = lowBound; i < highBound; i++)
         {
@@ -295,7 +298,7 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI
         {
             ItemStack head = new ItemStack(Material.PLAYER_HEAD);
         
-            Player p = online.get(curr);
+            Player p = byPage.get(curr);
             
             ItemMeta meta = head.getItemMeta();
         
