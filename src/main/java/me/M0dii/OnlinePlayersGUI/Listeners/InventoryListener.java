@@ -32,14 +32,14 @@ public class InventoryListener implements Listener
     private final List<HumanEntity> guiViewers;
     
     @EventHandler
-    public void addViewer(InventoryOpenEvent e)
+    public void addOnOpen(InventoryOpenEvent e)
     {
         if(e.getInventory().getHolder() instanceof CustomGUI)
             this.guiViewers.add(e.getPlayer());
     }
     
     @EventHandler
-    public void removeViewer(InventoryCloseEvent e)
+    public void removeOnClose(InventoryCloseEvent e)
     {
         if(e.getInventory().getHolder() instanceof CustomGUI)
             this.guiViewers.remove(e.getPlayer());
@@ -48,9 +48,10 @@ public class InventoryListener implements Listener
     @EventHandler
     public void onInteract(InventoryMoveItemEvent e)
     {
-        Inventory inv = e.getSource();
+        if(e.getSource() instanceof CustomGUI)
+            e.setCancelled(true);
         
-        if(inv.getHolder() instanceof CustomGUI)
+        if(e.getDestination() instanceof CustomGUI)
             e.setCancelled(true);
     }
     
@@ -65,19 +66,23 @@ public class InventoryListener implements Listener
     public void updateOnLeave(PlayerQuitEvent e)
     {
         if(this.plugin.getCfg().UPDATE_ON_LEAVE())
+        {
             updateView();
+            
+            guiViewers.remove(e.getPlayer());
+        }
     }
     
     private void updateView()
     {
         for(HumanEntity p : guiViewers)
-            Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, () ->
+            Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () ->
             {
                 Inventory inv = p.getOpenInventory().getTopInventory();
                 
                 if(inv.getHolder() instanceof CustomGUI)
                     ((CustomGUI)inv.getHolder()).refresh((Player)p);
-            }, 20L);
+            });
     }
     
     @EventHandler
@@ -89,9 +94,9 @@ public class InventoryListener implements Listener
         {
             e.setCancelled(true);
     
-            CustomGUI guiInv = (CustomGUI)inv.getHolder();
+            CustomGUI customGUI = (CustomGUI)inv.getHolder();
             
-            guiInv.execute((Player)e.getWhoClicked(), e.getCurrentItem(), e.isLeftClick());
+            customGUI.execute((Player)e.getWhoClicked(), e.getCurrentItem(), e.isLeftClick());
         }
     }
     

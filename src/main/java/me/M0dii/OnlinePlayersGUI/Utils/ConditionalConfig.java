@@ -2,6 +2,7 @@ package me.M0dii.OnlinePlayersGUI.Utils;
 
 import me.M0dii.OnlinePlayersGUI.CustomItem;
 import me.M0dii.OnlinePlayersGUI.OnlineGUI;
+import net.kyori.adventure.text.Component;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -13,6 +14,7 @@ import org.bukkit.persistence.PersistentDataType;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ConditionalConfig
 {
@@ -49,7 +51,7 @@ public class ConditionalConfig
         this.load();
     }
     
-    FileConfiguration cfg;
+    final FileConfiguration cfg;
     
     private static final String prefix = "";
     
@@ -139,17 +141,11 @@ public class ConditionalConfig
                 ItemMeta meta = item.getItemMeta();
 
                 if(CI_NAME.length() != 0)
-                    meta.setDisplayName(CI_NAME);
+                    meta.displayName(Component.text(CI_NAME));
 
-                List<String> lore = new ArrayList<>();
-
-                if(CI_LORE.size() != 0)
-                {
-                    for(String l : CI_LORE)
-                        lore.add(format(l));
-
-                    meta.setLore(lore);
-                }
+                List<String> lore = CI_LORE.stream().map(this::format).collect(Collectors.toList());
+                
+                meta.setLore(lore);
 
                 List<String> lcc = cfg.getStringList(
                         String.format(prefix + "CustomItems.%d.Commands.Left-Click", i));
@@ -244,11 +240,6 @@ public class ConditionalConfig
     public List<String> HEAD_LORE()
     {
         return HEAD_LORE;
-    }
-    
-    public String GUI_TITLE()
-    {
-        return GUI_TITLE;
     }
     
     public String NEXT_PAGE_BUTTON_NAME()

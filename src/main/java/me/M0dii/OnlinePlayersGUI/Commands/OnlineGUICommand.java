@@ -1,6 +1,8 @@
-package me.M0dii.OnlinePlayersGUI;
+package me.M0dii.OnlinePlayersGUI.Commands;
 
+import me.M0dii.OnlinePlayersGUI.ConditionalGUIs;
 import me.M0dii.OnlinePlayersGUI.InventoryHolder.OnlineGUIInventory;
+import me.M0dii.OnlinePlayersGUI.OnlineGUI;
 import me.M0dii.OnlinePlayersGUI.Utils.Config;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -12,12 +14,12 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CommandHandler implements CommandExecutor, TabCompleter
+public class OnlineGUICommand implements CommandExecutor, TabCompleter
 {
     private final OnlineGUI plugin;
     private final Config config;
     
-    public CommandHandler(OnlineGUI plugin)
+    public OnlineGUICommand(OnlineGUI plugin)
     {
         this.plugin = plugin;
         this.config = plugin.getCfg();
@@ -76,7 +78,9 @@ public class CommandHandler implements CommandExecutor, TabCompleter
         {
             Player p = (Player)sender;
             
-            OnlineGUIInventory ogi = new OnlineGUIInventory(this.plugin, this.plugin.getCfg().GUI_TITLE(), 0);
+            OnlineGUIInventory ogi = new OnlineGUIInventory(this.plugin,
+                    this.plugin.getCfg().GUI_TITLE(), 0);
+            
             ogi.setCustomItems(p);
             
             p.openInventory(ogi.getInventory());
@@ -102,8 +106,8 @@ public class CommandHandler implements CommandExecutor, TabCompleter
         {
             completes.add("reload");
             completes.add("toggleself");
-    
-            completes.addAll(new ConditionalGUIs(this.plugin).getConditionalNames());
+            
+            completes.addAll(this.plugin.getCgis().getConditionalNames());
         }
         
         return completes;

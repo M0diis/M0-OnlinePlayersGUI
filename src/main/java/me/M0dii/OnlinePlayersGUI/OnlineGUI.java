@@ -1,5 +1,6 @@
 package me.M0dii.OnlinePlayersGUI;
 
+import me.M0dii.OnlinePlayersGUI.Commands.OnlineGUICommand;
 import me.M0dii.OnlinePlayersGUI.Listeners.InventoryListener;
 import me.M0dii.OnlinePlayersGUI.Utils.Config;
 import me.M0dii.OnlinePlayersGUI.Utils.UpdateChecker;
@@ -85,8 +86,6 @@ public class OnlineGUI extends JavaPlugin
     {
         this.prepareConfig();
         
-       
-        
         this.cfg.load();
         
         cgis = new ConditionalGUIs(this);
@@ -100,7 +99,7 @@ public class OnlineGUI extends JavaPlugin
         PluginCommand cmd = this.getCommand("online");
         
         if(cmd != null)
-            cmd.setExecutor(new CommandHandler(this));
+            cmd.setExecutor(new OnlineGUICommand(this));
         
         Metrics metrics = new Metrics(this, 10924);
     

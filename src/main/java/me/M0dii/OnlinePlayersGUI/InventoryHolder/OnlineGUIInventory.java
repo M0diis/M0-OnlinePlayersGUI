@@ -1,15 +1,14 @@
 package me.M0dii.OnlinePlayersGUI.InventoryHolder;
 
-import me.M0dii.OnlinePlayersGUI.Utils.Config;
 import me.M0dii.OnlinePlayersGUI.CustomItem;
 import me.M0dii.OnlinePlayersGUI.OnlineGUI;
+import me.M0dii.OnlinePlayersGUI.Utils.Config;
 import me.M0dii.OnlinePlayersGUI.Utils.Utils;
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
@@ -52,16 +51,21 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI
         {
             SkullMeta sm = (SkullMeta)clickedItem.getItemMeta();
     
-            Player skullOwner = sm.getOwningPlayer().getPlayer();
-            
+            Player skullOwner = sm.getOwningPlayer() != null ? sm.getOwningPlayer().getPlayer() : null;
+    
             if(skullOwner == null)
-                skullOwner = Bukkit.getPlayer(sm.getOwner());
+            {
+                String owner = sm.getOwner();
+        
+                if(owner != null)
+                    skullOwner = Bukkit.getPlayer(owner);
+            }
             
             if(skullOwner != null)
             {
                 for(String cmd : left ? this.plugin.getCfg().LEFT_CLICK_CMDS() :
                         this.plugin.getCfg().RIGHT_CLICK_CMDS())
-                    sendCommand(clickee, skullOwner, cmd);
+                    Utils.sendCommand(clickee, skullOwner, cmd);
             }
             
             if(left && this.plugin.getCfg().CLOSE_ON_LEFT_CLICK())
@@ -93,9 +97,7 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI
                 {
                     OnlineGUIInventory newinv = new OnlineGUIInventory(this.plugin, this.name, nextPage);
                     newinv.setCustomItems(clickee);
-                    
-                    plugin.getLogger().info(String.valueOf(nextPage));
-                    
+
                     if(newinv.displayedHeads != 0)
                         clickee.openInventory(newinv.getInventory());
                 }
@@ -146,7 +148,7 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI
                                 close = true;
                         }
                     
-                        cicmds.forEach(cmd -> sendCommand(clickee, clickee, cmd));
+                        cicmds.forEach(cmd -> Utils.sendCommand(clickee, clickee, cmd));
                     
                         if(close)
                             clickee.closeInventory();
@@ -200,26 +202,6 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI
                 inv.setItem(this.size - 10 + slot, item);
             }
         }
-    }
-    
-    private void sendCommand(Player sender, Player placeholderHolder, String cmd)
-    {
-        cmd = PlaceholderAPI.setPlaceholders(placeholderHolder, cmd)
-                .replace("%sender_name%", sender.getName());
-        
-        if(cmd.startsWith("["))
-        {
-            String sendAs = cmd.substring(cmd.indexOf("["), cmd.indexOf("]") + 2);
-            
-            cmd = cmd.substring(cmd.indexOf("]") + 2);
-            
-            if(sendAs.equalsIgnoreCase("[PLAYER] "))
-                Bukkit.dispatchCommand(sender, cmd);
-            else if(sendAs.equalsIgnoreCase("[CONSOLE] "))
-                Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
-                        cmd.replace("[CONSOLE] ", ""));
-        }
-        else Bukkit.dispatchCommand(sender, cmd);
     }
     
     private int adjustSize(Config cfg)

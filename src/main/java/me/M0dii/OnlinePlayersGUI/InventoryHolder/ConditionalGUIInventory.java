@@ -60,16 +60,21 @@ public class ConditionalGUIInventory implements InventoryHolder, CustomGUI
         {
             SkullMeta sm = (SkullMeta)clickedItem.getItemMeta();
     
-            Player skullOwner = sm.getOwningPlayer().getPlayer();
+            Player skullOwner = sm.getOwningPlayer() != null ? sm.getOwningPlayer().getPlayer() : null;
     
             if(skullOwner == null)
-                skullOwner = Bukkit.getPlayer(sm.getOwner());
+            {
+                String owner = sm.getOwner();
+                
+                if(owner != null)
+                    skullOwner = Bukkit.getPlayer(owner);
+            }
     
             if(skullOwner != null)
             {
                 for(String cmd : left ? this.cfg.LEFT_CLICK_CMDS() :
                         this.cfg.RIGHT_CLICK_CMDS())
-                    sendCommand(clickee, skullOwner, cmd);
+                    Utils.sendCommand(clickee, skullOwner, cmd);
             }
             
             if(left && this.cfg.CLOSE_ON_LEFT_CLICK())
@@ -151,7 +156,7 @@ public class ConditionalGUIInventory implements InventoryHolder, CustomGUI
                                 close = true;
                         }
                     
-                        cicmds.forEach(cmd -> sendCommand(clickee, clickee, cmd));
+                        cicmds.forEach(cmd -> Utils.sendCommand(clickee, clickee, cmd));
                     
                         if(close)
                             clickee.closeInventory();
@@ -215,26 +220,6 @@ public class ConditionalGUIInventory implements InventoryHolder, CustomGUI
                 inv.setItem(this.size - 10 + slot, item);
             }
         }
-    }
-    
-    private void sendCommand(Player sender, Player placeholderHolder, String cmd)
-    {
-        cmd = PlaceholderAPI.setPlaceholders(placeholderHolder, cmd)
-                .replace("%sender_name%", sender.getName());
-        
-        if(cmd.startsWith("["))
-        {
-            String sendAs = cmd.substring(cmd.indexOf("["), cmd.indexOf("]") + 2);
-            
-            cmd = cmd.substring(cmd.indexOf("]") + 2);
-            
-            if(sendAs.equalsIgnoreCase("[PLAYER] "))
-                Bukkit.dispatchCommand(sender, cmd);
-            else if(sendAs.equalsIgnoreCase("[CONSOLE] "))
-                Bukkit.dispatchCommand(Bukkit.getConsoleSender(),
-                        cmd.replace("[CONSOLE] ", ""));
-        }
-        else Bukkit.dispatchCommand(sender, cmd);
     }
     
     private int adjustSize(ConditionalConfig cfg)

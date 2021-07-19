@@ -60,14 +60,17 @@ public class ConditionalGUIs
         File file = new File(plugin.getDataFolder() + File.separator
                 + "Custom" + File.separator + name + ".yml");
         
-        YamlConfiguration cfg =
-                YamlConfiguration.loadConfiguration(file);
-        
-        ConditionalGUIInventory cgi = new ConditionalGUIInventory(plugin,
-                Utils.format(cfg.getString("GUI.Title")), 0, cfg);
-        
-        cgi.setCustomItems(p);
-        
-        p.openInventory(cgi.getInventory());
+        if(file.exists())
+        {
+            YamlConfiguration cfg =
+                    YamlConfiguration.loadConfiguration(file);
+    
+            ConditionalGUIInventory cgi = new ConditionalGUIInventory(plugin,
+                    Utils.format(cfg.getString("GUI.Title")), 0, cfg);
+    
+            cgi.setCustomItems(p);
+    
+            p.openInventory(cgi.getInventory());
+        }
     }
 }
