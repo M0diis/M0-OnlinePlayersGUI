@@ -174,35 +174,7 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI
     
     public void setCustomItems(Player p)
     {
-        List<CustomItem> customItems = this.plugin.getCfg().getCustomItems();
-    
-        for(CustomItem c : customItems)
-        {
-            ItemStack item = c.getItem();
-            ItemMeta m = item.getItemMeta();
-        
-            NamespacedKey key = new NamespacedKey(this.plugin, "Slot");
-            PersistentDataContainer cont = item.getItemMeta().getPersistentDataContainer();
-        
-            if(cont.has(key, PersistentDataType.INTEGER))
-            {
-                //noinspection ConstantConditions
-                int slot = cont.get(key, PersistentDataType.INTEGER);
-            
-                List<String> lore = c.getLore();
-            
-                List<String> newLore = new ArrayList<>();
-            
-                for(String l : lore)
-                    newLore.add(PlaceholderAPI.setPlaceholders(p, l));
-            
-                m.setLore(newLore);
-            
-                item.setItemMeta(m);
-            
-                inv.setItem(this.size - 10 + slot, item);
-            }
-        }
+        new GUIUtils().setCustomItems(inv, p, size, plugin.getCfg().getCustomItems());
     }
     
     private int adjustSize(Config cfg)
@@ -257,8 +229,10 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI
                     .collect(Collectors.toList());
         }
         
-        return plugin.getCfg().isConditionEnabled() ?
-                Utils.filterByCondition(online, plugin.getCfg().getCondition()) : online;
+        if(plugin.getCfg().isConditionEnabled())
+            return new GUIUtils().filterByCondition(online, plugin.getCfg().getCondition());
+        
+        return online;
     }
     
     private void initByPage(int page)
