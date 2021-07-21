@@ -21,6 +21,7 @@ import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -248,7 +249,7 @@ public class ConditionalGUIInventory implements InventoryHolder, CustomGUI
                 !p.hasPermission("m0onlinegui.hidden"))
                 .collect(Collectors.toList());
         
-        online = filterByCondition(online);
+        online = Utils.filterByCondition(online, cfg.getCondition());
     
         List<Player> byPage = new ArrayList<>();
     
@@ -335,21 +336,5 @@ public class ConditionalGUIInventory implements InventoryHolder, CustomGUI
         
             inv.setItem(this.cfg.GUI_SIZE() - 6, prevButton);
         }
-    }
-    
-    private List<Player> filterByCondition(List<Player> players)
-    {
-        List<Player> filtered = new ArrayList<>();
-        
-        for(Player p : players)
-        {
-            String result = PlaceholderAPI.setPlaceholders(p, this.cfg.getCondition())
-                    .toLowerCase();
-            
-            if(result.equals("yes") || result.equals("true"))
-                filtered.add(p);
-        }
-        
-        return filtered;
     }
 }

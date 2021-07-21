@@ -20,6 +20,7 @@ import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -256,7 +257,8 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI
                     .collect(Collectors.toList());
         }
         
-        return plugin.getCfg().isConditionEnabled() ? filterByCondition(online) : online;
+        return plugin.getCfg().isConditionEnabled() ?
+                Utils.filterByCondition(online, plugin.getCfg().getCondition()) : online;
     }
     
     private void initByPage(int page)
@@ -349,21 +351,5 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI
         
             inv.setItem(plugin.getCfg().GUI_SIZE() - 6, prevButton);
         }
-    }
-    
-    private List<Player> filterByCondition(List<Player> players)
-    {
-        List<Player> filtered = new ArrayList<>();
-        
-        for(Player p : players)
-        {
-            String result = PlaceholderAPI.setPlaceholders(p, this.plugin.getCfg().getCondition())
-                    .toLowerCase();
-            
-            if(result.equals("yes") || result.equals("true"))
-                filtered.add(p);
-        }
-        
-        return filtered;
     }
 }

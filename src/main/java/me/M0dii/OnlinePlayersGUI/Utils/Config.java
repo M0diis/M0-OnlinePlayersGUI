@@ -17,7 +17,7 @@ import java.util.List;
 public class Config
 {
     private String HEAD_NAME;
-    private String CONFIG_RELOADED, NO_PERMISSION;
+    private String CONFIG_RELOADED, NO_PERMISSION, NO_PERMISSION_COND;
     
     private String NEXT_PAGE_NAME, PREVIOUS_PAGE_NAME;
     private String GUI_TITLE;
@@ -90,6 +90,7 @@ public class Config
         GUI_TITLE = getStringf("GUI.Title");
         
         NO_PERMISSION = getStringf("NoPermission");
+        NO_PERMISSION_COND = getStringf("NoPermissionConditional");
         CONFIG_RELOADED = getStringf("ReloadMessage");
         
         TOGGLE_MESSAGE = getStringf("ToggleMessage");
@@ -318,5 +319,10 @@ public class Config
     public String TOGGLE_MESSAGE()
     {
         return TOGGLE_MESSAGE;
+    }
+    
+    public String NO_PERMISSION_COND_MSG()
+    {
+        return NO_PERMISSION_COND;
     }
 }

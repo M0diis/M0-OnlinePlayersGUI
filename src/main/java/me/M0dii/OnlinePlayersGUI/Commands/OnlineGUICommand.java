@@ -29,52 +29,55 @@ public class OnlineGUICommand implements CommandExecutor, TabCompleter
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd,
                              @NotNull String alias, @NotNull String[] args)
     {
+        ConditionalGUIs cgis = plugin.getCgis();
+        
         if(args.length == 1)
         {
-            ConditionalGUIs cgis = plugin.getCgis();
-            
-            if(cgis.isConditional(args[0]))
-            {
-                cgis.displayConditional(args[0], (Player)sender);
-                
-                return true;
-            }
-            
-            if(isCommand(args[0], "reload"))
+            if(isCmd(args[0], "reload"))
             {
                 if(sender.hasPermission("m0onlinegui.command.reload"))
                 {
                     this.plugin.reloadConfig();
                     this.plugin.saveConfig();
-    
+            
                     this.plugin.renewConfig();
-                    
+            
                     cgis.loadGUIs();
-    
+            
                     sender.sendMessage(this.config.CONFIG_RELOAD_MSG());
                 }
                 else sender.sendMessage(this.config.NO_PERMISSION_MSG());
             }
-            if(sender instanceof Player)
-            {
-                Player p = (Player)sender;
-    
-                if(isCommand(args[0], "toggleself"))
-                {
-                    if(sender.hasPermission("m0onlinegui.command.toggleself"))
-                    {
-                        this.plugin.toggleHiddenPlayer(p);
-            
-                        p.sendMessage(this.config.TOGGLE_MESSAGE());
-                    }
-                    else sender.sendMessage(this.config.NO_PERMISSION_MSG());
-                }
-            }
-        
-            return true;
         }
         
-        if(sender instanceof Player)
+        if(sender instanceof Player && args.length == 1)
+        {
+            Player p = (Player)sender;
+
+            if(cgis.isConditional(args[0]))
+            {
+                if(p.hasPermission("m0onlinegui.conditional." + args[0]))
+                {
+                    cgis.displayConditional(args[0], p);
+    
+                    return true;
+                }
+                else p.sendMessage(this.config.NO_PERMISSION_COND_MSG());
+            }
+            
+            if(isCmd(args[0], "toggleself"))
+            {
+                if(p.hasPermission("m0onlinegui.command.toggleself"))
+                {
+                    this.plugin.toggleHiddenPlayer(p);
+        
+                    p.sendMessage(this.config.TOGGLE_MESSAGE());
+                }
+                else p.sendMessage(this.config.NO_PERMISSION_MSG());
+            }
+        }
+        
+        if(sender instanceof Player && args.length == 0)
         {
             Player p = (Player)sender;
             
@@ -84,14 +87,12 @@ public class OnlineGUICommand implements CommandExecutor, TabCompleter
             ogi.setCustomItems(p);
             
             p.openInventory(ogi.getInventory());
-    
-            return true;
         }
 
         return true;
     }
     
-    private boolean isCommand(String arg, String cmd)
+    private boolean isCmd(String arg, String cmd)
     {
         return arg.equalsIgnoreCase(cmd);
     }
@@ -104,10 +105,15 @@ public class OnlineGUICommand implements CommandExecutor, TabCompleter
         
         if(args.length == 1)
         {
-            completes.add("reload");
-            completes.add("toggleself");
+            if(sender.hasPermission("m0onlinegui.command.reload"))
+                completes.add("reload");
             
-            completes.addAll(this.plugin.getCgis().getConditionalNames());
+            if(sender.hasPermission("m0onlinegui.command.toggleself"))
+                completes.add("toggleself");
+            
+            for(String cond : this.plugin.getCgis().getConditionalNames())
+                if(sender.hasPermission("m0onlinegui.conditional." + cond.toLowerCase()))
+                    completes.add(cond);
         }
         
         return completes;

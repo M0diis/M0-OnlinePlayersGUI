@@ -1,9 +1,14 @@
 package me.M0dii.OnlinePlayersGUI.Utils;
 
+import me.M0dii.OnlinePlayersGUI.OnlineGUI;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class Utils
 {
@@ -38,5 +43,82 @@ public class Utils
     public static String clearFormat(String text)
     {
         return ChatColor.stripColor(text);
+    }
+    
+    public static List<Player> filterByCondition(List<Player> players, String cond)
+    {
+        List<Player> filtered = new ArrayList<>();
+        
+        List<String> condSplit = Arrays.asList(cond.split(" "));
+        
+        try
+        {
+            if(condSplit.size() == 3)
+            {
+                String op = condSplit.get(1);
+    
+                double right = Double.parseDouble(condSplit.get(2));
+                
+                for(Player p : players)
+                {
+                    double left = Double.parseDouble(
+                            PlaceholderAPI.setPlaceholders(p, condSplit.get(0))
+                                    .replaceAll("[a-zA-Z!@#$%&*()/\\\\\\[\\]{}:\"?]", ""));
+                    switch (op)
+                    {
+                        case ">":
+                            if(left > right)
+                                filtered.add(p);
+                            break;
+                        
+                        case "<":
+                            if(left < right)
+                                filtered.add(p);
+                            break;
+                        
+                        case "<=":
+                            if(left <= right)
+                                filtered.add(p);
+                            break;
+                        
+                        case ">=":
+                            if(left >= right)
+                                filtered.add(p);
+                            break;
+                        
+                        case "=": case "==":
+                        if(left == right)
+                            filtered.add(p);
+                        break;
+                        
+                        case "!=":
+                            if(left != right)
+                                filtered.add(p);
+                            break;
+                        
+                        default:
+                            break;
+                    }
+                }
+                
+            }
+            
+            return filtered;
+        }
+        catch(NumberFormatException ex)
+        {
+            OnlineGUI.instance.getLogger().warning("Error occured trying to parse the condition.");
+        }
+        
+        for(Player p : players)
+        {
+            String result = PlaceholderAPI.setPlaceholders(p, cond)
+                    .toLowerCase();
+            
+            if(result.equals("yes") || result.equals("true"))
+                filtered.add(p);
+        }
+        
+        return filtered;
     }
 }

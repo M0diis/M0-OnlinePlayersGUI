@@ -23,6 +23,8 @@ import java.util.Map;
 
 public class OnlineGUI extends JavaPlugin
 {
+    public static OnlineGUI instance;
+    
     private final PluginManager manager;
 
     public OnlineGUI()
@@ -84,6 +86,8 @@ public class OnlineGUI extends JavaPlugin
     
     public void onEnable()
     {
+        instance = this;
+        
         this.prepareConfig();
         
         this.cfg.load();
