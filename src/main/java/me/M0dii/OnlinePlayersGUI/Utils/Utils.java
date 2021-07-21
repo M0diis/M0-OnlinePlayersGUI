@@ -57,13 +57,17 @@ public class Utils
             {
                 String op = condSplit.get(1);
     
-                double right = Double.parseDouble(condSplit.get(2));
-                
+
                 for(Player p : players)
                 {
                     double left = Double.parseDouble(
                             PlaceholderAPI.setPlaceholders(p, condSplit.get(0))
-                                    .replaceAll("[a-zA-Z!@#$%&*()/\\\\\\[\\]{}:\"?]", ""));
+                                    .replaceAll("[a-zA-Z!@#$&*()/\\\\\\[\\]{}:\"?]", ""));
+                    
+                    double right = Double.parseDouble(
+                            PlaceholderAPI.setPlaceholders(p, condSplit.get(2))
+                                    .replaceAll("[a-zA-Z!@#$&*()/\\\\\\[\\]{}:\"?]", ""));
+                    
                     switch (op)
                     {
                         case ">":
