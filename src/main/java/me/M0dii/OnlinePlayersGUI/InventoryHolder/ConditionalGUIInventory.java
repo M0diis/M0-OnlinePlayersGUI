@@ -51,7 +51,8 @@ public class ConditionalGUIInventory implements InventoryHolder, CustomGUI
         
         this.condition = this.cfg.getCondition();
         
-        this.inv = Bukkit.createInventory(this, this.size, Component.text(name));
+        this.inv = Bukkit.createInventory(this, this.size,
+                Utils.format(this.cfg.getGUI_TITLE()));
         
         initByPage(page);
     }

@@ -47,28 +47,21 @@ public class ConditionalConfig
         this.load();
     }
     
-    public void reload()
-    {
-        this.load();
-    }
-    
     final FileConfiguration cfg;
-    
-    private static final String prefix = "";
     
     private boolean getBool(String path)
     {
-        return cfg.getBoolean(prefix + path);
+        return cfg.getBoolean(path, false);
     }
     
     private String getStringf(String path)
     {
-        return format(cfg.getString(prefix + path));
+        return format(cfg.getString(path));
     }
     
     private List<String> getStringList(String path)
     {
-        return cfg.getStringList(prefix + path);
+        return cfg.getStringList(path);
     }
 
     public void load()
@@ -153,10 +146,10 @@ public class ConditionalConfig
                 meta.setLore(lore);
 
                 List<String> lcc = cfg.getStringList(
-                        String.format(prefix + "CustomItems.%d.Commands.Left-Click", i));
+                        String.format("CustomItems.%d.Commands.Left-Click", i));
 
                 List<String> rcc = cfg.getStringList(
-                        String.format(prefix + "CustomItems.%d.Commands.Right-Click", i));
+                        String.format("CustomItems.%d.Commands.Right-Click", i));
 
                 meta.getPersistentDataContainer().set(
                         new NamespacedKey(plugin, "Slot"), PersistentDataType.INTEGER, i);
@@ -167,10 +160,10 @@ public class ConditionalConfig
                 item.setItemMeta(meta);
 
                 boolean colc = cfg.getBoolean(
-                        String.format(prefix + "CustomItems.%d.Commands.CloseOnLeftClick", i));
+                        String.format("CustomItems.%d.Commands.CloseOnLeftClick", i));
 
                 boolean corc = cfg.getBoolean(
-                        String.format(prefix + "CustomItems.%d.Commands.CloseOnRightClick", i));
+                        String.format("CustomItems.%d.Commands.CloseOnRightClick", i));
 
                 CustomItem ci = new CustomItem(item, i, lcc, rcc, colc, corc, lore);
 
@@ -291,5 +284,9 @@ public class ConditionalConfig
     public String getREQUIRED_PERMISSION()
     {
         return PERMISSION;
+    }
+    public String getGUI_TITLE()
+    {
+        return GUI_TITLE;
     }
 }
