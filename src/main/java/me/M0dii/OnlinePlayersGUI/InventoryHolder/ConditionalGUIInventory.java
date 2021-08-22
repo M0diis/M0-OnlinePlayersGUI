@@ -21,7 +21,6 @@ import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,7 +31,7 @@ public class ConditionalGUIInventory implements InventoryHolder, CustomGUI
     private final int size, page;
     private final OnlineGUI plugin;
     
-    private String condition;
+    private final String condition;
     
     private final ConditionalConfig cfg;
     private final FileConfiguration fileCfg;
@@ -227,16 +226,18 @@ public class ConditionalGUIInventory implements InventoryHolder, CustomGUI
         
         online = new GUIUtils().filterByCondition(online, this.condition);
     
+        if(cfg.isPERMISSION_REQUIRED())
+            online = online.stream().filter(p -> p.hasPermission(cfg.getREQUIRED_PERMISSION()))
+                    .collect(Collectors.toList());
+    
         List<Player> byPage = new ArrayList<>();
     
         int lowBound = (this.size - 9) * page;
         int highBound = (this.size - 9) * (page == 0 ? 1 : page + 1);
     
         for(int i = lowBound; i < highBound; i++)
-        {
             if(lowBound < online.size() && i < online.size())
                 byPage.add(online.get(i));
-        }
     
         displayedHeads = byPage.size();
         

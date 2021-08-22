@@ -20,7 +20,6 @@ import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -217,17 +216,21 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI
         {
             online = Bukkit.getOnlinePlayers().stream().filter(p ->
                     !p.hasPermission("m0onlinegui.hidden")
-                            || !plugin.getEssentials().getUser(p).isVanished()
-                            || !toggled.contains(p))
+                    || !plugin.getEssentials().getUser(p).isVanished()
+                    || !toggled.contains(p))
                     .collect(Collectors.toList());
         }
         else
         {
             online = Bukkit.getOnlinePlayers().stream().filter(p ->
                     !p.hasPermission("m0onlinegui.hidden")
-                            || !toggled.contains(p))
+                    || !toggled.contains(p))
                     .collect(Collectors.toList());
         }
+        
+        if(plugin.getCfg().isPERMISSION_REQUIRED())
+            online = online.stream().filter(p -> p.hasPermission(plugin.getCfg().getREQUIRED_PERMISSION()))
+                    .collect(Collectors.toList());
         
         if(plugin.getCfg().isConditionEnabled())
             return new GUIUtils().filterByCondition(online, plugin.getCfg().getCondition());

@@ -35,8 +35,8 @@ public class Config
     
     private boolean ESSENTIALSX_HOOK;
     
-    private boolean CONDITION_REQUIRED;
-    private String CONDITION;
+    private boolean CONDITION_REQUIRED, PERMISSION_REQUIRED;
+    private String CONDITION, PERMISSION;
     
     private final OnlineGUI plugin;
     
@@ -117,8 +117,10 @@ public class Config
         
         ESSENTIALSX_HOOK = getBool("EssentialsXHook");
         
-        CONDITION_REQUIRED = cfg.getBoolean("M0-OnlinePlayersGUI.Condition.Required", false);
+        CONDITION_REQUIRED = getBool("Condition.Required");
+        PERMISSION_REQUIRED = getBool("Condition.Permission.Required");
         CONDITION = cfg.getString("M0-OnlinePlayersGUI.Condition.Placeholder");
+        PERMISSION = cfg.getString("M0-OnlinePlayersGUI.Condition.Permission.Node");
         
         setUpCustomItems(plugin);
     }
@@ -324,5 +326,14 @@ public class Config
     public String NO_PERMISSION_COND_MSG()
     {
         return NO_PERMISSION_COND;
+    }
+    
+    public String getREQUIRED_PERMISSION()
+    {
+        return this.PERMISSION;
+    }
+    public boolean isPERMISSION_REQUIRED()
+    {
+        return this.PERMISSION_REQUIRED;
     }
 }

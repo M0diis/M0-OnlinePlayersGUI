@@ -95,29 +95,13 @@ public class OnlineGUI extends JavaPlugin
         cgis = new ConditionalGUIs(this);
     
         registerHooks();
-    
-        //this.manager.registerEvents(new GUIListener(this), this);
-        
+
         this.manager.registerEvents(new InventoryListener(this), this);
     
         PluginCommand cmd = this.getCommand("online");
         
         if(cmd != null)
             cmd.setExecutor(new OnlineGUICommand(this));
-        
-        Metrics metrics = new Metrics(this, 10924);
-    
-        CustomChart c = new MultiLineChart("players_and_servers", () ->
-        {
-            Map<String, Integer> valueMap = new HashMap<>();
-            
-            valueMap.put("servers", 1);
-            valueMap.put("players", Bukkit.getOnlinePlayers().size());
-            
-            return valueMap;
-        });
-        
-        metrics.addCustomChart(c);
         
         info("  __  __  ___  ");
         info(" |  \\/  |/ _ \\ ");
@@ -128,8 +112,27 @@ public class OnlineGUI extends JavaPlugin
         info(" ");
         info("M0-OnlinePlayersGUI has been successfully enabled!");
         info("");
+    
+        setupMetrics();
         
         checkForUpdates();
+    }
+    
+    private void setupMetrics()
+    {
+        Metrics metrics = new Metrics(this, 10924);
+    
+        CustomChart c = new MultiLineChart("players_and_servers", () ->
+        {
+            Map<String, Integer> valueMap = new HashMap<>();
+        
+            valueMap.put("servers", 1);
+            valueMap.put("players", Bukkit.getOnlinePlayers().size());
+        
+            return valueMap;
+        });
+    
+        metrics.addCustomChart(c);
     }
     
     private void checkForUpdates()
@@ -141,7 +144,7 @@ public class OnlineGUI extends JavaPlugin
             {
                 info("You are running an outdated version of M0-CoreCord.");
                 info("You can download the latest version on Spigot:");
-                info("https://www.spigotmc.org/resources/m0-onlineplayersgui.86813/");
+                info("https://www.spigotmc.org/resources/86813/");
             }
         });
     }

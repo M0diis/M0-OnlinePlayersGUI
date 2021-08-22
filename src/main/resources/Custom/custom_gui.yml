@@ -1,5 +1,8 @@
 Condition:
   Placeholder: "%checkitem_mat:DIRT%"
+  Permission:
+    Required: false
+    Node: "permission.to.include.player"
 PreviousButton:
   Material: ENCHANTED_BOOK
   Name: '&cPrevious Page'
