@@ -80,6 +80,12 @@ public class ConditionalGUIInventory implements InventoryHolder, CustomGUI
                 for(String cmd : left ? this.cfg.LEFT_CLICK_CMDS() :
                         this.cfg.RIGHT_CLICK_CMDS())
                     Utils.sendCommand(clickee, skullOwner, cmd);
+                
+                if(this.cfg.LEFT_CLICK_CMDS().contains("[CLOSE]"))
+                    clickee.closeInventory();
+    
+                if(this.cfg.RIGHT_CLICK_CMDS().contains("[CLOSE]"))
+                    clickee.closeInventory();
             }
             
             if(left && this.cfg.CLOSE_ON_LEFT_CLICK())
@@ -142,28 +148,16 @@ public class ConditionalGUIInventory implements InventoryHolder, CustomGUI
                     if(c != null)
                     {
                         List<String> cicmds = new ArrayList<>();
-                    
-                        boolean close = false;
-                    
-                        if(left)
-                        {
-                            cicmds = c.getLCC();
                         
-                            if(c.closeOnLeft())
-                                close = true;
-                        }
+                        if(left)
+                            cicmds = c.getLCC();
                     
                         if(!left)
-                        {
                             cicmds = c.getRCC();
-                        
-                            if(c.closeOnRight())
-                                close = true;
-                        }
                     
                         cicmds.forEach(cmd -> Utils.sendCommand(clickee, clickee, cmd));
-                    
-                        if(close)
+                        
+                        if(cicmds.contains("[CLOSE]"))
                             clickee.closeInventory();
                     }
                 }

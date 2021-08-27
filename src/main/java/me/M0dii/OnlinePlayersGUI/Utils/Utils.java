@@ -1,14 +1,9 @@
 package me.M0dii.OnlinePlayersGUI.Utils;
 
-import me.M0dii.OnlinePlayersGUI.OnlineGUI;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 public class Utils
 {
@@ -24,6 +19,9 @@ public class Utils
     {
         cmd = PlaceholderAPI.setPlaceholders(placeholderHolder, cmd)
                 .replace("%sender_name%", sender.getName());
+        
+        if(cmd.startsWith("[CLOSE]"))
+            return;
         
         if(cmd.startsWith("["))
         {

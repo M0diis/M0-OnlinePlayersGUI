@@ -66,6 +66,12 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI
                 for(String cmd : left ? this.plugin.getCfg().LEFT_CLICK_CMDS() :
                         this.plugin.getCfg().RIGHT_CLICK_CMDS())
                     Utils.sendCommand(clickee, skullOwner, cmd);
+    
+                if(this.plugin.getCfg().LEFT_CLICK_CMDS().contains("[CLOSE]"))
+                    clickee.closeInventory();
+    
+                if(this.plugin.getCfg().RIGHT_CLICK_CMDS().contains("[CLOSE]"))
+                    clickee.closeInventory();
             }
             
             if(left && this.plugin.getCfg().CLOSE_ON_LEFT_CLICK())

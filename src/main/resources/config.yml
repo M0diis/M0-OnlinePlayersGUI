@@ -50,6 +50,7 @@ M0-OnlinePlayersGUI:
         - '[PLAYER] msg %player_name% Hello, my name is %sender_name%.'
       Right-Click:
         - '[CONSOLE] msg %player_name% Hello! '
+        - '[CLOSE]' # This will close the GUI.
   # Custom Items
   # These items will be displayed in the same row as
   # the previous and next buttons are
@@ -59,61 +60,47 @@ M0-OnlinePlayersGUI:
       Name: ''
       Lore: []
       Commands:
-        CloseOnLeftClick: false
         Left-Click: []
-        CloseOnRightClick: false
         Right-Click: []
     2:
       Material: AIR
       Name: ''
       Lore: []
       Commands:
-        CloseOnLeftClick: false
         Left-Click: []
-        CloseOnRightClick: false
         Right-Click: []
     3:
       Material: AIR
       Name: ''
       Lore: []
       Commands:
-        CloseOnLeftClick: false
         Left-Click: []
-        CloseOnRightClick: false
         Right-Click: []
     5:
       Material: AIR
       Name: ''
       Lore: []
       Commands:
-        CloseOnLeftClick: false
         Left-Click: []
-        CloseOnRightClick: false
         Right-Click: []
     7:
       Material: AIR
       Name: ''
       Lore: []
       Commands:
-        CloseOnLeftClick: false
         Left-Click: []
-        CloseOnRightClick: false
         Right-Click: []
     8:
       Material: AIR
       Name: ''
       Lore: []
       Commands:
-        CloseOnLeftClick: false
         Left-Click: []
-        CloseOnRightClick: false
         Right-Click: []
     9:
       Material: AIR
       Name: ''
       Lore: []
       Commands:
-        CloseOnLeftClick: false
         Left-Click: []
-        CloseOnRightClick: false
         Right-Click: []
