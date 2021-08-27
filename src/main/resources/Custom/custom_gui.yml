@@ -43,61 +43,47 @@ CustomItems:
     Name: ''
     Lore: []
     Commands:
-      CloseOnLeftClick: false
       Left-Click: []
-      CloseOnRightClick: false
       Right-Click: []
   2:
     Material: AIR
     Name: ''
     Lore: []
     Commands:
-      CloseOnLeftClick: false
       Left-Click: []
-      CloseOnRightClick: false
       Right-Click: []
   3:
     Material: AIR
     Name: ''
     Lore: []
     Commands:
-      CloseOnLeftClick: false
       Left-Click: []
-      CloseOnRightClick: false
       Right-Click: []
   5:
     Material: AIR
     Name: ''
     Lore: []
     Commands:
-      CloseOnLeftClick: false
       Left-Click: []
-      CloseOnRightClick: false
       Right-Click: []
   7:
     Material: AIR
     Name: ''
     Lore: []
     Commands:
-      CloseOnLeftClick: false
       Left-Click: []
-      CloseOnRightClick: false
       Right-Click: []
   8:
     Material: AIR
     Name: ''
     Lore: []
     Commands:
-      CloseOnLeftClick: false
       Left-Click: []
-      CloseOnRightClick: false
       Right-Click: []
   9:
     Material: AIR
     Name: ''
     Lore: []
     Commands:
-      CloseOnLeftClick: false
       Left-Click: []
-      CloseOnRightClick: false
       Right-Click: []
