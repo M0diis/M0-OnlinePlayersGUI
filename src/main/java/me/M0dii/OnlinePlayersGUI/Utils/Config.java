@@ -308,12 +308,12 @@ public class Config
         return this.PREVIOUS_PAGE_MATERIAL;
     }
     
-    public boolean isConditionEnabled()
+    public boolean isCONDITION_REQUIRED()
     {
         return this.CONDITION_REQUIRED;
     }
     
-    public String getCondition()
+    public String getCONDITION()
     {
         return this.CONDITION;
     }

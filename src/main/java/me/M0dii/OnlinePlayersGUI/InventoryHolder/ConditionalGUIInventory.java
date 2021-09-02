@@ -169,8 +169,8 @@ public class ConditionalGUIInventory implements InventoryHolder, CustomGUI
     {
         this.inv = Bukkit.createInventory(this, this.size, Component.text(this.name));
     
-        this.initByPage(this.page);
-        this.setCustomItems(p);
+        initByPage(this.page);
+        setCustomItems(p);
     
         p.openInventory(this.inv);
     }
@@ -190,7 +190,7 @@ public class ConditionalGUIInventory implements InventoryHolder, CustomGUI
     
     public void setCustomItems(Player p)
     {
-        new GUIUtils().setCustomItems(inv, p, size, cfg.getCustomItems());
+        GUIUtils.setCustomItems(inv, p, size, cfg.getCustomItems());
     }
     
     private int adjustSize()
@@ -213,26 +213,29 @@ public class ConditionalGUIInventory implements InventoryHolder, CustomGUI
         return inv;
     }
     
-    private void initByPage(int page)
+    @NotNull
+    private List<Player> getByPage(int page)
     {
-        List<Player> online = Bukkit.getOnlinePlayers().stream().filter(p ->
-                !p.hasPermission("m0onlinegui.hidden"))
-                .collect(Collectors.toList());
+        String permission = cfg.isPERMISSION_REQUIRED() ? cfg.getREQUIRED_PERMISSION()
+                : null;
         
-        online = new GUIUtils().filterByCondition(online, this.condition);
-    
-        if(cfg.isPERMISSION_REQUIRED())
-            online = online.stream().filter(p -> p.hasPermission(cfg.getREQUIRED_PERMISSION()))
-                    .collect(Collectors.toList());
-    
+        List<Player> online = GUIUtils.getOnline(permission, cfg.getCondition());
+        
         List<Player> byPage = new ArrayList<>();
-    
+        
         int lowBound = (this.size - 9) * page;
         int highBound = (this.size - 9) * (page == 0 ? 1 : page + 1);
-    
+        
         for(int i = lowBound; i < highBound; i++)
             if(lowBound < online.size() && i < online.size())
                 byPage.add(online.get(i));
+        
+        return byPage;
+    }
+    
+    private void initByPage(int page)
+    {
+        List<Player> byPage = getByPage(page);
     
         displayedHeads = byPage.size();
         
@@ -246,7 +249,8 @@ public class ConditionalGUIInventory implements InventoryHolder, CustomGUI
             
             ItemMeta meta = head.getItemMeta();
         
-            List<String> lore = this.cfg.HEAD_LORE().stream().map(s -> Utils.format(PlaceholderAPI.setPlaceholders(p, s)))
+            List<String> lore = cfg.HEAD_LORE().stream()
+                    .map(str -> Utils.format(PlaceholderAPI.setPlaceholders(p, str)))
                     .collect(Collectors.toList());
     
             meta.displayName(
@@ -268,43 +272,66 @@ public class ConditionalGUIInventory implements InventoryHolder, CustomGUI
         setButtons();
     }
     
+    public boolean hasNextPage()
+    {
+        return getByPage(page + 1).size() != 0;
+    }
+    
     private void setButtons()
     {
-        if(!this.cfg.HIDE_BUTTONS_SINGLE_PAGE())
-        {
-            ItemStack nextButton = new ItemStack(this.cfg.NEXT_PAGE_MATERIAL());
-            ItemMeta nextButtonMeta = nextButton.getItemMeta();
+        boolean show = plugin.getCfg().ALWAYS_SHOW_BUTTONS();
         
-            List<String> nextLore = this.cfg.NEXT_PAGE_LORE().stream().map(Utils::format)
-                    .collect(Collectors.toList());
+        if(show)
+            setNextButton();
+        else if(hasNextPage())
+            setNextButton();
         
-            nextButtonMeta.setLore(nextLore);
+        if(show)
+            setPreviousButton();
+        else if(page != 0)
+            setPreviousButton();
+    }
+    
+    private void setNextButton()
+    {
+        ItemStack nextButton = new ItemStack(cfg.NEXT_PAGE_MATERIAL());
+        ItemMeta nextButtonMeta = nextButton.getItemMeta();
         
-            nextButtonMeta.getPersistentDataContainer().set(
-                    new NamespacedKey(plugin, "Button"),
-                    PersistentDataType.STRING, "Next");
+        List<String> nextLore = cfg.NEXT_PAGE_LORE().stream().map(Utils::format)
+                .map(str -> PlaceholderAPI.setPlaceholders(null, str))
+                .collect(Collectors.toList());
         
-            nextButtonMeta.displayName(Component.text(this.cfg.NEXT_PAGE_BUTTON_NAME()));
-            nextButton.setItemMeta(nextButtonMeta);
+        nextButtonMeta.setLore(nextLore);
         
-            inv.setItem(size - 4, nextButton);
-            
-            ItemStack prevButton = new ItemStack(this.cfg.PREV_PAGE_MATERIAL());
-            ItemMeta prevButtonMeta = prevButton.getItemMeta();
+        nextButtonMeta.getPersistentDataContainer().set(
+                new NamespacedKey(plugin, "Button"),
+                PersistentDataType.STRING, "Next");
         
-            List<String> prevLore = this.cfg.PREV_PAGE_LORE().stream().map(Utils::format)
-                    .collect(Collectors.toList());
+        nextButtonMeta.displayName(Component.text(cfg.NEXT_PAGE_BUTTON_NAME()));
         
-            prevButtonMeta.setLore(prevLore);
+        nextButton.setItemMeta(nextButtonMeta);
         
-            prevButtonMeta.getPersistentDataContainer().set(
-                    new NamespacedKey(plugin, "Button"),
-                    PersistentDataType.STRING, "Previous");
+        inv.setItem(size - 4, nextButton);
+    }
+    
+    private void setPreviousButton()
+    {
+        ItemStack prevButton = new ItemStack(cfg.PREV_PAGE_MATERIAL());
+        ItemMeta prevButtonMeta = prevButton.getItemMeta();
         
-            prevButtonMeta.displayName(Component.text(this.cfg.PREV_PAGE_BUTTON_NAME()));
-            prevButton.setItemMeta(prevButtonMeta);
+        List<String> prevLore = cfg.PREV_PAGE_LORE().stream().map(Utils::format)
+                .map(str -> PlaceholderAPI.setPlaceholders(null, str))
+                .collect(Collectors.toList());
         
-            inv.setItem(size - 6, prevButton);
-        }
+        prevButtonMeta.setLore(prevLore);
+        
+        prevButtonMeta.getPersistentDataContainer().set(
+                new NamespacedKey(plugin, "Button"),
+                PersistentDataType.STRING, "Previous");
+        
+        prevButtonMeta.displayName(Component.text(cfg.PREV_PAGE_BUTTON_NAME()));
+        prevButton.setItemMeta(prevButtonMeta);
+        
+        inv.setItem(size - 6, prevButton);
     }
 }

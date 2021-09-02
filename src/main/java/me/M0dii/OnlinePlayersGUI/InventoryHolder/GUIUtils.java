@@ -3,6 +3,7 @@ package me.M0dii.OnlinePlayersGUI.InventoryHolder;
 import me.M0dii.OnlinePlayersGUI.CustomItem;
 import me.M0dii.OnlinePlayersGUI.OnlineGUI;
 import me.clip.placeholderapi.PlaceholderAPI;
+import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -10,21 +11,58 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class GUIUtils
 {
-    public void setCustomItems(Inventory inv, Player p, int size, List<CustomItem> customItems)
+    static OnlineGUI plugin = OnlineGUI.getInstance();
+    
+    public static List<Player> getOnline(@Nullable String permission, @Nullable String condition)
+    {
+        List<Player> online;
+        
+        List<Player> toggled = plugin.getHiddenPlayersToggled();
+        
+        if(plugin.getCfg().ESSX_HOOK())
+        {
+            online = Bukkit.getOnlinePlayers().stream().filter(p ->
+                    !p.hasPermission("m0onlinegui.hidden")
+                    || !plugin.getEssentials().getUser(p).isVanished()
+                    || !toggled.contains(p))
+                    .collect(Collectors.toList());
+        }
+        else
+        {
+            online = Bukkit.getOnlinePlayers().stream().filter(p ->
+                    !p.hasPermission("m0onlinegui.hidden")
+                    || !toggled.contains(p))
+                    .collect(Collectors.toList());
+        }
+        
+        if(permission != null)
+            online = online.stream().filter(p -> p.hasPermission(permission))
+                    .collect(Collectors.toList());
+        
+        if(condition != null)
+            return filterByCondition(online, condition);
+        
+        return online;
+    }
+    
+    public static void setCustomItems(Inventory inv, Player p, int size,
+                               List<CustomItem> customItems)
     {
         for(CustomItem c : customItems)
         {
             ItemStack item = c.getItem();
             ItemMeta m = item.getItemMeta();
         
-            NamespacedKey key = new NamespacedKey(OnlineGUI.instance, "Slot");
+            NamespacedKey key = new NamespacedKey(OnlineGUI.getInstance(), "Slot");
             PersistentDataContainer cont = item.getItemMeta().getPersistentDataContainer();
         
             if(cont.has(key, PersistentDataType.INTEGER))
@@ -32,14 +70,11 @@ public class GUIUtils
                 //noinspection ConstantConditions
                 int slot = cont.get(key, PersistentDataType.INTEGER);
             
-                List<String> lore = c.getLore();
+                List<String> lore = c.getLore()
+                        .stream().map(str -> PlaceholderAPI.setPlaceholders(p, str))
+                        .collect(Collectors.toList());
             
-                List<String> newLore = new ArrayList<>();
-            
-                for(String l : lore)
-                    newLore.add(PlaceholderAPI.setPlaceholders(p, l));
-            
-                m.setLore(newLore);
+                m.setLore(lore);
             
                 item.setItemMeta(m);
             
@@ -48,7 +83,7 @@ public class GUIUtils
         }
     }
     
-    public List<Player> filterByCondition(List<Player> players, String cond)
+    public static List<Player> filterByCondition(List<Player> players, String cond)
     {
         List<Player> filtered = new ArrayList<>();
         
@@ -100,7 +135,8 @@ public class GUIUtils
             }
             catch(NumberFormatException ex)
             {
-                OnlineGUI.instance.getLogger().warning("Error occured trying to parse the condition.");
+                OnlineGUI.getInstance().getLogger()
+                        .warning("Error occured trying to parse the condition.");
             }
             
             return filtered;

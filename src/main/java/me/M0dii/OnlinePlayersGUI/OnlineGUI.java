@@ -23,7 +23,12 @@ import java.util.Map;
 
 public class OnlineGUI extends JavaPlugin
 {
-    public static OnlineGUI instance;
+    private static OnlineGUI instance;
+    
+    public static OnlineGUI getInstance()
+    {
+        return instance;
+    }
     
     private final PluginManager manager;
 
@@ -37,7 +42,7 @@ public class OnlineGUI extends JavaPlugin
     }
     
     private ConditionalGUIs cgis;
-    
+
     public ConditionalGUIs getCgis()
     {
         return this.cgis;

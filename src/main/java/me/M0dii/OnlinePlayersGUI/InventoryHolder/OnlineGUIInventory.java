@@ -179,7 +179,7 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI
     
     public void setCustomItems(Player p)
     {
-        new GUIUtils().setCustomItems(inv, p, size, plugin.getCfg().getCustomItems());
+        GUIUtils.setCustomItems(inv, p, size, plugin.getCfg().getCustomItems());
     }
     
     private int adjustSize(Config cfg)
@@ -212,38 +212,6 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI
         p.openInventory(this.inv);
     }
     
-    private List<Player> getOnline()
-    {
-        List<Player> online;
-        
-        List<Player> toggled = plugin.getHiddenPlayersToggled();
-        
-        if(plugin.getCfg().ESSX_HOOK())
-        {
-            online = Bukkit.getOnlinePlayers().stream().filter(p ->
-                    !p.hasPermission("m0onlinegui.hidden")
-                    || !plugin.getEssentials().getUser(p).isVanished()
-                    || !toggled.contains(p))
-                    .collect(Collectors.toList());
-        }
-        else
-        {
-            online = Bukkit.getOnlinePlayers().stream().filter(p ->
-                    !p.hasPermission("m0onlinegui.hidden")
-                    || !toggled.contains(p))
-                    .collect(Collectors.toList());
-        }
-        
-        if(plugin.getCfg().isPERMISSION_REQUIRED())
-            online = online.stream().filter(p -> p.hasPermission(plugin.getCfg().getREQUIRED_PERMISSION()))
-                    .collect(Collectors.toList());
-        
-        if(plugin.getCfg().isConditionEnabled())
-            return new GUIUtils().filterByCondition(online, plugin.getCfg().getCondition());
-        
-        return online;
-    }
-    
     public boolean hasNextPage()
     {
         return getByPage(page + 1).size() != 0;
@@ -265,10 +233,9 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI
             
             ItemMeta meta = head.getItemMeta();
         
-            List<String> lore = new ArrayList<>();
-        
-            for(String s : plugin.getCfg().HEAD_LORE())
-                lore.add(Utils.format(PlaceholderAPI.setPlaceholders(p, s)));
+            List<String> lore = plugin.getCfg().HEAD_LORE().stream()
+                    .map(str -> Utils.format(PlaceholderAPI.setPlaceholders(p, str)))
+                    .collect(Collectors.toList());
 
             meta.displayName(Component.text(Utils.format(
                     PlaceholderAPI.setPlaceholders(p, plugin.getCfg()
@@ -292,7 +259,13 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI
     @NotNull
     private List<Player> getByPage(int page)
     {
-        List<Player> online = getOnline();
+        String permission = plugin.getCfg().isPERMISSION_REQUIRED() ? plugin.getCfg().getREQUIRED_PERMISSION()
+                : null;
+    
+        String condition = plugin.getCfg().isCONDITION_REQUIRED() ? plugin.getCfg().getCONDITION()
+                : null;
+        
+        List<Player> online = GUIUtils.getOnline(permission, condition);
         
         List<Player> byPage = new ArrayList<>();
         
@@ -327,6 +300,7 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI
         ItemMeta nextButtonMeta = nextButton.getItemMeta();
     
         List<String> nextLore = plugin.getCfg().NEXT_PAGE_LORE().stream().map(Utils::format)
+                .map(str -> PlaceholderAPI.setPlaceholders(null, str))
                 .collect(Collectors.toList());
     
         nextButtonMeta.setLore(nextLore);
@@ -348,6 +322,7 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI
         ItemMeta prevButtonMeta = prevButton.getItemMeta();
     
         List<String> prevLore = plugin.getCfg().PREV_PAGE_LORE().stream().map(Utils::format)
+                .map(str -> PlaceholderAPI.setPlaceholders(null, str))
                 .collect(Collectors.toList());
     
         prevButtonMeta.setLore(prevLore);
