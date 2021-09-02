@@ -5,7 +5,7 @@ M0-OnlinePlayersGUI:
   ToggleMessage: '&2You have toggled your visibility in Online GUI.'
   # Whether to hide buttons if there are not enough players
   # to fill up more than one page
-  HideButtonsOnSinglePage: false
+  AlwaysShowPageButtons: false
   # Hook to EssentialsX which will hide players
   # in the GUI if they are vanished
   EssentialsXHook: false

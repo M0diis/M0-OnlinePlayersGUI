@@ -28,7 +28,7 @@ public class Config
     private List<String> LEFT_CLICK_COMMANDS, RIGHT_CLICK_COMMANDS;
     
     private boolean CLOSE_ON_LEFT_CLICK, CLOSE_ON_RIGHT_CLICK;
-    private boolean UPDATE_ON_JOIN, UPDATE_ON_LEAVE, HIDE_BUTTONS_ON_SINGLE;
+    private boolean UPDATE_ON_JOIN, UPDATE_ON_LEAVE, ALWAYS_SHOW_BUTTONS;
     private int GUI_SIZE;
     
     private Material NEXT_PAGE_MATERIAL, PREVIOUS_PAGE_MATERIAL;
@@ -81,7 +81,7 @@ public class Config
         CLOSE_ON_LEFT_CLICK = getBool("GUI.CloseOn.LeftClick");
         CLOSE_ON_RIGHT_CLICK = getBool("GUI.CloseOn.RightClick");
         
-        HIDE_BUTTONS_ON_SINGLE = getBool("HideButtonsOnSinglePage");
+        ALWAYS_SHOW_BUTTONS = getBool("AlwaysShowPageButtons");
         
         HEAD_NAME = getStringf("PlayerDisplay.Name");
         
@@ -230,9 +230,9 @@ public class Config
         return UPDATE_ON_LEAVE;
     }
     
-    public boolean HIDE_BUTTONS_SINGLE_PAGE()
+    public boolean ALWAYS_SHOW_BUTTONS()
     {
-        return HIDE_BUTTONS_ON_SINGLE;
+        return ALWAYS_SHOW_BUTTONS;
     }
     
     public List<String> NEXT_PAGE_LORE()

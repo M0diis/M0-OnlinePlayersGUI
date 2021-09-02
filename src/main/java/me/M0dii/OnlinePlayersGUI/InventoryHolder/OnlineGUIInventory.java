@@ -206,19 +206,19 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI
     {
         this.inv = Bukkit.createInventory(this, this.size, Component.text(this.name));
         
-        this.initByPage(this.page);
-        this.setCustomItems(p);
+        initByPage(this.page);
+        setCustomItems(p);
         
         p.openInventory(this.inv);
     }
     
-    private List<Player> getOnline(boolean hook)
+    private List<Player> getOnline()
     {
         List<Player> online;
         
         List<Player> toggled = plugin.getHiddenPlayersToggled();
         
-        if(hook)
+        if(plugin.getCfg().ESSX_HOOK())
         {
             online = Bukkit.getOnlinePlayers().stream().filter(p ->
                     !p.hasPermission("m0onlinegui.hidden")
@@ -244,21 +244,15 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI
         return online;
     }
     
+    public boolean hasNextPage()
+    {
+        return getByPage(page + 1).size() != 0;
+    }
+    
     private void initByPage(int page)
     {
-        List<Player> online = getOnline(plugin.getCfg().ESSX_HOOK());
+        List<Player> byPage = getByPage(page);
     
-        List<Player> byPage = new ArrayList<>();
-        
-        int lowBound = (this.size - 9) * page;
-        int highBound = (this.size - 9) * (page == 0 ? 1 : page + 1);
-        
-        for(int i = lowBound; i < highBound; i++)
-        {
-            if(lowBound < online.size() && i < online.size())
-                byPage.add(online.get(i));
-        }
-        
         displayedHeads = byPage.size();
         
         int curr = 0;
@@ -295,44 +289,76 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI
         setButtons();
     }
     
+    @NotNull
+    private List<Player> getByPage(int page)
+    {
+        List<Player> online = getOnline();
+        
+        List<Player> byPage = new ArrayList<>();
+        
+        int lowBound = (this.size - 9) * page;
+        int highBound = (this.size - 9) * (page == 0 ? 1 : page + 1);
+        
+        for(int i = lowBound; i < highBound; i++)
+            if(lowBound < online.size() && i < online.size())
+                byPage.add(online.get(i));
+ 
+        return byPage;
+    }
+    
     private void setButtons()
     {
-        if(!plugin.getCfg().HIDE_BUTTONS_SINGLE_PAGE())
-        {
-            ItemStack nextButton = new ItemStack(plugin.getCfg().NEXT_PAGE_MATERIAL());
-            ItemMeta nextButtonMeta = nextButton.getItemMeta();
+        boolean show = plugin.getCfg().ALWAYS_SHOW_BUTTONS();
         
-            List<String> nextLore = plugin.getCfg().NEXT_PAGE_LORE().stream().map(Utils::format)
-                    .collect(Collectors.toList());
-        
-            nextButtonMeta.setLore(nextLore);
-        
-            nextButtonMeta.getPersistentDataContainer().set(
-                    new NamespacedKey(plugin, "Button"),
-                    PersistentDataType.STRING, "Next");
-            
-            nextButtonMeta.displayName(Component.text(plugin.getCfg().NEXT_PAGE_BUTTON_NAME()));
-            
-            nextButton.setItemMeta(nextButtonMeta);
-        
-            inv.setItem(plugin.getCfg().GUI_SIZE() - 4, nextButton);
-            
-            ItemStack prevButton = new ItemStack(plugin.getCfg().PREV_PAGE_MATERIAL());
-            ItemMeta prevButtonMeta = prevButton.getItemMeta();
-        
-            List<String> prevLore = plugin.getCfg().PREV_PAGE_LORE().stream().map(Utils::format)
-                    .collect(Collectors.toList());
-        
-            prevButtonMeta.setLore(prevLore);
-        
-            prevButtonMeta.getPersistentDataContainer().set(
-                    new NamespacedKey(plugin, "Button"),
-                    PersistentDataType.STRING, "Previous");
-        
-            prevButtonMeta.displayName(Component.text(plugin.getCfg().PREV_PAGE_BUTTON_NAME()));
-            prevButton.setItemMeta(prevButtonMeta);
-        
-            inv.setItem(plugin.getCfg().GUI_SIZE() - 6, prevButton);
-        }
+        if(show)
+            setNextButton();
+        else if(hasNextPage())
+            setNextButton();
+    
+        if(show)
+            setPreviousButton();
+        else if(page != 0)
+            setPreviousButton();
+    }
+    
+    private void setNextButton()
+    {
+        ItemStack nextButton = new ItemStack(plugin.getCfg().NEXT_PAGE_MATERIAL());
+        ItemMeta nextButtonMeta = nextButton.getItemMeta();
+    
+        List<String> nextLore = plugin.getCfg().NEXT_PAGE_LORE().stream().map(Utils::format)
+                .collect(Collectors.toList());
+    
+        nextButtonMeta.setLore(nextLore);
+    
+        nextButtonMeta.getPersistentDataContainer().set(
+                new NamespacedKey(plugin, "Button"),
+                PersistentDataType.STRING, "Next");
+    
+        nextButtonMeta.displayName(Component.text(plugin.getCfg().NEXT_PAGE_BUTTON_NAME()));
+    
+        nextButton.setItemMeta(nextButtonMeta);
+    
+        inv.setItem(plugin.getCfg().GUI_SIZE() - 4, nextButton);
+    }
+    
+    private void setPreviousButton()
+    {
+        ItemStack prevButton = new ItemStack(plugin.getCfg().PREV_PAGE_MATERIAL());
+        ItemMeta prevButtonMeta = prevButton.getItemMeta();
+    
+        List<String> prevLore = plugin.getCfg().PREV_PAGE_LORE().stream().map(Utils::format)
+                .collect(Collectors.toList());
+    
+        prevButtonMeta.setLore(prevLore);
+    
+        prevButtonMeta.getPersistentDataContainer().set(
+                new NamespacedKey(plugin, "Button"),
+                PersistentDataType.STRING, "Previous");
+    
+        prevButtonMeta.displayName(Component.text(plugin.getCfg().PREV_PAGE_BUTTON_NAME()));
+        prevButton.setItemMeta(prevButtonMeta);
+    
+        inv.setItem(plugin.getCfg().GUI_SIZE() - 6, prevButton);
     }
 }
