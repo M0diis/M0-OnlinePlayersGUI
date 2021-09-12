@@ -1,7 +1,7 @@
-package me.M0dii.OnlinePlayersGUI.Utils;
+package me.m0dii.onlineplayersgui.utils;
 
-import me.M0dii.OnlinePlayersGUI.CustomItem;
-import me.M0dii.OnlinePlayersGUI.OnlineGUI;
+import me.m0dii.onlineplayersgui.CustomItem;
+import me.m0dii.onlineplayersgui.OnlineGUI;
 import net.kyori.adventure.text.Component;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -27,12 +27,9 @@ public class ConditionalConfig
     private List<String> LEFT_CLICK_COMMANDS, RIGHT_CLICK_COMMANDS;
     
     private boolean CLOSE_ON_LEFT_CLICK, CLOSE_ON_RIGHT_CLICK;
-    private boolean UPDATE_ON_JOIN, UPDATE_ON_LEAVE, HIDE_BUTTONS_ON_SINGLE;
     private int GUI_SIZE;
     
     private Material NEXT_PAGE_MATERIAL, PREVIOUS_PAGE_MATERIAL;
-    
-    private boolean ESSENTIALSX_HOOK;
     
     private boolean PERMISSION_REQUIRED;
     private String CONDITION, PERMISSION;
@@ -56,35 +53,30 @@ public class ConditionalConfig
     
     private String getStringf(String path)
     {
-        return format(cfg.getString(path));
+        return Utils.format(cfg.getString(path));
     }
     
     private List<String> getStringList(String path)
     {
         return cfg.getStringList(path);
     }
-
+    
     public void load()
     {
-        UPDATE_ON_JOIN = getBool("GUI.UpdateOn.Join");
-        UPDATE_ON_LEAVE = getBool("GUI.UpdateOn.Leave");
-        
         CLOSE_ON_LEFT_CLICK = getBool("GUI.CloseOn.LeftClick");
         CLOSE_ON_RIGHT_CLICK = getBool("GUI.CloseOn.RightClick");
-        
-        HIDE_BUTTONS_ON_SINGLE = getBool("HideButtonsOnSinglePage");
         
         HEAD_NAME = getStringf("PlayerDisplay.Name");
         
         HEAD_LORE = getStringList("PlayerDisplay.Lore");
-    
+        
         GUI_TITLE = getStringf("GUI.Title");
         
         LEFT_CLICK_COMMANDS = getStringList("PlayerDisplay.Commands.Left-Click");
         RIGHT_CLICK_COMMANDS = getStringList("PlayerDisplay.Commands.Right-Click");
         
         GUI_SIZE = cfg.getInt("GUI.Size");
-    
+        
         String mat1 = cfg.getString("NextButton.Material", "ENCHANTED_BOOK");
         String mat2 = cfg.getString("PreviousButton.Material", "ENCHANTED_BOOK");
         
@@ -99,8 +91,6 @@ public class ConditionalConfig
         
         PREVIOUS_PAGE_NAME = getStringf("PreviousButton.Name");
         NEXT_PAGE_NAME = getStringf("NextButton.Name");
-        
-        ESSENTIALSX_HOOK = getBool("EssentialsXHook");
         
         CONDITION = cfg.getString("Condition.Placeholder");
         
@@ -123,61 +113,60 @@ public class ConditionalConfig
         {
             String itemName = cfg.getString(
                     String.format("CustomItems.%d.Material", i), "BOOK");
-    
+            
             Material CI_ITEM = Material.getMaterial(itemName);
-    
+            
             if(CI_ITEM != null && !CI_ITEM.equals(Material.AIR))
             {
                 ItemStack item = new ItemStack(CI_ITEM);
-
+                
                 String CI_NAME = getStringf(
                         String.format("CustomItems.%d.Name", i));
-
+                
                 List<String> CI_LORE = getStringList(
                         String.format("CustomItems.%d.Lore", i));
-
+                
                 ItemMeta meta = item.getItemMeta();
-
+                
                 if(CI_NAME.length() != 0)
                     meta.displayName(Component.text(CI_NAME));
-
-                List<String> lore = CI_LORE.stream().map(this::format).collect(Collectors.toList());
                 
-                meta.setLore(lore);
-
+                List<Component> lore = new ArrayList<>();
+    
+                if(CI_LORE.size() != 0)
+                {
+                    lore = CI_LORE.stream().map(Utils::format)
+                            .map(Component::text)
+                            .collect(Collectors.toList());
+        
+                    meta.lore(lore);
+                }
+                
                 List<String> lcc = cfg.getStringList(
                         String.format("CustomItems.%d.Commands.Left-Click", i));
-
+                
                 List<String> rcc = cfg.getStringList(
                         String.format("CustomItems.%d.Commands.Right-Click", i));
-
+                
                 meta.getPersistentDataContainer().set(
                         new NamespacedKey(plugin, "Slot"), PersistentDataType.INTEGER, i);
-
+                
                 meta.getPersistentDataContainer().set(
                         new NamespacedKey(plugin, "IsCustom"), PersistentDataType.STRING, "true");
-
+                
                 item.setItemMeta(meta);
-
+                
                 boolean colc = cfg.getBoolean(
                         String.format("CustomItems.%d.Commands.CloseOnLeftClick", i));
-
+                
                 boolean corc = cfg.getBoolean(
                         String.format("CustomItems.%d.Commands.CloseOnRightClick", i));
-
+                
                 CustomItem ci = new CustomItem(item, i, lcc, rcc, colc, corc, lore);
-
+                
                 this.CUSTOM_ITEMS.add(ci);
             }
         }
-    }
-    
-    private String format(@Nullable String text)
-    {
-        if(text == null || text.isEmpty())
-            return text;
-        
-        return ChatColor.translateAlternateColorCodes('&', text);
     }
     
     public boolean CLOSE_ON_LEFT_CLICK()
@@ -198,21 +187,6 @@ public class ConditionalConfig
     public int GUI_SIZE()
     {
         return GUI_SIZE;
-    }
-    
-    public boolean UPDATE_ON_JOIN()
-    {
-        return UPDATE_ON_JOIN;
-    }
-    
-    public boolean UPDATE_ON_LEAVE()
-    {
-        return UPDATE_ON_LEAVE;
-    }
-    
-    public boolean HIDE_BUTTONS_SINGLE_PAGE()
-    {
-        return HIDE_BUTTONS_ON_SINGLE;
     }
     
     public List<String> NEXT_PAGE_LORE()
@@ -253,14 +227,6 @@ public class ConditionalConfig
     public String HEAD_DISPLAY_NAME()
     {
         return HEAD_NAME;
-    }
-    
-    public boolean ESSX_HOOK()
-    {
-        if(this.plugin.getEssentials() == null)
-            return false;
-            
-        return ESSENTIALSX_HOOK;
     }
     
     public Material NEXT_PAGE_MATERIAL()

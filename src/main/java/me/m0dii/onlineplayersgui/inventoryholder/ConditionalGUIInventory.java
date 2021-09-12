@@ -1,9 +1,9 @@
-package me.M0dii.OnlinePlayersGUI.InventoryHolder;
+package me.m0dii.onlineplayersgui.inventoryholder;
 
-import me.M0dii.OnlinePlayersGUI.Utils.ConditionalConfig;
-import me.M0dii.OnlinePlayersGUI.CustomItem;
-import me.M0dii.OnlinePlayersGUI.OnlineGUI;
-import me.M0dii.OnlinePlayersGUI.Utils.Utils;
+import me.m0dii.onlineplayersgui.utils.ConditionalConfig;
+import me.m0dii.onlineplayersgui.CustomItem;
+import me.m0dii.onlineplayersgui.OnlineGUI;
+import me.m0dii.onlineplayersgui.utils.Utils;
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -190,7 +190,7 @@ public class ConditionalGUIInventory implements InventoryHolder, CustomGUI
     
     public void setCustomItems(Player p)
     {
-        GUIUtils.setCustomItems(inv, p, size, cfg.getCustomItems());
+        plugin.getGuiUtils().setCustomItems(inv, p, size, cfg.getCustomItems());
     }
     
     private int adjustSize()
@@ -219,7 +219,7 @@ public class ConditionalGUIInventory implements InventoryHolder, CustomGUI
         String permission = cfg.isPERMISSION_REQUIRED() ? cfg.getREQUIRED_PERMISSION()
                 : null;
         
-        List<Player> online = GUIUtils.getOnline(permission, cfg.getCondition());
+        List<Player> online = plugin.getGuiUtils().getOnline(permission, this.condition);
         
         List<Player> byPage = new ArrayList<>();
         
@@ -297,11 +297,12 @@ public class ConditionalGUIInventory implements InventoryHolder, CustomGUI
         ItemStack nextButton = new ItemStack(cfg.NEXT_PAGE_MATERIAL());
         ItemMeta nextButtonMeta = nextButton.getItemMeta();
         
-        List<String> nextLore = cfg.NEXT_PAGE_LORE().stream().map(Utils::format)
+        List<Component> nextLore = cfg.NEXT_PAGE_LORE().stream().map(Utils::format)
                 .map(str -> PlaceholderAPI.setPlaceholders(null, str))
+                .map(Component::text)
                 .collect(Collectors.toList());
         
-        nextButtonMeta.setLore(nextLore);
+        nextButtonMeta.lore(nextLore);
         
         nextButtonMeta.getPersistentDataContainer().set(
                 new NamespacedKey(plugin, "Button"),
@@ -319,11 +320,12 @@ public class ConditionalGUIInventory implements InventoryHolder, CustomGUI
         ItemStack prevButton = new ItemStack(cfg.PREV_PAGE_MATERIAL());
         ItemMeta prevButtonMeta = prevButton.getItemMeta();
         
-        List<String> prevLore = cfg.PREV_PAGE_LORE().stream().map(Utils::format)
+        List<Component> prevLore = cfg.PREV_PAGE_LORE().stream().map(Utils::format)
                 .map(str -> PlaceholderAPI.setPlaceholders(null, str))
+                .map(Component::text)
                 .collect(Collectors.toList());
         
-        prevButtonMeta.setLore(prevLore);
+        prevButtonMeta.lore(prevLore);
         
         prevButtonMeta.getPersistentDataContainer().set(
                 new NamespacedKey(plugin, "Button"),

@@ -1,4 +1,4 @@
-package me.M0dii.OnlinePlayersGUI.InventoryHolder;
+package me.m0dii.onlineplayersgui.inventoryholder;
 
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;

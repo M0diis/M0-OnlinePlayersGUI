@@ -1,4 +1,4 @@
-package me.M0dii.OnlinePlayersGUI.Utils;
+package me.m0dii.onlineplayersgui.utils;
 
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;

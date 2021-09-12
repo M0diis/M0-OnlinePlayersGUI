@@ -1,9 +1,10 @@
-package me.M0dii.OnlinePlayersGUI;
+package me.m0dii.onlineplayersgui;
 
-import me.M0dii.OnlinePlayersGUI.Commands.OnlineGUICommand;
-import me.M0dii.OnlinePlayersGUI.Listeners.InventoryListener;
-import me.M0dii.OnlinePlayersGUI.Utils.Config;
-import me.M0dii.OnlinePlayersGUI.Utils.UpdateChecker;
+import me.m0dii.onlineplayersgui.commands.OnlineGUICommand;
+import me.m0dii.onlineplayersgui.inventoryholder.GUIUtils;
+import me.m0dii.onlineplayersgui.listeners.InventoryListener;
+import me.m0dii.onlineplayersgui.utils.Config;
+import me.m0dii.onlineplayersgui.utils.UpdateChecker;
 import net.ess3.api.IEssentials;
 import org.bstats.bukkit.Metrics;
 import org.bstats.charts.CustomChart;
@@ -89,15 +90,21 @@ public class OnlineGUI extends JavaPlugin
         return this.ess;
     }
     
+    private GUIUtils guiUtils;
+    
+    public GUIUtils getGuiUtils()
+    {
+        return this.guiUtils;
+    }
     public void onEnable()
     {
         instance = this;
         
         this.prepareConfig();
         
-        this.cfg.load();
-        
         cgis = new ConditionalGUIs(this);
+        
+        guiUtils = new GUIUtils(this);
     
         registerHooks();
 
@@ -161,15 +168,15 @@ public class OnlineGUI extends JavaPlugin
             this.ess = (IEssentials)this.manager.getPlugin("Essentials");
             
             if(this.ess == null)
-                this.warning("Could not find EssentialsX.");
+                warning("Could not find EssentialsX.");
         }
         
         if (this.manager.getPlugin("PlaceholderAPI") == null)
         {
-            this.warning("Could not find PlaceholderAPI! This plugin is required.");
-            this.warning("Disabling M0-OnlinePlayersGUI..");
+            warning("Could not find PlaceholderAPI! This plugin is required.");
+            warning("Disabling M0-OnlinePlayersGUI..");
             
-            this.manager.disablePlugin(this);
+            manager.disablePlugin(this);
         }
     }
     
@@ -206,16 +213,18 @@ public class OnlineGUI extends JavaPlugin
         }
     
         YamlConfiguration.loadConfiguration(this.configFile);
+    
+        this.cfg.load();
     }
     
     private void info(String message)
     {
-        this.getLogger().info(message);
+        getLogger().info(message);
     }
     
     private void warning(String message)
     {
-        this.getLogger().warning(message);
+        getLogger().warning(message);
     }
     
     private void copy(InputStream in, File file)

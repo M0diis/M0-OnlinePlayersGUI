@@ -1,5 +1,5 @@
 name: M0-OnlinePlayersGUI
-main: me.M0dii.OnlinePlayersGUI.OnlineGUI
+main: me.m0dii.onlineplayersgui.OnlineGUI
 description: M0-OnlinePlayersGUI
 version: 3.4.0
 api-version: 1.13

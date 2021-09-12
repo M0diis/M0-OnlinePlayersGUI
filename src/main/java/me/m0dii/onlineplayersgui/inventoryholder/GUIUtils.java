@@ -1,8 +1,10 @@
-package me.M0dii.OnlinePlayersGUI.InventoryHolder;
+package me.m0dii.onlineplayersgui.inventoryholder;
 
-import me.M0dii.OnlinePlayersGUI.CustomItem;
-import me.M0dii.OnlinePlayersGUI.OnlineGUI;
+import me.m0dii.onlineplayersgui.CustomItem;
+import me.m0dii.onlineplayersgui.OnlineGUI;
 import me.clip.placeholderapi.PlaceholderAPI;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
@@ -20,9 +22,14 @@ import java.util.stream.Collectors;
 
 public class GUIUtils
 {
-    static OnlineGUI plugin = OnlineGUI.getInstance();
+    OnlineGUI plugin;
     
-    public static List<Player> getOnline(@Nullable String permission, @Nullable String condition)
+    public GUIUtils(OnlineGUI plugin)
+    {
+        this.plugin = plugin;
+    }
+    
+    public List<Player> getOnline(@Nullable String permission, @Nullable String condition)
     {
         List<Player> online;
         
@@ -54,7 +61,7 @@ public class GUIUtils
         return online;
     }
     
-    public static void setCustomItems(Inventory inv, Player p, int size,
+    public void setCustomItems(Inventory inv, Player p, int size,
                                List<CustomItem> customItems)
     {
         for(CustomItem c : customItems)
@@ -69,12 +76,12 @@ public class GUIUtils
             {
                 //noinspection ConstantConditions
                 int slot = cont.get(key, PersistentDataType.INTEGER);
-            
-                List<String> lore = c.getLore()
-                        .stream().map(str -> PlaceholderAPI.setPlaceholders(p, str))
+                
+                List<Component> lore = c.getLore().stream()
+                        .map(str -> Component.text(PlaceholderAPI.setPlaceholders(p, ((TextComponent)str).content())))
                         .collect(Collectors.toList());
             
-                m.setLore(lore);
+                m.lore(lore);
             
                 item.setItemMeta(m);
             
@@ -83,7 +90,7 @@ public class GUIUtils
         }
     }
     
-    public static List<Player> filterByCondition(List<Player> players, String cond)
+    public List<Player> filterByCondition(List<Player> players, String cond)
     {
         List<Player> filtered = new ArrayList<>();
         
@@ -97,9 +104,11 @@ public class GUIUtils
             {
                 for(Player p : players)
                 {
-                    double left = Double.parseDouble(PlaceholderAPI.setPlaceholders(p, condSplit.get(0)).replaceAll("[a-zA-Z!@#$&*()/\\\\\\[\\]{}:\"?]", ""));
+                    double left = Double.parseDouble(PlaceholderAPI.setPlaceholders(p,
+                            condSplit.get(0)).replaceAll("[a-zA-Z!@#$&*()/\\\\\\[\\]{}:\"?]", ""));
                     
-                    double right = Double.parseDouble(PlaceholderAPI.setPlaceholders(p, condSplit.get(2)).replaceAll("[a-zA-Z!@#$&*()/\\\\\\[\\]{}:\"?]", ""));
+                    double right = Double.parseDouble(PlaceholderAPI.setPlaceholders(p,
+                            condSplit.get(2)).replaceAll("[a-zA-Z!@#$&*()/\\\\\\[\\]{}:\"?]", ""));
                     
                     switch(op)
                     {

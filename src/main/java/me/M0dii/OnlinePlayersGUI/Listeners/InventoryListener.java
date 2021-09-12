@@ -1,7 +1,7 @@
-package me.M0dii.OnlinePlayersGUI.Listeners;
+package me.m0dii.onlineplayersgui.listeners;
 
-import me.M0dii.OnlinePlayersGUI.InventoryHolder.CustomGUI;
-import me.M0dii.OnlinePlayersGUI.OnlineGUI;
+import me.m0dii.onlineplayersgui.inventoryholder.CustomGUI;
+import me.m0dii.onlineplayersgui.OnlineGUI;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;

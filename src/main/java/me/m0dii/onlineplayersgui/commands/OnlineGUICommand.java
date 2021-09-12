@@ -1,9 +1,9 @@
-package me.M0dii.OnlinePlayersGUI.Commands;
+package me.m0dii.onlineplayersgui.commands;
 
-import me.M0dii.OnlinePlayersGUI.ConditionalGUIs;
-import me.M0dii.OnlinePlayersGUI.InventoryHolder.OnlineGUIInventory;
-import me.M0dii.OnlinePlayersGUI.OnlineGUI;
-import me.M0dii.OnlinePlayersGUI.Utils.Config;
+import me.m0dii.onlineplayersgui.ConditionalGUIs;
+import me.m0dii.onlineplayersgui.inventoryholder.OnlineGUIInventory;
+import me.m0dii.onlineplayersgui.OnlineGUI;
+import me.m0dii.onlineplayersgui.utils.Config;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;

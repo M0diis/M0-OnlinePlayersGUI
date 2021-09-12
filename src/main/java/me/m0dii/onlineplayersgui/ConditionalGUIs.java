@@ -1,7 +1,7 @@
-package me.M0dii.OnlinePlayersGUI;
+package me.m0dii.onlineplayersgui;
 
-import me.M0dii.OnlinePlayersGUI.InventoryHolder.ConditionalGUIInventory;
-import me.M0dii.OnlinePlayersGUI.Utils.Utils;
+import me.m0dii.onlineplayersgui.inventoryholder.ConditionalGUIInventory;
+import me.m0dii.onlineplayersgui.utils.Utils;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
@@ -48,11 +48,10 @@ public class ConditionalGUIs
                 String name = file.getName();
     
                 if (file.isFile() && name.endsWith(".yml") && !name.startsWith("config")
-                && !conditionalNames.contains(file.getName().replace(".yml", "")))
-                    conditionalNames.add(file.getName().replace(".yml", ""));
+                && !conditionalNames.contains(name.replace(".yml", "")))
+                    conditionalNames.add(name.replace(".yml", ""));
             }
         }
-    
     }
     
     public void displayConditional(String name, Player p)

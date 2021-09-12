@@ -1,5 +1,6 @@
-package me.M0dii.OnlinePlayersGUI;
+package me.m0dii.onlineplayersgui;
 
+import net.kyori.adventure.text.Component;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
@@ -12,7 +13,7 @@ public class CustomItem
     private final List<String> leftClickCommands;
     private final List<String> rightClickCommands;
     
-    private final List<String> lore;
+    private final List<Component> lore;
     
     private final boolean closeOnLeftClick;
     private final boolean closeOnRightClick;
@@ -20,7 +21,7 @@ public class CustomItem
     public CustomItem(ItemStack itemStack, int slot,
                       List<String> lcc, List<String> rcc,
                       boolean closeOnLeft, boolean closeOnRight,
-                      List<String> lore)
+                      List<Component> lore)
     {
         this.itemStack = itemStack;
         
@@ -35,7 +36,7 @@ public class CustomItem
         this.rightClickCommands = rcc;
     }
     
-    public List<String> getLore()
+    public List<Component> getLore()
     {
         return this.lore;
     }

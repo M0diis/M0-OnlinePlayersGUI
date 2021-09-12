@@ -1,7 +1,8 @@
-package me.M0dii.OnlinePlayersGUI.Utils;
+package me.m0dii.onlineplayersgui.utils;
 
-import me.M0dii.OnlinePlayersGUI.CustomItem;
-import me.M0dii.OnlinePlayersGUI.OnlineGUI;
+import me.m0dii.onlineplayersgui.CustomItem;
+import me.m0dii.onlineplayersgui.OnlineGUI;
+import net.kyori.adventure.text.Component;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -13,6 +14,7 @@ import org.bukkit.persistence.PersistentDataType;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Config
 {
@@ -153,16 +155,17 @@ public class Config
                 ItemMeta meta = item.getItemMeta();
 
                 if(CI_NAME.length() != 0)
-                    meta.setDisplayName(CI_NAME);
+                    meta.displayName(Component.text(CI_NAME));
 
-                List<String> lore = new ArrayList<>();
+                List<Component> lore = new ArrayList<>();
 
                 if(CI_LORE.size() != 0)
                 {
-                    for(String l : CI_LORE)
-                        lore.add(format(l));
+                    lore = CI_LORE.stream().map(Utils::format)
+                            .map(Component::text)
+                            .collect(Collectors.toList());
                     
-                    meta.setLore(lore);
+                    meta.lore(lore);
                 }
 
                 List<String> lcc = cfg.getStringList(
@@ -184,10 +187,8 @@ public class Config
 
                 boolean corc = cfg.getBoolean(
                         String.format(prefix + "CustomItems.%d.Commands.CloseOnRightClick", i));
-
-                CustomItem ci = new CustomItem(item, i, lcc, rcc, colc, corc, lore);
-
-                this.CUSTOM_ITEMS.add(ci);
+                
+                CUSTOM_ITEMS.add(new CustomItem(item, i, lcc, rcc, colc, corc, lore));
             }
         }
     }
