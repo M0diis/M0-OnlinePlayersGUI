@@ -80,8 +80,8 @@ public class InventoryListener implements Listener
             {
                 Inventory inv = p.getOpenInventory().getTopInventory();
                 
-                if(inv.getHolder() instanceof CustomGUI)
-                    ((CustomGUI)inv.getHolder()).refresh((Player)p);
+                if(inv.getHolder() instanceof CustomGUI cg)
+                    cg.refresh((Player)p);
             });
     }
     
@@ -90,13 +90,11 @@ public class InventoryListener implements Listener
     {
         Inventory inv = e.getClickedInventory();
         
-        if(inv != null && inv.getHolder() instanceof CustomGUI)
+        if(inv != null && inv.getHolder() instanceof CustomGUI cg)
         {
             e.setCancelled(true);
     
-            CustomGUI customGUI = (CustomGUI)inv.getHolder();
-            
-            customGUI.execute((Player)e.getWhoClicked(), e.getCurrentItem(), e.isLeftClick());
+            cg.execute((Player)e.getWhoClicked(), e.getCurrentItem(), e.getClick());
         }
     }
     

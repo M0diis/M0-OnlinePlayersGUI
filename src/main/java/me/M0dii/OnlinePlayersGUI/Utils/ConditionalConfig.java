@@ -3,7 +3,6 @@ package me.m0dii.onlineplayersgui.utils;
 import me.m0dii.onlineplayersgui.CustomItem;
 import me.m0dii.onlineplayersgui.OnlineGUI;
 import net.kyori.adventure.text.Component;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -11,7 +10,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,9 +22,8 @@ public class ConditionalConfig
     private String GUI_TITLE;
     
     private List<String> HEAD_LORE, NEXT_PAGE_LORE, PREVIOUS_PAGE_LORE;
-    private List<String> LEFT_CLICK_COMMANDS, RIGHT_CLICK_COMMANDS;
+    private List<String> LEFT_CLICK_COMMANDS, MIDDLE_CLICK_COMMANDS, RIGHT_CLICK_COMMANDS;
     
-    private boolean CLOSE_ON_LEFT_CLICK, CLOSE_ON_RIGHT_CLICK;
     private int GUI_SIZE;
     
     private Material NEXT_PAGE_MATERIAL, PREVIOUS_PAGE_MATERIAL;
@@ -63,9 +60,6 @@ public class ConditionalConfig
     
     public void load()
     {
-        CLOSE_ON_LEFT_CLICK = getBool("GUI.CloseOn.LeftClick");
-        CLOSE_ON_RIGHT_CLICK = getBool("GUI.CloseOn.RightClick");
-        
         HEAD_NAME = getStringf("PlayerDisplay.Name");
         
         HEAD_LORE = getStringList("PlayerDisplay.Lore");
@@ -73,6 +67,7 @@ public class ConditionalConfig
         GUI_TITLE = getStringf("GUI.Title");
         
         LEFT_CLICK_COMMANDS = getStringList("PlayerDisplay.Commands.Left-Click");
+        MIDDLE_CLICK_COMMANDS = getStringList("PlayerDisplay.Commands.Middle-Click");
         RIGHT_CLICK_COMMANDS = getStringList("PlayerDisplay.Commands.Right-Click");
         
         GUI_SIZE = cfg.getInt("GUI.Size");
@@ -145,6 +140,9 @@ public class ConditionalConfig
                 List<String> lcc = cfg.getStringList(
                         String.format("CustomItems.%d.Commands.Left-Click", i));
                 
+                List<String> mcc = cfg.getStringList(
+                        String.format("CustomItems.%d.Commands.Middle-Click", i));
+                
                 List<String> rcc = cfg.getStringList(
                         String.format("CustomItems.%d.Commands.Right-Click", i));
                 
@@ -156,27 +154,9 @@ public class ConditionalConfig
                 
                 item.setItemMeta(meta);
                 
-                boolean colc = cfg.getBoolean(
-                        String.format("CustomItems.%d.Commands.CloseOnLeftClick", i));
-                
-                boolean corc = cfg.getBoolean(
-                        String.format("CustomItems.%d.Commands.CloseOnRightClick", i));
-                
-                CustomItem ci = new CustomItem(item, i, lcc, rcc, colc, corc, lore);
-                
-                this.CUSTOM_ITEMS.add(ci);
+                CUSTOM_ITEMS.add(new CustomItem(item, i, lcc, mcc, rcc, lore));
             }
         }
-    }
-    
-    public boolean CLOSE_ON_LEFT_CLICK()
-    {
-        return this.CLOSE_ON_LEFT_CLICK;
-    }
-    
-    public boolean CLOSE_ON_RIGHT_CLICK()
-    {
-        return this.CLOSE_ON_RIGHT_CLICK;
     }
     
     public List<CustomItem> getCustomItems()
@@ -231,17 +211,17 @@ public class ConditionalConfig
     
     public Material NEXT_PAGE_MATERIAL()
     {
-        return this.NEXT_PAGE_MATERIAL;
+        return NEXT_PAGE_MATERIAL;
     }
     
     public Material PREV_PAGE_MATERIAL()
     {
-        return this.PREVIOUS_PAGE_MATERIAL;
+        return PREVIOUS_PAGE_MATERIAL;
     }
     
     public String getCondition()
     {
-        return this.CONDITION;
+        return CONDITION;
     }
     public boolean isPERMISSION_REQUIRED()
     {
@@ -254,5 +234,9 @@ public class ConditionalConfig
     public String getGUI_TITLE()
     {
         return GUI_TITLE;
+    }
+    public List<String> MIDDLE_CLICK_CMDS()
+    {
+        return MIDDLE_CLICK_COMMANDS;
     }
 }

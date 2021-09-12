@@ -27,9 +27,8 @@ public class Config
     private String TOGGLE_MESSAGE;
     
     private List<String> HEAD_LORE, NEXT_PAGE_LORE, PREVIOUS_PAGE_LORE;
-    private List<String> LEFT_CLICK_COMMANDS, RIGHT_CLICK_COMMANDS;
+    private List<String> LEFT_CLICK_COMMANDS, MIDDLE_CLICK_COMMANDS, RIGHT_CLICK_COMMANDS;
     
-    private boolean CLOSE_ON_LEFT_CLICK, CLOSE_ON_RIGHT_CLICK;
     private boolean UPDATE_ON_JOIN, UPDATE_ON_LEAVE, ALWAYS_SHOW_BUTTONS;
     private int GUI_SIZE;
     
@@ -80,9 +79,6 @@ public class Config
         UPDATE_ON_JOIN = getBool("GUI.UpdateOn.Join");
         UPDATE_ON_LEAVE = getBool("GUI.UpdateOn.Leave");
         
-        CLOSE_ON_LEFT_CLICK = getBool("GUI.CloseOn.LeftClick");
-        CLOSE_ON_RIGHT_CLICK = getBool("GUI.CloseOn.RightClick");
-        
         ALWAYS_SHOW_BUTTONS = getBool("AlwaysShowPageButtons");
         
         HEAD_NAME = getStringf("PlayerDisplay.Name");
@@ -98,6 +94,7 @@ public class Config
         TOGGLE_MESSAGE = getStringf("ToggleMessage");
         
         LEFT_CLICK_COMMANDS = getStringList("PlayerDisplay.Commands.Left-Click");
+        MIDDLE_CLICK_COMMANDS = getStringList("PlayerDisplay.Commands.Middle-Click");
         RIGHT_CLICK_COMMANDS = getStringList("PlayerDisplay.Commands.Right-Click");
         
         GUI_SIZE = cfg.getInt("M0-OnlinePlayersGUI.GUI.Size");
@@ -170,6 +167,9 @@ public class Config
 
                 List<String> lcc = cfg.getStringList(
                         String.format(prefix + "CustomItems.%d.Commands.Left-Click", i));
+    
+                List<String> mcc = cfg.getStringList(
+                        String.format(prefix + "CustomItems.%d.Commands.Middle-Click", i));
 
                 List<String> rcc = cfg.getStringList(
                         String.format(prefix + "CustomItems.%d.Commands.Right-Click", i));
@@ -181,14 +181,8 @@ public class Config
                         new NamespacedKey(plugin, "IsCustom"), PersistentDataType.STRING, "true");
 
                 item.setItemMeta(meta);
-
-                boolean colc = cfg.getBoolean(
-                        String.format(prefix + "CustomItems.%d.Commands.CloseOnLeftClick", i));
-
-                boolean corc = cfg.getBoolean(
-                        String.format(prefix + "CustomItems.%d.Commands.CloseOnRightClick", i));
                 
-                CUSTOM_ITEMS.add(new CustomItem(item, i, lcc, rcc, colc, corc, lore));
+                CUSTOM_ITEMS.add(new CustomItem(item, i, lcc, mcc, rcc, lore));
             }
         }
     }
@@ -199,16 +193,6 @@ public class Config
             return text;
         
         return ChatColor.translateAlternateColorCodes('&', text);
-    }
-    
-    public boolean CLOSE_ON_LEFT_CLICK()
-    {
-        return this.CLOSE_ON_LEFT_CLICK;
-    }
-    
-    public boolean CLOSE_ON_RIGHT_CLICK()
-    {
-        return this.CLOSE_ON_RIGHT_CLICK;
     }
     
     public List<CustomItem> getCustomItems()
@@ -336,5 +320,10 @@ public class Config
     public boolean isPERMISSION_REQUIRED()
     {
         return this.PERMISSION_REQUIRED;
+    }
+    
+    public List<String> MIDDLE_CLICK_CMDS()
+    {
+        return this.MIDDLE_CLICK_COMMANDS;
     }
 }

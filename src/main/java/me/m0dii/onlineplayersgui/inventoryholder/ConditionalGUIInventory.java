@@ -11,6 +11,7 @@ import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
@@ -57,9 +58,7 @@ public class ConditionalGUIInventory implements InventoryHolder, CustomGUI
         initByPage(page);
     }
     
-    private int displayedHeads = 0;
-    
-    public void execute(Player clickee, ItemStack clickedItem, boolean left)
+    public void execute(Player clickee, ItemStack clickedItem, ClickType clickType)
     {
         if(clickedItem != null && clickedItem.getType().equals(Material.PLAYER_HEAD))
         {
@@ -77,22 +76,20 @@ public class ConditionalGUIInventory implements InventoryHolder, CustomGUI
     
             if(skullOwner != null)
             {
-                for(String cmd : left ? this.cfg.LEFT_CLICK_CMDS() :
-                        this.cfg.RIGHT_CLICK_CMDS())
-                    Utils.sendCommand(clickee, skullOwner, cmd);
-                
-                if(this.cfg.LEFT_CLICK_CMDS().contains("[CLOSE]"))
-                    clickee.closeInventory();
+                List<String> cmds = new ArrayList<>();
+        
+                if(clickType.equals(ClickType.LEFT))
+                    cmds = this.cfg.LEFT_CLICK_CMDS();
     
-                if(this.cfg.RIGHT_CLICK_CMDS().contains("[CLOSE]"))
-                    clickee.closeInventory();
+                if(clickType.equals(ClickType.MIDDLE))
+                    cmds = this.cfg.MIDDLE_CLICK_CMDS();
+        
+                if(clickType.equals(ClickType.RIGHT))
+                    cmds = this.cfg.RIGHT_CLICK_CMDS();
+        
+                for(String cmd : cmds)
+                    Utils.sendCommand(clickee, skullOwner, cmd);
             }
-            
-            if(left && this.cfg.CLOSE_ON_LEFT_CLICK())
-                clickee.closeInventory();
-
-            if(!left && this.cfg.CLOSE_ON_RIGHT_CLICK())
-                clickee.closeInventory();
         }
     
         if((clickedItem != null) &&
@@ -117,7 +114,7 @@ public class ConditionalGUIInventory implements InventoryHolder, CustomGUI
                 {
                     ConditionalGUIInventory newinv = new ConditionalGUIInventory(this.plugin, this.name, nextPage, fileCfg);
                     
-                    if(newinv.displayedHeads != 0)
+                    if(newinv.hasNextPage())
                         clickee.openInventory(newinv.getInventory());
                 }
                 catch(IndexOutOfBoundsException ex)
@@ -149,10 +146,13 @@ public class ConditionalGUIInventory implements InventoryHolder, CustomGUI
                     {
                         List<String> cicmds = new ArrayList<>();
                         
-                        if(left)
+                        if(clickType.equals(ClickType.LEFT))
                             cicmds = c.getLCC();
-                    
-                        if(!left)
+    
+                        if(clickType.equals(ClickType.MIDDLE))
+                            cicmds = c.getMCC();
+                        
+                        if(clickType.equals(ClickType.RIGHT))
                             cicmds = c.getRCC();
                     
                         cicmds.forEach(cmd -> Utils.sendCommand(clickee, clickee, cmd));
@@ -216,8 +216,7 @@ public class ConditionalGUIInventory implements InventoryHolder, CustomGUI
     @NotNull
     private List<Player> getByPage(int page)
     {
-        String permission = cfg.isPERMISSION_REQUIRED() ? cfg.getREQUIRED_PERMISSION()
-                : null;
+        String permission = cfg.isPERMISSION_REQUIRED() ? cfg.getREQUIRED_PERMISSION() : null;
         
         List<Player> online = plugin.getGuiUtils().getOnline(permission, this.condition);
         
@@ -236,8 +235,6 @@ public class ConditionalGUIInventory implements InventoryHolder, CustomGUI
     private void initByPage(int page)
     {
         List<Player> byPage = getByPage(page);
-    
-        displayedHeads = byPage.size();
         
         int curr = 0;
     

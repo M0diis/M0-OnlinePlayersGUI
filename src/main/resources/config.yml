@@ -51,6 +51,8 @@ M0-OnlinePlayersGUI:
       Right-Click:
         - '[CONSOLE] msg %player_name% Hello! '
         - '[CLOSE]' # This will close the GUI.
+      Middle-Click:
+        - '[CLOSE]'
   # Custom Items
   # These items will be displayed in the same row as
   # the previous and next buttons are

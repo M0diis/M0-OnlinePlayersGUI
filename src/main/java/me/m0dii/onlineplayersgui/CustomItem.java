@@ -11,16 +11,13 @@ public class CustomItem
     private final ItemStack itemStack;
     
     private final List<String> leftClickCommands;
+    private final List<String> middleClickCommands;
     private final List<String> rightClickCommands;
     
     private final List<Component> lore;
     
-    private final boolean closeOnLeftClick;
-    private final boolean closeOnRightClick;
-    
     public CustomItem(ItemStack itemStack, int slot,
-                      List<String> lcc, List<String> rcc,
-                      boolean closeOnLeft, boolean closeOnRight,
+                      List<String> lcc, List<String> mcc, List<String> rcc,
                       List<Component> lore)
     {
         this.itemStack = itemStack;
@@ -29,10 +26,8 @@ public class CustomItem
         
         this.lore = lore;
         
-        this.closeOnLeftClick = closeOnLeft;
-        this.closeOnRightClick = closeOnRight;
-        
         this.leftClickCommands = lcc;
+        this.middleClickCommands = mcc;
         this.rightClickCommands = rcc;
     }
     
@@ -56,6 +51,11 @@ public class CustomItem
         return this.leftClickCommands;
     }
     
+    public List<String> getMCC()
+    {
+        return this.middleClickCommands;
+    }
+    
     public List<String> getRCC()
     {
         return this.rightClickCommands;
@@ -63,11 +63,16 @@ public class CustomItem
     
     public boolean closeOnLeft()
     {
-        return this.closeOnLeftClick;
+        return this.leftClickCommands.stream().anyMatch(str -> str.startsWith("[CLOSE]"));
+    }
+    
+    public boolean closeOnMiddle()
+    {
+        return this.middleClickCommands.stream().anyMatch(str -> str.startsWith("[CLOSE]"));
     }
     
     public boolean closeOnRight()
     {
-        return this.closeOnRightClick;
+        return this.rightClickCommands.stream().anyMatch(str -> str.startsWith("[CLOSE]"));
     }
 }

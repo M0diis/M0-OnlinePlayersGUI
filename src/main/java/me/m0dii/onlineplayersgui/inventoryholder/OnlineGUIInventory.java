@@ -10,6 +10,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
@@ -29,8 +30,7 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI
     private final String name;
     private final int size, page;
     private final OnlineGUI plugin;
-    private int displayedHeads = 0;
-    
+
     public OnlineGUIInventory(OnlineGUI plugin, String name, int page)
     {
         this.size = this.adjustSize(plugin.getCfg());
@@ -45,7 +45,7 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI
         initByPage(page);
     }
     
-    public void execute(Player clickee, ItemStack clickedItem, boolean left)
+    public void execute(Player clickee, ItemStack clickedItem, ClickType clickType)
     {
         if(clickedItem != null && clickedItem.getType().equals(Material.PLAYER_HEAD))
         {
@@ -63,21 +63,28 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI
             
             if(skullOwner != null)
             {
-                for(String cmd : left ? this.plugin.getCfg().LEFT_CLICK_CMDS() :
-                        this.plugin.getCfg().RIGHT_CLICK_CMDS())
+                List<String> cmds = new ArrayList<>();
+                
+                if(clickType.equals(ClickType.LEFT))
+                    cmds = this.plugin.getCfg().LEFT_CLICK_CMDS();
+    
+                if(clickType.equals(ClickType.MIDDLE))
+                    cmds = this.plugin.getCfg().MIDDLE_CLICK_CMDS();
+    
+                if(clickType.equals(ClickType.RIGHT))
+                    cmds = this.plugin.getCfg().RIGHT_CLICK_CMDS();
+                
+                for(String cmd : cmds)
                     Utils.sendCommand(clickee, skullOwner, cmd);
-    
-                if(this.plugin.getCfg().LEFT_CLICK_CMDS().contains("[CLOSE]"))
-                    clickee.closeInventory();
-    
-                if(this.plugin.getCfg().RIGHT_CLICK_CMDS().contains("[CLOSE]"))
-                    clickee.closeInventory();
             }
-            
-            if(left && this.plugin.getCfg().CLOSE_ON_LEFT_CLICK())
+    
+            if(clickType.equals(ClickType.LEFT) && this.plugin.getCfg().LEFT_CLICK_CMDS().contains("[CLOSE]"))
                 clickee.closeInventory();
-
-            if(!left && this.plugin.getCfg().CLOSE_ON_RIGHT_CLICK())
+    
+            if(clickType.equals(ClickType.MIDDLE) && this.plugin.getCfg().MIDDLE_CLICK_CMDS().contains("[CLOSE]"))
+                clickee.closeInventory();
+            
+            if(clickType.equals(ClickType.RIGHT) && this.plugin.getCfg().RIGHT_CLICK_CMDS().contains("[CLOSE]"))
                 clickee.closeInventory();
         }
     
@@ -104,7 +111,7 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI
                     OnlineGUIInventory newinv = new OnlineGUIInventory(this.plugin, this.name, nextPage);
                     newinv.setCustomItems(clickee);
 
-                    if(newinv.displayedHeads != 0)
+                    if(newinv.hasNextPage())
                         clickee.openInventory(newinv.getInventory());
                 }
                 catch(IndexOutOfBoundsException ex)
@@ -130,33 +137,24 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI
                     //noinspection ConstantConditions
                     int slot = cont.get(key, PersistentDataType.INTEGER);
                 
-                    CustomItem c = this.getCustomItemBySlot(slot);
+                    CustomItem c = getCustomItemBySlot(slot);
                 
                     if(c != null)
                     {
                         List<String> cicmds = new ArrayList<>();
-                    
-                        boolean close = false;
-                    
-                        if(left)
-                        {
+                        
+                        if(clickType.equals(ClickType.LEFT))
                             cicmds = c.getLCC();
-                        
-                            if(c.closeOnLeft())
-                                close = true;
-                        }
-                    
-                        if(!left)
-                        {
+    
+                        if(clickType.equals(ClickType.MIDDLE))
+                            cicmds = c.getMCC();
+    
+                        if(clickType.equals(ClickType.RIGHT))
                             cicmds = c.getRCC();
-                        
-                            if(c.closeOnRight())
-                                close = true;
-                        }
                     
                         cicmds.forEach(cmd -> Utils.sendCommand(clickee, clickee, cmd));
-                    
-                        if(close)
+    
+                        if(cicmds.contains("[CLOSE]"))
                             clickee.closeInventory();
                     }
                 }
@@ -220,8 +218,6 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI
     private void initByPage(int page)
     {
         List<Player> byPage = getByPage(page);
-    
-        displayedHeads = byPage.size();
         
         int curr = 0;
     

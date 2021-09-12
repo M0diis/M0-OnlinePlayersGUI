@@ -7,13 +7,14 @@ import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
 public class ConditionalGUIs
 {
     private final OnlineGUI plugin;
     private final ArrayList<String> conditionalNames;
     
-    public ArrayList<String> getConditionalNames()
+    public List<String> getConditionalNames()
     {
         return this.conditionalNames;
     }

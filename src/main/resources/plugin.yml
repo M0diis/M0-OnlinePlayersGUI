@@ -1,7 +1,7 @@
 name: M0-OnlinePlayersGUI
 main: me.m0dii.onlineplayersgui.OnlineGUI
 description: M0-OnlinePlayersGUI
-version: 3.4.0
+version: 3.4.1
 api-version: 1.13
 author: M0dii
 softdepend: [PlaceholderAPI, EssentialsX]
