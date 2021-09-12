@@ -3,6 +3,7 @@ package me.m0dii.onlineplayersgui.inventoryholder;
 import me.m0dii.onlineplayersgui.CustomItem;
 import me.m0dii.onlineplayersgui.OnlineGUI;
 import me.clip.placeholderapi.PlaceholderAPI;
+import me.m0dii.onlineplayersgui.utils.Utils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import org.bukkit.Bukkit;
@@ -18,6 +19,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class GUIUtils
@@ -104,11 +106,26 @@ public class GUIUtils
             {
                 for(Player p : players)
                 {
-                    double left = Double.parseDouble(PlaceholderAPI.setPlaceholders(p,
-                            condSplit.get(0)).replaceAll("[a-zA-Z!@#$&*()/\\\\\\[\\]{}:\"?]", ""));
+                    String leftStr = condSplit.get(0);
+                    String rightStr = condSplit.get(2);
+    
+                    if(Objects.equals(op, "=") || Objects.equals(op, "=="))
+                    {
+                        if(!Utils.isDigit(leftStr) && !Utils.isDigit(rightStr))
+                        {
+                            if(leftStr.equalsIgnoreCase(rightStr))
+                                filtered.add(p);
+                            
+                            continue;
+                        }
+                    }
                     
-                    double right = Double.parseDouble(PlaceholderAPI.setPlaceholders(p,
-                            condSplit.get(2)).replaceAll("[a-zA-Z!@#$&*()/\\\\\\[\\]{}:\"?]", ""));
+                    double left = Double.parseDouble(PlaceholderAPI.setPlaceholders(p, leftStr)
+                            .replaceAll("[a-zA-Z!@#$&*()/\\\\\\[\\]{}:\"?]", ""));
+    
+
+                    double right = Double.parseDouble(PlaceholderAPI.setPlaceholders(p, rightStr)
+                            .replaceAll("[a-zA-Z!@#$&*()/\\\\\\[\\]{}:\"?]", ""));
                     
                     switch(op)
                     {

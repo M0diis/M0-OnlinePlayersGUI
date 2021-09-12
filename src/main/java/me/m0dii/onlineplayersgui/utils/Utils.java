@@ -15,6 +15,20 @@ public class Utils
         return ChatColor.translateAlternateColorCodes('&', text);
     }
     
+    public static boolean isDigit(String str)
+    {
+        try
+        {
+            Double.parseDouble(str);
+        }
+        catch(NumberFormatException ex)
+        {
+            return false;
+        }
+        
+        return true;
+    }
+    
     public static void sendCommand(Player sender, Player placeholderHolder, String cmd)
     {
         cmd = PlaceholderAPI.setPlaceholders(placeholderHolder, cmd)
