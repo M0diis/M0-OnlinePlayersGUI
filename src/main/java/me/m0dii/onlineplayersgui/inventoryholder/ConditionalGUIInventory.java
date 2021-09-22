@@ -167,7 +167,7 @@ public class ConditionalGUIInventory implements InventoryHolder, CustomGUI
     
     public void refresh(Player p)
     {
-        this.inv = Bukkit.createInventory(this, this.size, Component.text(this.name));
+        this.inv = Bukkit.createInventory(this, this.size, this.name);
     
         initByPage(this.page);
         setCustomItems(p);
@@ -250,9 +250,8 @@ public class ConditionalGUIInventory implements InventoryHolder, CustomGUI
                     .map(str -> Utils.format(PlaceholderAPI.setPlaceholders(p, str)))
                     .collect(Collectors.toList());
     
-            meta.displayName(
-                    Component.text(Utils.format(PlaceholderAPI.setPlaceholders(p, this.cfg
-                            .HEAD_DISPLAY_NAME()))));
+            meta.setDisplayName(Utils.format(PlaceholderAPI.setPlaceholders(p, this.cfg
+                            .HEAD_DISPLAY_NAME())));
         
             meta.setLore(lore);
         
@@ -294,18 +293,18 @@ public class ConditionalGUIInventory implements InventoryHolder, CustomGUI
         ItemStack nextButton = new ItemStack(cfg.NEXT_PAGE_MATERIAL());
         ItemMeta nextButtonMeta = nextButton.getItemMeta();
         
-        List<Component> nextLore = cfg.NEXT_PAGE_LORE().stream().map(Utils::format)
+        List<String> nextLore = cfg.NEXT_PAGE_LORE().stream()
+                .map(Utils::format)
                 .map(str -> PlaceholderAPI.setPlaceholders(null, str))
-                .map(Component::text)
                 .collect(Collectors.toList());
         
-        nextButtonMeta.lore(nextLore);
+        nextButtonMeta.setLore(nextLore);
         
         nextButtonMeta.getPersistentDataContainer().set(
                 new NamespacedKey(plugin, "Button"),
                 PersistentDataType.STRING, "Next");
         
-        nextButtonMeta.displayName(Component.text(cfg.NEXT_PAGE_BUTTON_NAME()));
+        nextButtonMeta.setDisplayName(Utils.format(cfg.NEXT_PAGE_BUTTON_NAME()));
         
         nextButton.setItemMeta(nextButtonMeta);
         
@@ -317,18 +316,18 @@ public class ConditionalGUIInventory implements InventoryHolder, CustomGUI
         ItemStack prevButton = new ItemStack(cfg.PREV_PAGE_MATERIAL());
         ItemMeta prevButtonMeta = prevButton.getItemMeta();
         
-        List<Component> prevLore = cfg.PREV_PAGE_LORE().stream().map(Utils::format)
+        List<String> prevLore = cfg.PREV_PAGE_LORE().stream()
+                .map(Utils::format)
                 .map(str -> PlaceholderAPI.setPlaceholders(null, str))
-                .map(Component::text)
                 .collect(Collectors.toList());
         
-        prevButtonMeta.lore(prevLore);
+        prevButtonMeta.setLore(prevLore);
         
         prevButtonMeta.getPersistentDataContainer().set(
                 new NamespacedKey(plugin, "Button"),
                 PersistentDataType.STRING, "Previous");
         
-        prevButtonMeta.displayName(Component.text(cfg.PREV_PAGE_BUTTON_NAME()));
+        prevButtonMeta.setDisplayName(Utils.format(cfg.PREV_PAGE_BUTTON_NAME()));
         prevButton.setItemMeta(prevButtonMeta);
         
         inv.setItem(size - 6, prevButton);

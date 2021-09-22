@@ -124,17 +124,17 @@ public class ConditionalConfig
                 ItemMeta meta = item.getItemMeta();
                 
                 if(CI_NAME.length() != 0)
-                    meta.displayName(Component.text(CI_NAME));
+                    meta.setDisplayName(Utils.format(CI_NAME));
                 
-                List<Component> lore = new ArrayList<>();
+                List<String> lore = new ArrayList<>();
     
                 if(CI_LORE.size() != 0)
                 {
-                    lore = CI_LORE.stream().map(Utils::format)
-                            .map(Component::text)
+                    lore = CI_LORE.stream()
+                            .map(Utils::format)
                             .collect(Collectors.toList());
         
-                    meta.lore(lore);
+                    meta.setLore(lore);
                 }
                 
                 List<String> lcc = cfg.getStringList(

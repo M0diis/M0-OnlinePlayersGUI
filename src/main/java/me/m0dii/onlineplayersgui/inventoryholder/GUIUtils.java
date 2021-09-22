@@ -79,11 +79,11 @@ public class GUIUtils
                 //noinspection ConstantConditions
                 int slot = cont.get(key, PersistentDataType.INTEGER);
                 
-                List<Component> lore = c.getLore().stream()
-                        .map(str -> Component.text(PlaceholderAPI.setPlaceholders(p, ((TextComponent)str).content())))
+                List<String> lore = c.getLore().stream()
+                        .map(str -> PlaceholderAPI.setPlaceholders(p, str))
                         .collect(Collectors.toList());
             
-                m.lore(lore);
+                m.setLore(lore);
             
                 item.setItemMeta(m);
             

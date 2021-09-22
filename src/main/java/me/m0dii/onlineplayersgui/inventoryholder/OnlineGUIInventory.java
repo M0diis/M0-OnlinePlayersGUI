@@ -40,7 +40,7 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI
         
         this.plugin = plugin;
     
-        this.inv = Bukkit.createInventory(this, this.size, Component.text(name));
+        this.inv = Bukkit.createInventory(this, this.size, name);
         
         initByPage(page);
     }
@@ -202,7 +202,7 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI
     
     public void refresh(Player p)
     {
-        this.inv = Bukkit.createInventory(this, this.size, Component.text(this.name));
+        this.inv = Bukkit.createInventory(this, this.size, this.name);
         
         initByPage(this.page);
         setCustomItems(p);
@@ -233,9 +233,9 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI
                     .map(str -> Utils.format(PlaceholderAPI.setPlaceholders(p, str)))
                     .collect(Collectors.toList());
 
-            meta.displayName(Component.text(Utils.format(
+            meta.setDisplayName(Utils.format(
                     PlaceholderAPI.setPlaceholders(p, plugin.getCfg()
-                            .HEAD_DISPLAY_NAME()))));
+                            .HEAD_DISPLAY_NAME())));
         
             meta.setLore(lore);
         
@@ -295,18 +295,18 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI
         ItemStack nextButton = new ItemStack(plugin.getCfg().NEXT_PAGE_MATERIAL());
         ItemMeta nextButtonMeta = nextButton.getItemMeta();
     
-        List<Component> nextLore = plugin.getCfg().NEXT_PAGE_LORE().stream().map(Utils::format)
+        List<String> nextLore = plugin.getCfg().NEXT_PAGE_LORE().stream()
+                .map(Utils::format)
                 .map(str -> PlaceholderAPI.setPlaceholders(null, str))
-                .map(Component::text)
                 .collect(Collectors.toList());
     
-        nextButtonMeta.lore(nextLore);
+        nextButtonMeta.setLore(nextLore);
     
         nextButtonMeta.getPersistentDataContainer().set(
                 new NamespacedKey(plugin, "Button"),
                 PersistentDataType.STRING, "Next");
     
-        nextButtonMeta.displayName(Component.text(plugin.getCfg().NEXT_PAGE_BUTTON_NAME()));
+        nextButtonMeta.setDisplayName(plugin.getCfg().NEXT_PAGE_BUTTON_NAME());
     
         nextButton.setItemMeta(nextButtonMeta);
     
@@ -318,18 +318,18 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI
         ItemStack prevButton = new ItemStack(plugin.getCfg().PREV_PAGE_MATERIAL());
         ItemMeta prevButtonMeta = prevButton.getItemMeta();
     
-        List<Component> prevLore = plugin.getCfg().PREV_PAGE_LORE().stream().map(Utils::format)
+        List<String> prevLore = plugin.getCfg().PREV_PAGE_LORE().stream()
+                .map(Utils::format)
                 .map(str -> PlaceholderAPI.setPlaceholders(null, str))
-                .map(Component::text)
                 .collect(Collectors.toList());
     
-        prevButtonMeta.lore(prevLore);
+        prevButtonMeta.setLore(prevLore);
     
         prevButtonMeta.getPersistentDataContainer().set(
                 new NamespacedKey(plugin, "Button"),
                 PersistentDataType.STRING, "Previous");
     
-        prevButtonMeta.displayName(Component.text(plugin.getCfg().PREV_PAGE_BUTTON_NAME()));
+        prevButtonMeta.setDisplayName(Utils.format(plugin.getCfg().PREV_PAGE_BUTTON_NAME()));
         prevButton.setItemMeta(prevButtonMeta);
     
         inv.setItem(plugin.getCfg().GUI_SIZE() - 6, prevButton);

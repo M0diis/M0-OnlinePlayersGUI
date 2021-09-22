@@ -14,11 +14,11 @@ public class CustomItem
     private final List<String> middleClickCommands;
     private final List<String> rightClickCommands;
     
-    private final List<Component> lore;
+    private final List<String> lore;
     
     public CustomItem(ItemStack itemStack, int slot,
                       List<String> lcc, List<String> mcc, List<String> rcc,
-                      List<Component> lore)
+                      List<String> lore)
     {
         this.itemStack = itemStack;
         
@@ -31,7 +31,7 @@ public class CustomItem
         this.rightClickCommands = rcc;
     }
     
-    public List<Component> getLore()
+    public List<String> getLore()
     {
         return this.lore;
     }
