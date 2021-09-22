@@ -122,8 +122,7 @@ public class GUIUtils
                     
                     double left = Double.parseDouble(PlaceholderAPI.setPlaceholders(p, leftStr)
                             .replaceAll("[a-zA-Z!@#$&*()/\\\\\\[\\]{}:\"?]", ""));
-    
-
+                    
                     double right = Double.parseDouble(PlaceholderAPI.setPlaceholders(p, rightStr)
                             .replaceAll("[a-zA-Z!@#$&*()/\\\\\\[\\]{}:\"?]", ""));
                     
