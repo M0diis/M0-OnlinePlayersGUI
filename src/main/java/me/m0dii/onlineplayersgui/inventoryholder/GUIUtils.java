@@ -1,11 +1,9 @@
 package me.m0dii.onlineplayersgui.inventoryholder;
 
+import me.clip.placeholderapi.PlaceholderAPI;
 import me.m0dii.onlineplayersgui.CustomItem;
 import me.m0dii.onlineplayersgui.OnlineGUI;
-import me.clip.placeholderapi.PlaceholderAPI;
 import me.m0dii.onlineplayersgui.utils.Utils;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;

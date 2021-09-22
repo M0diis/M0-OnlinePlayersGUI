@@ -2,7 +2,6 @@ package me.m0dii.onlineplayersgui.utils;
 
 import me.m0dii.onlineplayersgui.CustomItem;
 import me.m0dii.onlineplayersgui.OnlineGUI;
-import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -123,19 +122,12 @@ public class ConditionalConfig
                 
                 ItemMeta meta = item.getItemMeta();
                 
-                if(CI_NAME.length() != 0)
-                    meta.setDisplayName(Utils.format(CI_NAME));
-                
-                List<String> lore = new ArrayList<>();
-    
-                if(CI_LORE.size() != 0)
-                {
-                    lore = CI_LORE.stream()
+                List<String> lore = CI_LORE.stream()
                             .map(Utils::format)
                             .collect(Collectors.toList());
-        
-                    meta.setLore(lore);
-                }
+    
+                meta.setDisplayName(Utils.format(CI_NAME));
+                meta.setLore(lore);
                 
                 List<String> lcc = cfg.getStringList(
                         String.format("CustomItems.%d.Commands.Left-Click", i));

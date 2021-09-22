@@ -1,6 +1,5 @@
 package me.m0dii.onlineplayersgui;
 
-import net.kyori.adventure.text.Component;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
