@@ -25,7 +25,7 @@ public record UpdateChecker(OnlineGUI plugin, int resourceId)
             }
             catch(IOException ex)
             {
-                this.plugin.getLogger().info("Failed to check for updates: " + ex.getMessage());
+                Messenger.warn("Failed to check for updates: " + ex.getMessage());
             }
         });
     }

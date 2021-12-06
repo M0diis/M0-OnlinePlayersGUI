@@ -246,11 +246,10 @@ public class ConditionalGUIInventory implements InventoryHolder, CustomGUI
             ItemMeta meta = head.getItemMeta();
         
             List<String> lore = cfg.HEAD_LORE().stream()
-                    .map(str -> Utils.format(PlaceholderAPI.setPlaceholders(p, str)))
+                    .map(str -> Utils.setPlaceholders(str, p))
                     .collect(Collectors.toList());
     
-            meta.setDisplayName(Utils.format(PlaceholderAPI.setPlaceholders(p, this.cfg
-                            .HEAD_DISPLAY_NAME())));
+            meta.setDisplayName(Utils.setPlaceholders(this.cfg.HEAD_DISPLAY_NAME(), p));
         
             meta.setLore(lore);
         
@@ -293,8 +292,7 @@ public class ConditionalGUIInventory implements InventoryHolder, CustomGUI
         ItemMeta nextButtonMeta = nextButton.getItemMeta();
         
         List<String> nextLore = cfg.NEXT_PAGE_LORE().stream()
-                .map(Utils::format)
-                .map(str -> PlaceholderAPI.setPlaceholders(null, str))
+                .map(str -> Utils.setPlaceholders(str, null))
                 .collect(Collectors.toList());
         
         nextButtonMeta.setLore(nextLore);
@@ -316,8 +314,7 @@ public class ConditionalGUIInventory implements InventoryHolder, CustomGUI
         ItemMeta prevButtonMeta = prevButton.getItemMeta();
         
         List<String> prevLore = cfg.PREV_PAGE_LORE().stream()
-                .map(Utils::format)
-                .map(str -> PlaceholderAPI.setPlaceholders(null, str))
+                .map(str -> Utils.setPlaceholders(str, null))
                 .collect(Collectors.toList());
         
         prevButtonMeta.setLore(prevLore);

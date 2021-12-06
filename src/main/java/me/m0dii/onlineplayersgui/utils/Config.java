@@ -38,6 +38,8 @@ public class Config
     private boolean CONDITION_REQUIRED, PERMISSION_REQUIRED;
     private String CONDITION, PERMISSION;
     
+    private boolean DEBUG_ENABLED;
+    
     private final OnlineGUI plugin;
     
     public Config(OnlineGUI plugin)
@@ -79,6 +81,8 @@ public class Config
         UPDATE_ON_LEAVE = getBool("GUI.UpdateOn.Leave");
         
         ALWAYS_SHOW_BUTTONS = getBool("AlwaysShowPageButtons");
+        
+        DEBUG_ENABLED = cfg.getBoolean("Debug", false);
         
         HEAD_NAME = getStringf("PlayerDisplay.Name");
         
@@ -318,4 +322,10 @@ public class Config
     {
         return this.MIDDLE_CLICK_COMMANDS;
     }
+    
+    public boolean DEBUG_ENABLED()
+    {
+        return this.DEBUG_ENABLED;
+    }
+    
 }

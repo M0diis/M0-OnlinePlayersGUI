@@ -4,6 +4,7 @@ import me.m0dii.onlineplayersgui.commands.OnlineGUICommand;
 import me.m0dii.onlineplayersgui.inventoryholder.GUIUtils;
 import me.m0dii.onlineplayersgui.listeners.InventoryListener;
 import me.m0dii.onlineplayersgui.utils.Config;
+import me.m0dii.onlineplayersgui.utils.Messenger;
 import me.m0dii.onlineplayersgui.utils.UpdateChecker;
 import net.ess3.api.IEssentials;
 import org.bstats.bukkit.Metrics;
@@ -13,8 +14,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.plugin.java.JavaPluginLoader;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -31,15 +34,18 @@ public class OnlineGUI extends JavaPlugin
         return instance;
     }
     
-    private final PluginManager manager;
+    private PluginManager manager;
+    
+    protected OnlineGUI(JavaPluginLoader loader,
+                        PluginDescriptionFile description,
+                        File dataFolder, File file)
+    {
+        super(loader, description, dataFolder, file);
+    }
 
     public OnlineGUI()
     {
-        this.manager = getServer().getPluginManager();
-        
-        this.hiddenPlayersToggled = new ArrayList<>();
-        
-        this.cfg = new Config(this);
+        super();
     }
     
     private ConditionalGUIs cgis;
@@ -68,7 +74,7 @@ public class OnlineGUI extends JavaPlugin
     
     private File configFile = null;
     
-    private final Config cfg;
+    private Config cfg;
     
     public Config getCfg()
     {
@@ -96,9 +102,16 @@ public class OnlineGUI extends JavaPlugin
     {
         return this.guiUtils;
     }
+    
     public void onEnable()
     {
         instance = this;
+        
+        this.manager = getServer().getPluginManager();
+    
+        this.hiddenPlayersToggled = new ArrayList<>();
+    
+        this.cfg = new Config(this);
         
         this.prepareConfig();
         
@@ -154,12 +167,14 @@ public class OnlineGUI extends JavaPlugin
             if (!this.getDescription().getVersion().equalsIgnoreCase(
                     ver.replace("v", "")))
             {
-                info("You are running an outdated version of M0-CoreCord.");
-                info("You can download the latest version on Spigot:");
-                info("https://www.spigotmc.org/resources/86813/");
+                Messenger.info("You are running an outdated version of M0-OnlinePlayersGUI.");
+                Messenger.info("You can download the latest version on Spigot:");
+                Messenger.info("https://www.spigotmc.org/resources/86813/");
             }
         });
     }
+    
+    public static boolean PAPI = true;
     
     private void registerHooks()
     {
@@ -168,15 +183,16 @@ public class OnlineGUI extends JavaPlugin
             this.ess = (IEssentials)this.manager.getPlugin("Essentials");
             
             if(this.ess == null)
-                warning("Could not find EssentialsX.");
+            {
+                Messenger.warn("EssX hook is enabled but could not find EssentialsX plugin.");
+            }
         }
         
         if (this.manager.getPlugin("PlaceholderAPI") == null)
         {
-            warning("Could not find PlaceholderAPI! This plugin is required.");
-            warning("Disabling M0-OnlinePlayersGUI..");
+            Messenger.warn("Could not find PlaceholderAPI! Placeholders will not work.");
             
-            manager.disablePlugin(this);
+            PAPI = false;
         }
     }
     
@@ -187,7 +203,9 @@ public class OnlineGUI extends JavaPlugin
         info("");
         
         if(this.isEnabled())
+        {
             this.manager.disablePlugin(this);
+        }
     }
     
     private void prepareConfig()
@@ -207,9 +225,9 @@ public class OnlineGUI extends JavaPlugin
             this.getConfig().options().copyDefaults(true);
             this.getConfig().save(this.configFile);
         }
-        catch(IOException e)
+        catch(IOException ex)
         {
-            e.printStackTrace();
+            ex.printStackTrace();
         }
     
         YamlConfiguration.loadConfiguration(this.configFile);
@@ -220,11 +238,6 @@ public class OnlineGUI extends JavaPlugin
     private void info(String message)
     {
         getLogger().info(message);
-    }
-    
-    private void warning(String message)
-    {
-        getLogger().warning(message);
     }
     
     private void copy(InputStream in, File file)
@@ -245,11 +258,11 @@ public class OnlineGUI extends JavaPlugin
                 out.close();
                 in.close();
             }
-            catch(Exception e)
+            catch(Exception ex)
             {
-                this.warning("Error copying resource: " + e.getMessage());
+                Messenger.error("Error copying resource: " + ex.getMessage());
         
-                e.printStackTrace();
+                ex.printStackTrace();
             }
         }
     }

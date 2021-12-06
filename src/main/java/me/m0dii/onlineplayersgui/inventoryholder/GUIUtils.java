@@ -3,6 +3,7 @@ package me.m0dii.onlineplayersgui.inventoryholder;
 import me.clip.placeholderapi.PlaceholderAPI;
 import me.m0dii.onlineplayersgui.CustomItem;
 import me.m0dii.onlineplayersgui.OnlineGUI;
+import me.m0dii.onlineplayersgui.utils.Messenger;
 import me.m0dii.onlineplayersgui.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
@@ -22,7 +23,7 @@ import java.util.stream.Collectors;
 
 public class GUIUtils
 {
-    OnlineGUI plugin;
+    final OnlineGUI plugin;
     
     public GUIUtils(OnlineGUI plugin)
     {
@@ -158,8 +159,7 @@ public class GUIUtils
             }
             catch(NumberFormatException ex)
             {
-                OnlineGUI.getInstance().getLogger()
-                        .warning("Error occured trying to parse the condition.");
+                Messenger.warn("Error occured trying to parse the condition.");
             }
             
             return filtered;
@@ -168,8 +168,7 @@ public class GUIUtils
         {
             for(Player p : players)
             {
-                String result = PlaceholderAPI.setPlaceholders(p, cond)
-                        .toLowerCase();
+                String result = PlaceholderAPI.setPlaceholders(p, cond).toLowerCase();
                 
                 if(result.equals("yes") || result.equals("true"))
                     filtered.add(p);

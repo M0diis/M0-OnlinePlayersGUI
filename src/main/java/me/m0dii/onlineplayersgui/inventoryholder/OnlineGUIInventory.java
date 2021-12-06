@@ -229,13 +229,11 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI
             ItemMeta meta = head.getItemMeta();
         
             List<String> lore = plugin.getCfg().HEAD_LORE().stream()
-                    .map(str -> Utils.format(PlaceholderAPI.setPlaceholders(p, str)))
+                    .map(str -> Utils.setPlaceholders(str, p))
                     .collect(Collectors.toList());
-
-            meta.setDisplayName(Utils.format(
-                    PlaceholderAPI.setPlaceholders(p, plugin.getCfg()
-                            .HEAD_DISPLAY_NAME())));
-        
+            
+            meta.setDisplayName(Utils.setPlaceholders(plugin.getCfg().HEAD_DISPLAY_NAME(), p));
+            
             meta.setLore(lore);
         
             SkullMeta sm = (SkullMeta)meta;
@@ -295,8 +293,7 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI
         ItemMeta nextButtonMeta = nextButton.getItemMeta();
     
         List<String> nextLore = plugin.getCfg().NEXT_PAGE_LORE().stream()
-                .map(Utils::format)
-                .map(str -> PlaceholderAPI.setPlaceholders(null, str))
+                .map(str -> Utils.setPlaceholders(str, null))
                 .collect(Collectors.toList());
     
         nextButtonMeta.setLore(nextLore);
@@ -317,9 +314,10 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI
         ItemStack prevButton = new ItemStack(plugin.getCfg().PREV_PAGE_MATERIAL());
         ItemMeta prevButtonMeta = prevButton.getItemMeta();
     
+        plugin.getCfg().PREV_PAGE_LORE().forEach(System.out::println);
+    
         List<String> prevLore = plugin.getCfg().PREV_PAGE_LORE().stream()
-                .map(Utils::format)
-                .map(str -> PlaceholderAPI.setPlaceholders(null, str))
+                .map(str -> Utils.setPlaceholders(str, null))
                 .collect(Collectors.toList());
     
         prevButtonMeta.setLore(prevLore);

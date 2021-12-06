@@ -106,3 +106,4 @@ M0-OnlinePlayersGUI:
       Commands:
         Left-Click: []
         Right-Click: []
+Debug: false
