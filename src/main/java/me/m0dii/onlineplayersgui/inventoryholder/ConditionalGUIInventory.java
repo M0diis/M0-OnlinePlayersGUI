@@ -1,9 +1,9 @@
 package me.m0dii.onlineplayersgui.inventoryholder;
 
-import me.clip.placeholderapi.PlaceholderAPI;
 import me.m0dii.onlineplayersgui.CustomItem;
 import me.m0dii.onlineplayersgui.OnlineGUI;
 import me.m0dii.onlineplayersgui.utils.ConditionalConfig;
+import me.m0dii.onlineplayersgui.utils.Messenger;
 import me.m0dii.onlineplayersgui.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -31,6 +31,8 @@ public class ConditionalGUIInventory implements InventoryHolder, CustomGUI
     private final int size, page;
     private final OnlineGUI plugin;
     
+    private final List<Integer> customItemSlots;
+    
     private final String condition;
     
     private final ConditionalConfig cfg;
@@ -53,6 +55,8 @@ public class ConditionalGUIInventory implements InventoryHolder, CustomGUI
         
         this.inv = Bukkit.createInventory(this, this.size,
                 Utils.format(this.cfg.getGUI_TITLE()));
+        
+        this.customItemSlots = plugin.getCfg().getCustomItemSlots();
         
         initByPage(page);
     }
@@ -118,8 +122,7 @@ public class ConditionalGUIInventory implements InventoryHolder, CustomGUI
                 }
                 catch(IndexOutOfBoundsException ex)
                 {
-                    // TODO
-                    // Logger?
+                    Messenger.debug("IndexOutOfBoundsException: " + ex.getMessage());
                 }
             }
         }
@@ -140,25 +143,27 @@ public class ConditionalGUIInventory implements InventoryHolder, CustomGUI
                     int slot = cont.get(key, PersistentDataType.INTEGER);
                 
                     CustomItem c = this.getCustomItemBySlot(slot);
-                
-                    if(c != null)
-                    {
-                        List<String> cicmds = new ArrayList<>();
-                        
-                        if(clickType.equals(ClickType.LEFT))
-                            cicmds = c.getLCC();
     
-                        if(clickType.equals(ClickType.MIDDLE))
-                            cicmds = c.getMCC();
-                        
-                        if(clickType.equals(ClickType.RIGHT))
-                            cicmds = c.getRCC();
-                    
-                        cicmds.forEach(cmd -> Utils.sendCommand(clickee, clickee, cmd));
-                        
-                        if(cicmds.contains("[CLOSE]"))
-                            clickee.closeInventory();
+                    if(c == null)
+                    {
+                        return;
                     }
+                    
+                    List<String> cicmds = new ArrayList<>();
+    
+                    if(clickType.equals(ClickType.LEFT))
+                        cicmds = c.getLCC();
+    
+                    if(clickType.equals(ClickType.MIDDLE))
+                        cicmds = c.getMCC();
+    
+                    if(clickType.equals(ClickType.RIGHT))
+                        cicmds = c.getRCC();
+    
+                    cicmds.forEach(cmd -> Utils.sendCommand(clickee, clickee, cmd));
+    
+                    if(cicmds.contains("[CLOSE]"))
+                        clickee.closeInventory();
                 }
             }
         }
@@ -176,20 +181,12 @@ public class ConditionalGUIInventory implements InventoryHolder, CustomGUI
     
     private CustomItem getCustomItemBySlot(int slot)
     {
-        List<CustomItem> customItems = this.cfg.getCustomItems();
-        
-        CustomItem custom = null;
-        
-        for(CustomItem c : customItems)
-            if(c.getItemSlot() == slot)
-                custom = c;
-        
-        return custom;
+        return cfg.getCustomItems().getOrDefault(slot, null);
     }
     
     public void setCustomItems(Player p)
     {
-        plugin.getGuiUtils().setCustomItems(inv, p, size, cfg.getCustomItems());
+        plugin.getGuiUtils().setCustomItems(inv, p, cfg.getCustomItems());
     }
     
     private int adjustSize()
@@ -221,8 +218,10 @@ public class ConditionalGUIInventory implements InventoryHolder, CustomGUI
         
         List<Player> byPage = new ArrayList<>();
         
-        int lowBound = (this.size - 9) * page;
-        int highBound = (this.size - 9) * (page == 0 ? 1 : page + 1);
+        Messenger.info(String.valueOf(customItemSlots.size()));
+        
+        int lowBound = (this.size - 9) * page - customItemSlots.size();
+        int highBound = (this.size - 9) * (page == 0 ? 1 : page + 1) - customItemSlots.size();
         
         for(int i = lowBound; i < highBound; i++)
             if(lowBound < online.size() && i < online.size())

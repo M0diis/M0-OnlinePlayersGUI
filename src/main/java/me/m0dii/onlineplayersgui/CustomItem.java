@@ -59,19 +59,4 @@ public class CustomItem
     {
         return this.rightClickCommands;
     }
-    
-    public boolean closeOnLeft()
-    {
-        return this.leftClickCommands.stream().anyMatch(str -> str.startsWith("[CLOSE]"));
-    }
-    
-    public boolean closeOnMiddle()
-    {
-        return this.middleClickCommands.stream().anyMatch(str -> str.startsWith("[CLOSE]"));
-    }
-    
-    public boolean closeOnRight()
-    {
-        return this.rightClickCommands.stream().anyMatch(str -> str.startsWith("[CLOSE]"));
-    }
 }

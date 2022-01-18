@@ -39,6 +39,13 @@ public class Messenger
         }
     }
     
+    public static void info(Object obj)
+    {
+        String prefix = "&2[&aOnlineGUI - INFO&2]&r ";
+        
+        Bukkit.getConsoleSender().sendMessage(format(prefix + obj));
+    }
+    
     public static void info(String msg)
     {
         String prefix = "&2[&aOnlineGUI - INFO&2]&r ";

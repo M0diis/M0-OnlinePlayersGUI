@@ -78,9 +78,7 @@ public class OnlineGUICommand implements CommandExecutor, TabCompleter
         if(sender instanceof Player p && args.length == 0)
         {
             OnlineGUIInventory ogi = new OnlineGUIInventory(this.plugin,
-                    this.plugin.getCfg().GUI_TITLE(), 0);
-            
-            ogi.setCustomItems(p);
+                    this.plugin.getCfg().GUI_TITLE(), 0, p);
             
             p.openInventory(ogi.getInventory());
         }

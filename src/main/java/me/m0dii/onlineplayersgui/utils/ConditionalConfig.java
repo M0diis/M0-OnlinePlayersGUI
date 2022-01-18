@@ -4,13 +4,16 @@ import me.m0dii.onlineplayersgui.CustomItem;
 import me.m0dii.onlineplayersgui.OnlineGUI;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class ConditionalConfig
@@ -42,11 +45,6 @@ public class ConditionalConfig
     
     final FileConfiguration cfg;
     
-    private boolean getBool(String path)
-    {
-        return cfg.getBoolean(path, false);
-    }
-    
     private String getStringf(String path)
     {
         return Utils.format(cfg.getString(path));
@@ -59,99 +57,146 @@ public class ConditionalConfig
     
     public void load()
     {
-        HEAD_NAME = getStringf("PlayerDisplay.Name");
-        
-        HEAD_LORE = getStringList("PlayerDisplay.Lore");
-        
-        GUI_TITLE = getStringf("GUI.Title");
-        
-        LEFT_CLICK_COMMANDS = getStringList("PlayerDisplay.Commands.Left-Click");
-        MIDDLE_CLICK_COMMANDS = getStringList("PlayerDisplay.Commands.Middle-Click");
-        RIGHT_CLICK_COMMANDS = getStringList("PlayerDisplay.Commands.Right-Click");
-        
-        GUI_SIZE = cfg.getInt("GUI.Size");
-        
-        String mat1 = cfg.getString("NextButton.Material", "ENCHANTED_BOOK");
-        String mat2 = cfg.getString("PreviousButton.Material", "ENCHANTED_BOOK");
-        
+        HEAD_NAME = getStringf("player-display.name");
+    
+        HEAD_LORE = getStringList("player-display.lore");
+    
+        GUI_TITLE = getStringf("gui.title");
+    
+        LEFT_CLICK_COMMANDS = getStringList("player-display.commands.left-click");
+        MIDDLE_CLICK_COMMANDS = getStringList("player-display.commands.middle-click");
+        RIGHT_CLICK_COMMANDS = getStringList("player-display.commands.right-click");
+    
+        GUI_SIZE = cfg.getInt("gui.size");
+    
+        String mat1 = cfg.getString("next-button.material", "ENCHANTED_BOOK");
+        String mat2 = cfg.getString("previous-button.material", "ENCHANTED_BOOK");
+    
         PREVIOUS_PAGE_MATERIAL = Material.getMaterial(mat1);
         if(PREVIOUS_PAGE_MATERIAL == null) PREVIOUS_PAGE_MATERIAL = Material.BOOK;
-        
+    
         NEXT_PAGE_MATERIAL = Material.getMaterial(mat2);
         if(NEXT_PAGE_MATERIAL == null) NEXT_PAGE_MATERIAL = Material.BOOK;
+    
+        PREVIOUS_PAGE_LORE = getStringList("previous-button.lore");
+        NEXT_PAGE_LORE = getStringList("next-button.lore");
+    
+        PREVIOUS_PAGE_NAME = getStringf("previous-button.name");
+        NEXT_PAGE_NAME = getStringf("next-button.name");
         
-        PREVIOUS_PAGE_LORE = getStringList("PreviousButton.Lore");
-        NEXT_PAGE_LORE = getStringList("NextButton.Lore");
-        
-        PREVIOUS_PAGE_NAME = getStringf("PreviousButton.Name");
-        NEXT_PAGE_NAME = getStringf("NextButton.Name");
-        
-        CONDITION = cfg.getString("Condition.Placeholder");
-        
-        PERMISSION_REQUIRED = getBool("Condition.Permission.Required");
-        CONDITION = cfg.getString("M0-OnlinePlayersGUI.Condition.Placeholder");
-        PERMISSION = cfg.getString("M0-OnlinePlayersGUI.Condition.Permission.Node");
+        PERMISSION_REQUIRED = cfg.getBoolean("condition.permission.required");
+        CONDITION = cfg.getString("condition.placeholder");
+        PERMISSION = cfg.getString("condition.permission.node");
         
         setUpCustomItems(plugin);
     }
-    
-    private List<CustomItem> CUSTOM_ITEMS;
+
+    private Map<Integer, CustomItem> CUSTOM_ITEMS;
     
     private void setUpCustomItems(OnlineGUI plugin)
     {
-        CUSTOM_ITEMS = new ArrayList<>();
+        CUSTOM_ITEMS = new HashMap<>();
         
-        int[] slots = new int[]{1, 2, 3, 5, 7, 8, 9};
+        ConfigurationSection sec = cfg.getConfigurationSection("custom-items");
         
-        for(int i : slots)
+        if(sec == null)
         {
-            String itemName = cfg.getString(
-                    String.format("CustomItems.%d.Material", i), "BOOK");
+            return;
+        }
+        
+        sec.getKeys(false).forEach(key ->
+        {
+            ConfigurationSection itemSec = sec.getConfigurationSection(key);
             
-            Material CI_ITEM = Material.getMaterial(itemName);
-            
-            if(CI_ITEM != null && !CI_ITEM.equals(Material.AIR))
+            if(itemSec == null)
             {
-                ItemStack item = new ItemStack(CI_ITEM);
+                return;
+            }
+            
+            String itemName = itemSec.getString("material", "BOOK");
+            
+            Material customItem = Material.getMaterial(itemName);
+            
+            if(customItem != null && !customItem.equals(Material.AIR))
+            {
+                ItemStack item = new ItemStack(customItem);
                 
-                String CI_NAME = getStringf(
-                        String.format("CustomItems.%d.Name", i));
+                String customItemName = Utils.format(itemSec.getString("name"));
                 
-                List<String> CI_LORE = getStringList(
-                        String.format("CustomItems.%d.Lore", i));
+                List<String> customItemLore = format(itemSec.getStringList("lore"));
                 
                 ItemMeta meta = item.getItemMeta();
                 
-                List<String> lore = CI_LORE.stream()
-                            .map(Utils::format)
-                            .collect(Collectors.toList());
+                meta.setDisplayName(customItemName);
+                meta.setLore(customItemLore);
     
-                meta.setDisplayName(Utils.format(CI_NAME));
-                meta.setLore(lore);
-                
-                List<String> lcc = cfg.getStringList(
-                        String.format("CustomItems.%d.Commands.Left-Click", i));
-                
-                List<String> mcc = cfg.getStringList(
-                        String.format("CustomItems.%d.Commands.Middle-Click", i));
-                
-                List<String> rcc = cfg.getStringList(
-                        String.format("CustomItems.%d.Commands.Right-Click", i));
-                
-                meta.getPersistentDataContainer().set(
-                        new NamespacedKey(plugin, "Slot"), PersistentDataType.INTEGER, i);
-                
+                List<String> lcc = itemSec.getStringList("commands.left-click");
+                List<String> mcc = itemSec.getStringList("commands.middle-click");
+                List<String> rcc = itemSec.getStringList("commands.right-click");
+    
                 meta.getPersistentDataContainer().set(
                         new NamespacedKey(plugin, "IsCustom"), PersistentDataType.STRING, "true");
+    
+                if(itemSec.contains("slots"))
+                {
+                    if(itemSec.contains("slots.start"))
+                    {
+                        int start = itemSec.getInt("slots.start");
+                        int end = itemSec.getInt("slots.end");
+            
+                        for(int i = start; i <= end; i++)
+                        {
+                            addCustomItem(meta, plugin, i, item, CUSTOM_ITEMS, lcc, mcc, rcc, customItemLore);
+                        }
+                    }
+                    else
+                    {
+                        Object slots = itemSec.get("slots");
+            
+                        if(slots instanceof List)
+                        {
+                            List<Integer> slotList = (List<Integer>)slots;
                 
-                item.setItemMeta(meta);
+                            for(Integer slot : slotList)
+                            {
+                                addCustomItem(meta, plugin, slot, item, CUSTOM_ITEMS, lcc, mcc, rcc, customItemLore);
+                            }
+                        }
+                        else
+                        {
+                            int slot = itemSec.getInt("slot", -1);
                 
-                CUSTOM_ITEMS.add(new CustomItem(item, i, lcc, mcc, rcc, lore));
+                            addCustomItem(meta, plugin, slot, item, CUSTOM_ITEMS, lcc, mcc, rcc, customItemLore);
+                        }
+                    }
+                }
+                else
+                {
+                    int slot = itemSec.getInt("slot", -1);
+        
+                    addCustomItem(meta, plugin, slot, item, CUSTOM_ITEMS, lcc, mcc, rcc, customItemLore);
+                }
             }
-        }
+        });
     }
     
-    public List<CustomItem> getCustomItems()
+    private void addCustomItem(ItemMeta meta, OnlineGUI plugin, int slot, ItemStack item, Map<Integer, CustomItem> CUSTOM_ITEMS
+            , List<String> lcc, List<String> mcc, List<String> rcc, List<String> customItemLore)
+    {
+        meta.getPersistentDataContainer().set(
+                new NamespacedKey(plugin, "Slot"), PersistentDataType.INTEGER, slot);
+        
+        item.setItemMeta(meta);
+        
+        CUSTOM_ITEMS.put(slot, new CustomItem(item, slot, lcc, mcc, rcc, customItemLore));
+    }
+
+    private List<String> format(List<String> list)
+    {
+        return list.stream().map(Utils::format).collect(Collectors.toList());
+    }
+    
+    public Map<Integer, CustomItem> getCustomItems()
     {
         return this.CUSTOM_ITEMS;
     }

@@ -6,19 +6,13 @@ import me.m0dii.onlineplayersgui.OnlineGUI;
 import me.m0dii.onlineplayersgui.utils.Messenger;
 import me.m0dii.onlineplayersgui.utils.Utils;
 import org.bukkit.Bukkit;
-import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.persistence.PersistentDataContainer;
-import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class GUIUtils
@@ -62,31 +56,28 @@ public class GUIUtils
         return online;
     }
     
-    public void setCustomItems(Inventory inv, Player p, int size,
-                               List<CustomItem> customItems)
+    public void setCustomItems(Inventory inv, Player p, Map<Integer, CustomItem> customItems)
     {
-        for(CustomItem c : customItems)
+        for(Map.Entry<Integer, CustomItem> entry : customItems.entrySet())
         {
+            CustomItem c = entry.getValue();
             ItemStack item = c.getItem();
+            
             ItemMeta m = item.getItemMeta();
+            
+            int slot = c.getItemSlot();
+            
+            List<String> lore = c.getLore().stream()
+                    .map(str -> PlaceholderAPI.setPlaceholders(p, str))
+                    .collect(Collectors.toList());
         
-            NamespacedKey key = new NamespacedKey(OnlineGUI.getInstance(), "Slot");
-            PersistentDataContainer cont = item.getItemMeta().getPersistentDataContainer();
+            m.setLore(lore);
         
-            if(cont.has(key, PersistentDataType.INTEGER))
+            item.setItemMeta(m);
+            
+            if(inv.getItem(slot) == null)
             {
-                //noinspection ConstantConditions
-                int slot = cont.get(key, PersistentDataType.INTEGER);
-                
-                List<String> lore = c.getLore().stream()
-                        .map(str -> PlaceholderAPI.setPlaceholders(p, str))
-                        .collect(Collectors.toList());
-            
-                m.setLore(lore);
-            
-                item.setItemMeta(m);
-            
-                inv.setItem(size - 10 + slot, item);
+                inv.setItem(slot, item);
             }
         }
     }

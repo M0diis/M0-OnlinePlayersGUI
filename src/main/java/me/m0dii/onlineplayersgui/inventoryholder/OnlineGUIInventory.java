@@ -1,9 +1,9 @@
 package me.m0dii.onlineplayersgui.inventoryholder;
 
-import me.clip.placeholderapi.PlaceholderAPI;
 import me.m0dii.onlineplayersgui.CustomItem;
 import me.m0dii.onlineplayersgui.OnlineGUI;
 import me.m0dii.onlineplayersgui.utils.Config;
+import me.m0dii.onlineplayersgui.utils.Messenger;
 import me.m0dii.onlineplayersgui.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -21,6 +21,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class OnlineGUIInventory implements InventoryHolder, CustomGUI
@@ -30,7 +31,7 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI
     private final int size, page;
     private final OnlineGUI plugin;
 
-    public OnlineGUIInventory(OnlineGUI plugin, String name, int page)
+    public OnlineGUIInventory(OnlineGUI plugin, String name, int page, Player p)
     {
         this.size = this.adjustSize(plugin.getCfg());
         
@@ -38,8 +39,10 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI
         this.page = page;
         
         this.plugin = plugin;
-    
+        
         this.inv = Bukkit.createInventory(this, this.size, name);
+    
+        setCustomItems(p);
         
         initByPage(page);
     }
@@ -107,10 +110,9 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI
     
                 try
                 {
-                    OnlineGUIInventory newinv = new OnlineGUIInventory(this.plugin, this.name, nextPage);
-                    newinv.setCustomItems(clickee);
-
-                    if(newinv.hasNextPage())
+                    OnlineGUIInventory newinv = new OnlineGUIInventory(this.plugin, this.name, nextPage, clickee);
+                    
+                    if(newinv.hasPlayers())
                         clickee.openInventory(newinv.getInventory());
                 }
                 catch(IndexOutOfBoundsException ex)
@@ -138,24 +140,26 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI
                 
                     CustomItem c = getCustomItemBySlot(slot);
                 
-                    if(c != null)
+                    if(c == null)
                     {
-                        List<String> cicmds = new ArrayList<>();
-                        
-                        if(clickType.equals(ClickType.LEFT))
-                            cicmds = c.getLCC();
-    
-                        if(clickType.equals(ClickType.MIDDLE))
-                            cicmds = c.getMCC();
-    
-                        if(clickType.equals(ClickType.RIGHT))
-                            cicmds = c.getRCC();
-                    
-                        cicmds.forEach(cmd -> Utils.sendCommand(clickee, clickee, cmd));
-    
-                        if(cicmds.contains("[CLOSE]"))
-                            clickee.closeInventory();
+                        return;
                     }
+                    
+                    List<String> cicmds = new ArrayList<>();
+                    
+                    if(clickType.equals(ClickType.LEFT))
+                        cicmds = c.getLCC();
+
+                    if(clickType.equals(ClickType.MIDDLE))
+                        cicmds = c.getMCC();
+
+                    if(clickType.equals(ClickType.RIGHT))
+                        cicmds = c.getRCC();
+                
+                    cicmds.forEach(cmd -> Utils.sendCommand(clickee, clickee, cmd));
+                    
+                    if(cicmds.contains("[CLOSE]"))
+                        clickee.closeInventory();
                 }
             }
         }
@@ -163,20 +167,12 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI
     
     private CustomItem getCustomItemBySlot(int slot)
     {
-        List<CustomItem> customItems = this.plugin.getCfg().getCustomItems();
-        
-        CustomItem custom = null;
-        
-        for(CustomItem c : customItems)
-            if(c.getItemSlot() == slot)
-                custom = c;
-        
-        return custom;
+        return plugin.getCfg().getCustomItems().getOrDefault(slot, null);
     }
     
     public void setCustomItems(Player p)
     {
-        plugin.getGuiUtils().setCustomItems(inv, p, size, plugin.getCfg().getCustomItems());
+        plugin.getGuiUtils().setCustomItems(inv, p, plugin.getCfg().getCustomItems());
     }
     
     private int adjustSize(Config cfg)
@@ -209,41 +205,38 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI
         p.openInventory(this.inv);
     }
     
-    public boolean hasNextPage()
+    public boolean hasPlayers()
     {
-        return getByPage(page + 1).size() != 0;
+        return getByPage(page).size() != 0;
     }
     
     private void initByPage(int page)
     {
         List<Player> byPage = getByPage(page);
-        
-        int curr = 0;
     
-        for(int slot = 0; slot < byPage.size(); slot++)
+        for(Player player : byPage)
         {
-            ItemStack head = new ItemStack(Material.PLAYER_HEAD);
+            int slotToPutIn = inv.firstEmpty();
         
-            Player p = byPage.get(curr);
-            
+            ItemStack head = new ItemStack(Material.PLAYER_HEAD);
+    
             ItemMeta meta = head.getItemMeta();
         
-            List<String> lore = plugin.getCfg().HEAD_LORE().stream()
-                    .map(str -> Utils.setPlaceholders(str, p))
+            List<String> lore = plugin.getCfg().HEAD_LORE()
+                    .stream()
+                    .map(str -> Utils.setPlaceholders(str, player))
                     .collect(Collectors.toList());
-            
-            meta.setDisplayName(Utils.setPlaceholders(plugin.getCfg().HEAD_DISPLAY_NAME(), p));
-            
+        
+            meta.setDisplayName(Utils.setPlaceholders(plugin.getCfg().HEAD_DISPLAY_NAME(), player));
+        
             meta.setLore(lore);
         
             SkullMeta sm = (SkullMeta)meta;
-            
-            sm.setOwningPlayer(p);
+        
+            sm.setOwningPlayer(player);
             head.setItemMeta(sm);
         
-            inv.setItem(slot, head);
-        
-            curr++;
+            inv.setItem(slotToPutIn, head);
         }
         
         setButtons();
@@ -262,12 +255,27 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI
         
         List<Player> byPage = new ArrayList<>();
         
-        int lowBound = (this.size - 9) * page;
-        int highBound = (this.size - 9) * (page == 0 ? 1 : page + 1);
+        int availableSlots = this.size - 9;
+    
+        for(Map.Entry<Integer, CustomItem> entry : plugin.getCfg()
+                .getCustomItems()
+                .entrySet())
+        {
+            if(entry.getKey() >= this.size - 9)
+            {
+                continue;
+            }
+            
+            availableSlots--;
+        }
+    
+        int lowBound = availableSlots * page;
+        int highBound = availableSlots * (page == 0 ? 1 : page + 1);
         
         for(int i = lowBound; i < highBound; i++)
             if(lowBound < online.size() && i < online.size())
                 byPage.add(online.get(i));
+
  
         return byPage;
     }
@@ -278,7 +286,7 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI
         
         if(show)
             setNextButton();
-        else if(hasNextPage())
+        else if(hasPlayers())
             setNextButton();
     
         if(show)
@@ -313,9 +321,7 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI
     {
         ItemStack prevButton = new ItemStack(plugin.getCfg().PREV_PAGE_MATERIAL());
         ItemMeta prevButtonMeta = prevButton.getItemMeta();
-    
-        plugin.getCfg().PREV_PAGE_LORE().forEach(System.out::println);
-    
+        
         List<String> prevLore = plugin.getCfg().PREV_PAGE_LORE().stream()
                 .map(str -> Utils.setPlaceholders(str, null))
                 .collect(Collectors.toList());

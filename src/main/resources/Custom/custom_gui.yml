@@ -1,89 +1,84 @@
-Condition:
-  Placeholder: "%checkitem_mat:DIRT%"
-  Permission:
-    Required: false
-    Node: "permission.to.include.player"
-PreviousButton:
-  Material: ENCHANTED_BOOK
-  Name: '&cPrevious Page'
-  Lore:
+condition:
+  # You can also use ==, !=, <, >, <=, >= for placeholders that return numbers
+  # Ex.: %player_health% == 20
+  placeholder: "%checkitem_mat:DIRT%" # Requires CheckItem PAPI extension
+  rermission:
+    required: false
+    node: "permission.to.include.player"
+
+previous-button:
+  material: ENCHANTED_BOOK
+  name: '&cPrevious Page'
+  lore:
     - '&7Click to open previous page.'
-NextButton:
-  Material: ENCHANTED_BOOK
-  Name: '&aNext Page'
-  Lore:
+
+next-button:
+  material: ENCHANTED_BOOK
+  name: '&aNext Page'
+  lore:
     - '&7Click to open next page.'
+# Player display configuration
+# Every section supports placeholders
+player-display:
+  name: '&6%player_name%'
+  lore:
+    - '&2Right click to &ateleport&2 to the player.'
+    - '&2Left click to &asay hi&2.'
+  commands:
+    left-click:
+      - '[PLAYER] tp %player_name%'
+    right-click:
+      - '[PLAYER] msg %player_name% Hello, my name is %sender_name%.'
+      - '[CONSOLE] msg %player_name% Hello! '
+      - '[CLOSE]' # This will close the GUI.
+    middle-click:
+      - '[CLOSE]'
+
+# GUI Slots:
+# --------------------------
+# 0  1  2  OC 4  OC 6  7  8
+# 9  10 11 OC 13 OC 15 16 17
+# 18 19 20 OC 22 OC 24 25 26
+# 27 28 29 OC 31 OC 33 34 35
+# 36 37 38 OC 40 OC 42 43 44
+# 45 46 47 OC 49 OC 51 52 53
+# --------------------------
+
+# Page buttons take 4 and 6th slot
+# on every row, depending on the GUI size.
+
 # Size should be in increments of 9 and not
 # lower than 9 or higher than 54
 # 9 slots is one row
-GUI:
-  Size: 18
-  Title: '&2Online Players'
-  UpdateOn:
-    Join: true
-    Leave: true
-# Player display configuration
-# Every section supports placeholders
-PlayerDisplay:
-  Name: '&6%player_name%'
-  Lore:
-    - '&2Right click to &ateleport&2 to the player.'
-    - '&2Left click to &asay hi&2.'
-  Commands:
-    Left-Click:
-      - '[PLAYER] msg %player_name% Hello, my name is %sender_name%.'
-    Right-Click:
-      - '[CONSOLE] msg %player_name% Hello! '
+gui:
+  size: 18
+  title: '&2Online Players'
+  update-on:
+    join: true
+    leave: true
+
 # Custom Items
 # These items will be displayed in the same row as
 # the previous and next buttons are
-CustomItems:
-  1:
-    Material: AIR
-    Name: ''
-    Lore: []
-    Commands:
-      Left-Click: []
-      Right-Click: []
-  2:
-    Material: AIR
-    Name: ''
-    Lore: []
-    Commands:
-      Left-Click: []
-      Right-Click: []
-  3:
-    Material: AIR
-    Name: ''
-    Lore: []
-    Commands:
-      Left-Click: []
-      Right-Click: []
-  5:
-    Material: AIR
-    Name: ''
-    Lore: []
-    Commands:
-      Left-Click: []
-      Right-Click: []
-  7:
-    Material: AIR
-    Name: ''
-    Lore: []
-    Commands:
-      Left-Click: []
-      Right-Click: []
-  8:
-    Material: AIR
-    Name: ''
-    Lore: []
-    Commands:
-      Left-Click: []
-      Right-Click: []
-  9:
-    Material: AIR
-    Name: ''
-    Lore: []
-    Commands:
-      Left-Click: []
-      Right-Click: []
+custom-items:
+  '1':
+    material: WHITE_STAINED_GLASS_PANE
+    slots:
+      start: 0
+      end: 8
+    name: '&r'
+    lore: []
+  '2':
+    material: WHITE_STAINED_GLASS_PANE
+    slots:
+      - 9
+      - 17
+      - 18
+      - 19
+      - 20
+      - 22
+      - 24
+      - 25
+      - 26
+    name: '&r'
+    lore: []
