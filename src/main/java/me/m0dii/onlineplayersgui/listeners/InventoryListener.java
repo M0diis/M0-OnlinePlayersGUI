@@ -59,7 +59,9 @@ public class InventoryListener implements Listener
     public void updateOnJoin(PlayerJoinEvent e)
     {
         if(this.plugin.getCfg().UPDATE_ON_JOIN())
+        {
             updateView();
+        }
     }
     
     @EventHandler
@@ -75,14 +77,16 @@ public class InventoryListener implements Listener
     
     private void updateView()
     {
-        for(HumanEntity p : guiViewers)
-            Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () ->
+        Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () ->
+        {
+            for(HumanEntity p : guiViewers)
             {
                 Inventory inv = p.getOpenInventory().getTopInventory();
-                
+    
                 if(inv.getHolder() instanceof CustomGUI cg)
                     cg.refresh((Player)p);
-            });
+            }
+        });
     }
     
     @EventHandler

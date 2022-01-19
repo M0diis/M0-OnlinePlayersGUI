@@ -33,6 +33,7 @@ public class Config
     private int GUI_SIZE;
     
     private Material NEXT_PAGE_MATERIAL, PREVIOUS_PAGE_MATERIAL;
+    private int NEXT_PAGE_SLOT, PREVIOUS_PAGE_SLOT;
     
     private boolean ESSENTIALSX_HOOK;
     
@@ -116,6 +117,9 @@ public class Config
         
         PREVIOUS_PAGE_NAME = getStringf("previous-button.name");
         NEXT_PAGE_NAME = getStringf("next-button.name");
+        
+        PREVIOUS_PAGE_SLOT = cfg.getInt("previous-button.slot", 0);
+        NEXT_PAGE_SLOT = cfg.getInt("next-button.slot", 8);
         
         ESSENTIALSX_HOOK = getBool("essentialsx-hook");
         
@@ -292,6 +296,16 @@ public class Config
         return GUI_TITLE;
     }
     
+    public int NEXT_PAGE_SLOT()
+    {
+        return NEXT_PAGE_SLOT;
+    }
+    
+    public int PREV_PAGE_SLOT()
+    {
+        return PREVIOUS_PAGE_SLOT;
+    }
+    
     public String NEXT_PAGE_BUTTON_NAME()
     {
         return NEXT_PAGE_NAME;
@@ -373,5 +387,4 @@ public class Config
     {
         return this.DEBUG_ENABLED;
     }
-    
 }

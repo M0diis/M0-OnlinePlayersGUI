@@ -22,6 +22,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class ConditionalGUIInventory implements InventoryHolder, CustomGUI
@@ -117,7 +118,7 @@ public class ConditionalGUIInventory implements InventoryHolder, CustomGUI
                 {
                     ConditionalGUIInventory newinv = new ConditionalGUIInventory(this.plugin, this.name, nextPage, fileCfg);
                     
-                    if(newinv.hasNextPage())
+                    if(newinv.hasPlayers())
                         clickee.openInventory(newinv.getInventory());
                 }
                 catch(IndexOutOfBoundsException ex)
@@ -214,14 +215,31 @@ public class ConditionalGUIInventory implements InventoryHolder, CustomGUI
     {
         String permission = cfg.isPERMISSION_REQUIRED() ? cfg.getREQUIRED_PERMISSION() : null;
         
-        List<Player> online = plugin.getGuiUtils().getOnline(permission, this.condition);
+        List<Player> online = plugin.getGuiUtils().getOnline(permission, condition);
         
         List<Player> byPage = new ArrayList<>();
+    
+        int availableSlots = this.size - 9;
+    
+        for(Map.Entry<Integer, CustomItem> entry : cfg.getCustomItems()
+                                                    .entrySet())
+        {
+            if(entry.getKey() >= this.size - 9)
+            {
+                continue;
+            }
         
-        Messenger.info(String.valueOf(customItemSlots.size()));
-        
-        int lowBound = (this.size - 9) * page - customItemSlots.size();
-        int highBound = (this.size - 9) * (page == 0 ? 1 : page + 1) - customItemSlots.size();
+            availableSlots--;
+        }
+    
+        if(cfg.NEXT_PAGE_SLOT() < this.size - 9)
+            availableSlots--;
+    
+        if(cfg.PREV_PAGE_SLOT() < this.size - 9)
+            availableSlots--;
+    
+        int lowBound = availableSlots * page;
+        int highBound = availableSlots * (page == 0 ? 1 : page + 1);
         
         for(int i = lowBound; i < highBound; i++)
             if(lowBound < online.size() && i < online.size())
@@ -265,9 +283,14 @@ public class ConditionalGUIInventory implements InventoryHolder, CustomGUI
         setButtons();
     }
     
-    public boolean hasNextPage()
+    public boolean hasPlayers()
     {
-        return getByPage(page + 1).size() != 0;
+        return getByPage(page).size() != 0;
+    }
+    
+    public boolean hasPlayers(int offset)
+    {
+        return getByPage(page + offset).size() != 0;
     }
     
     private void setButtons()
@@ -276,7 +299,7 @@ public class ConditionalGUIInventory implements InventoryHolder, CustomGUI
         
         if(show)
             setNextButton();
-        else if(hasNextPage())
+        else if(hasPlayers(1))
             setNextButton();
         
         if(show)
@@ -304,7 +327,7 @@ public class ConditionalGUIInventory implements InventoryHolder, CustomGUI
         
         nextButton.setItemMeta(nextButtonMeta);
         
-        inv.setItem(size - 4, nextButton);
+        inv.setItem(cfg.NEXT_PAGE_SLOT(), nextButton);
     }
     
     private void setPreviousButton()
@@ -325,6 +348,6 @@ public class ConditionalGUIInventory implements InventoryHolder, CustomGUI
         prevButtonMeta.setDisplayName(Utils.format(cfg.PREV_PAGE_BUTTON_NAME()));
         prevButton.setItemMeta(prevButtonMeta);
         
-        inv.setItem(size - 6, prevButton);
+        inv.setItem(cfg.PREV_PAGE_SLOT(), prevButton);
     }
 }

@@ -9,12 +9,14 @@ condition:
 previous-button:
   material: ENCHANTED_BOOK
   name: '&cPrevious Page'
+  slot: 21
   lore:
     - '&7Click to open previous page.'
 
 next-button:
   material: ENCHANTED_BOOK
   name: '&aNext Page'
+  slot: 23
   lore:
     - '&7Click to open next page.'
 # Player display configuration
@@ -36,16 +38,13 @@ player-display:
 
 # GUI Slots:
 # --------------------------
-# 0  1  2  OC 4  OC 6  7  8
-# 9  10 11 OC 13 OC 15 16 17
-# 18 19 20 OC 22 OC 24 25 26
-# 27 28 29 OC 31 OC 33 34 35
-# 36 37 38 OC 40 OC 42 43 44
-# 45 46 47 OC 49 OC 51 52 53
+# 0  1  2  3  4  5  6  7  8
+# 9  10 11 12 13 14 15 16 17
+# 18 19 20 21 22 23 24 25 26
+# 27 28 29 22 31 32 33 34 35
+# 36 37 38 39 40 41 42 43 44
+# 45 46 47 48 49 50 51 52 53
 # --------------------------
-
-# Page buttons take 4 and 6th slot
-# on every row, depending on the GUI size.
 
 # Size should be in increments of 9 and not
 # lower than 9 or higher than 54

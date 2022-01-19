@@ -35,7 +35,7 @@ public class ConditionalGUIs
     
     public void loadGUIs()
     {
-        File folder = new File(plugin.getDataFolder() + File.separator + "Custom");
+        File folder = new File(plugin.getDataFolder() + File.separator + "custom");
     
         if(!folder.exists())
             folder.mkdirs();
@@ -58,7 +58,7 @@ public class ConditionalGUIs
     public void displayConditional(String name, Player p)
     {
         File file = new File(plugin.getDataFolder() + File.separator
-                + "Custom" + File.separator + name + ".yml");
+                + "custom" + File.separator + name + ".yml");
         
         if(file.exists())
         {

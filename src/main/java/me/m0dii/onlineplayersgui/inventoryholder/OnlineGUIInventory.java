@@ -210,10 +210,17 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI
         return getByPage(page).size() != 0;
     }
     
+    public boolean hasPlayers(int offset)
+    {
+        return getByPage(page + offset).size() != 0;
+    }
+    
     private void initByPage(int page)
     {
+        setButtons();
+        
         List<Player> byPage = getByPage(page);
-    
+        
         for(Player player : byPage)
         {
             int slotToPutIn = inv.firstEmpty();
@@ -238,8 +245,6 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI
         
             inv.setItem(slotToPutIn, head);
         }
-        
-        setButtons();
     }
     
     @NotNull
@@ -268,6 +273,12 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI
             
             availableSlots--;
         }
+        
+        if(plugin.getCfg().NEXT_PAGE_SLOT() < this.size - 9)
+            availableSlots--;
+        
+        if(plugin.getCfg().PREV_PAGE_SLOT() < this.size - 9)
+            availableSlots--;
     
         int lowBound = availableSlots * page;
         int highBound = availableSlots * (page == 0 ? 1 : page + 1);
@@ -275,7 +286,6 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI
         for(int i = lowBound; i < highBound; i++)
             if(lowBound < online.size() && i < online.size())
                 byPage.add(online.get(i));
-
  
         return byPage;
     }
@@ -286,7 +296,7 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI
         
         if(show)
             setNextButton();
-        else if(hasPlayers())
+        else if(hasPlayers(1))
             setNextButton();
     
         if(show)
@@ -309,12 +319,12 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI
         nextButtonMeta.getPersistentDataContainer().set(
                 new NamespacedKey(plugin, "Button"),
                 PersistentDataType.STRING, "Next");
-    
+        
         nextButtonMeta.setDisplayName(plugin.getCfg().NEXT_PAGE_BUTTON_NAME());
     
         nextButton.setItemMeta(nextButtonMeta);
     
-        inv.setItem(plugin.getCfg().GUI_SIZE() - 4, nextButton);
+        inv.setItem(plugin.getCfg().NEXT_PAGE_SLOT(), nextButton);
     }
     
     private void setPreviousButton()
@@ -335,6 +345,6 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI
         prevButtonMeta.setDisplayName(Utils.format(plugin.getCfg().PREV_PAGE_BUTTON_NAME()));
         prevButton.setItemMeta(prevButtonMeta);
     
-        inv.setItem(plugin.getCfg().GUI_SIZE() - 6, prevButton);
+        inv.setItem(plugin.getCfg().PREV_PAGE_SLOT(), prevButton);
     }
 }

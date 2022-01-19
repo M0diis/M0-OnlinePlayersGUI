@@ -29,6 +29,7 @@ public class ConditionalConfig
     private int GUI_SIZE;
     
     private Material NEXT_PAGE_MATERIAL, PREVIOUS_PAGE_MATERIAL;
+    private int NEXT_PAGE_SLOT, PREVIOUS_PAGE_SLOT;
     
     private boolean PERMISSION_REQUIRED;
     private String CONDITION, PERMISSION;
@@ -83,6 +84,9 @@ public class ConditionalConfig
     
         PREVIOUS_PAGE_NAME = getStringf("previous-button.name");
         NEXT_PAGE_NAME = getStringf("next-button.name");
+        
+        PREVIOUS_PAGE_SLOT = cfg.getInt("previous-button.slot");
+        NEXT_PAGE_SLOT = cfg.getInt("next-button.slot");
         
         PERMISSION_REQUIRED = cfg.getBoolean("condition.permission.required");
         CONDITION = cfg.getString("condition.placeholder");
@@ -194,6 +198,16 @@ public class ConditionalConfig
     private List<String> format(List<String> list)
     {
         return list.stream().map(Utils::format).collect(Collectors.toList());
+    }
+    
+    public int PREV_PAGE_SLOT()
+    {
+        return PREVIOUS_PAGE_SLOT;
+    }
+    
+    public int NEXT_PAGE_SLOT()
+    {
+        return NEXT_PAGE_SLOT;
     }
     
     public Map<Integer, CustomItem> getCustomItems()
