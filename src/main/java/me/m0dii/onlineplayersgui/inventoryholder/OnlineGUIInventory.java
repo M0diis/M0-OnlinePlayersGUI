@@ -223,8 +223,6 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI
         
         for(Player player : byPage)
         {
-            int slotToPutIn = inv.firstEmpty();
-        
             ItemStack head = new ItemStack(Material.PLAYER_HEAD);
     
             ItemMeta meta = head.getItemMeta();
@@ -242,8 +240,19 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI
         
             sm.setOwningPlayer(player);
             head.setItemMeta(sm);
-        
-            inv.setItem(slotToPutIn, head);
+            
+            for(int i = 0; i < inv.getSize(); i++)
+            {
+                if(inv.getItem(i) == null)
+                {
+                    if(plugin.getCfg().NEXT_PAGE_SLOT() != i &&
+                       plugin.getCfg().PREV_PAGE_SLOT() != i)
+                    {
+                        inv.setItem(i, head);
+                    }
+                }
+            }
+    
         }
     }
     
