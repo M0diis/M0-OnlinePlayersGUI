@@ -233,30 +233,9 @@ public class OnlineGUI extends JavaPlugin
         YamlConfiguration.loadConfiguration(this.configFile);
     
         this.cfg.load();
-        this.copyCustom();
-    }
+        this.copy(this.getResource("config.yml_backup"), new File(this.getDataFolder(), "config.yml_backup"));
+        this.copy(this.getResource("custom" + File.separator + "custom_gui.yml_example"), this.configFile);
     
-    private void copyCustom()
-    {
-        this.configFile = new File(this.getDataFolder(), "custom"  + File.separator +  "custom_gui.yml");
-    
-        if(!this.configFile.exists())
-        {
-            //noinspection ResultOfMethodCallIgnored
-            this.configFile.getParentFile().mkdirs();
-        
-            this.copy(this.getResource("custom" + File.separator + "custom_gui.yml"), this.configFile);
-        }
-    
-        try
-        {
-            this.getConfig().options().copyDefaults(true);
-            this.getConfig().save(this.configFile);
-        }
-        catch(IOException ex)
-        {
-            ex.printStackTrace();
-        }
     }
     
     private void info(String message)

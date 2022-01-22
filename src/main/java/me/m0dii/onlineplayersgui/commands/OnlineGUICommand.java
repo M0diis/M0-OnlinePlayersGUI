@@ -12,6 +12,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class OnlineGUICommand implements CommandExecutor, TabCompleter
@@ -33,7 +34,7 @@ public class OnlineGUICommand implements CommandExecutor, TabCompleter
         
         if(args.length == 1)
         {
-            if(isCmd(args[0], "reload"))
+            if(alias(args[0], "reload"))
             {
                 if(sender.hasPermission("m0onlinegui.command.reload"))
                 {
@@ -44,9 +45,9 @@ public class OnlineGUICommand implements CommandExecutor, TabCompleter
             
                     cgis.loadGUIs();
             
-                    sender.sendMessage(this.config.CONFIG_RELOAD_MSG());
+                    sender.sendMessage(this.config.getCfgReloadMsg());
                 }
-                else sender.sendMessage(this.config.NO_PERMISSION_MSG());
+                else sender.sendMessage(this.config.getNoPermMsg());
             }
         }
         
@@ -60,25 +61,25 @@ public class OnlineGUICommand implements CommandExecutor, TabCompleter
     
                     return true;
                 }
-                else p.sendMessage(this.config.NO_PERMISSION_COND_MSG());
+                else p.sendMessage(this.config.getNoPermissionCondMsg());
             }
             
-            if(isCmd(args[0], "toggleself"))
+            if(alias(args[0], "toggleself"))
             {
                 if(p.hasPermission("m0onlinegui.command.toggleself"))
                 {
                     this.plugin.toggleHiddenPlayer(p);
         
-                    p.sendMessage(this.config.TOGGLE_MESSAGE());
+                    p.sendMessage(this.config.getToggleMsg());
                 }
-                else p.sendMessage(this.config.NO_PERMISSION_MSG());
+                else p.sendMessage(this.config.getNoPermMsg());
             }
         }
         
         if(sender instanceof Player p && args.length == 0)
         {
             OnlineGUIInventory ogi = new OnlineGUIInventory(this.plugin,
-                    this.plugin.getCfg().GUI_TITLE(), 0, p);
+                    this.plugin.getCfg().getGuiTitle(), 0, p);
             
             p.openInventory(ogi.getInventory());
         }
@@ -86,9 +87,9 @@ public class OnlineGUICommand implements CommandExecutor, TabCompleter
         return true;
     }
     
-    private boolean isCmd(String arg, String cmd)
+    private boolean alias(String arg, String... aliases)
     {
-        return arg.equalsIgnoreCase(cmd);
+        return Arrays.stream(aliases).anyMatch(arg::equalsIgnoreCase);
     }
     
     @Override

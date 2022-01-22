@@ -36,21 +36,26 @@ public class ConditionalGUIs
     public void loadGUIs()
     {
         File folder = new File(plugin.getDataFolder() + File.separator + "custom");
+        
+        conditionalNames.clear();
     
         if(!folder.exists())
             folder.mkdirs();
         
         File[] files = folder.listFiles();
     
-        if(files != null)
+        if(files == null)
         {
-            for (File file : files)
+            return;
+        }
+        
+        for (File file : files)
+        {
+            String name = file.getName();
+
+            if (file.isFile() && name.endsWith(".yml") && !name.startsWith("config"))
             {
-                String name = file.getName();
-    
-                if (file.isFile() && name.endsWith(".yml") && !name.startsWith("config")
-                && !conditionalNames.contains(name.replace(".yml", "")))
-                    conditionalNames.add(name.replace(".yml", ""));
+                conditionalNames.add(name.replace(".yml", ""));
             }
         }
     }
@@ -59,18 +64,19 @@ public class ConditionalGUIs
     {
         File file = new File(plugin.getDataFolder() + File.separator
                 + "custom" + File.separator + name + ".yml");
-        
-        if(file.exists())
+    
+        if(!file.exists())
         {
-            YamlConfiguration cfg =
-                    YamlConfiguration.loadConfiguration(file);
-    
-            ConditionalGUIInventory cgi = new ConditionalGUIInventory(plugin,
-                    Utils.format(cfg.getString("GUI.Title")), 0, cfg);
-    
-            cgi.setCustomItems(p);
-    
-            p.openInventory(cgi.getInventory());
+            return;
         }
+        
+        YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
+    
+        ConditionalGUIInventory cgi = new ConditionalGUIInventory(plugin,
+                Utils.format(cfg.getString("GUI.Title")), 0, cfg);
+    
+        cgi.setCustomItems(p);
+    
+        p.openInventory(cgi.getInventory());
     }
 }

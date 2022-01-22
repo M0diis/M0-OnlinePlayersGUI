@@ -58,7 +58,7 @@ public class InventoryListener implements Listener
     @EventHandler
     public void updateOnJoin(PlayerJoinEvent e)
     {
-        if(this.plugin.getCfg().UPDATE_ON_JOIN())
+        if(this.plugin.getCfg().doUpdateOnJoin())
         {
             updateView();
         }
@@ -67,7 +67,7 @@ public class InventoryListener implements Listener
     @EventHandler
     public void updateOnLeave(PlayerQuitEvent e)
     {
-        if(this.plugin.getCfg().UPDATE_ON_LEAVE())
+        if(this.plugin.getCfg().doUpdateOnLeave())
         {
             updateView();
             

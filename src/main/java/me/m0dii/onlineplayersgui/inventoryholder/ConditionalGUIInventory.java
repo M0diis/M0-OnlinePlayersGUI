@@ -55,7 +55,7 @@ public class ConditionalGUIInventory implements InventoryHolder, CustomGUI
         this.condition = this.cfg.getCondition();
         
         this.inv = Bukkit.createInventory(this, this.size,
-                Utils.format(this.cfg.getGUI_TITLE()));
+                Utils.format(this.cfg.getGuiTitle()));
         
         this.customItemSlots = plugin.getCfg().getCustomItemSlots();
         
@@ -83,13 +83,13 @@ public class ConditionalGUIInventory implements InventoryHolder, CustomGUI
                 List<String> cmds = new ArrayList<>();
         
                 if(clickType.equals(ClickType.LEFT))
-                    cmds = this.cfg.LEFT_CLICK_CMDS();
+                    cmds = this.cfg.getLeftClickCmds();
     
                 if(clickType.equals(ClickType.MIDDLE))
-                    cmds = this.cfg.MIDDLE_CLICK_CMDS();
+                    cmds = this.cfg.getMiddleClickCmds();
         
                 if(clickType.equals(ClickType.RIGHT))
-                    cmds = this.cfg.RIGHT_CLICK_CMDS();
+                    cmds = this.cfg.getRightClickCmds();
         
                 for(String cmd : cmds)
                     Utils.sendCommand(clickee, skullOwner, cmd);
@@ -97,8 +97,8 @@ public class ConditionalGUIInventory implements InventoryHolder, CustomGUI
         }
     
         if((clickedItem != null) &&
-            (clickedItem.getType().equals(this.cfg.PREV_PAGE_MATERIAL())
-            || clickedItem.getType().equals(this.cfg.NEXT_PAGE_MATERIAL())))
+            (clickedItem.getType().equals(this.cfg.getPrevPageMat())
+            || clickedItem.getType().equals(this.cfg.getNextPageMat())))
         {
             NamespacedKey key = new NamespacedKey(this.plugin, "Button");
             PersistentDataContainer cont = clickedItem.getItemMeta().getPersistentDataContainer();
@@ -107,10 +107,10 @@ public class ConditionalGUIInventory implements InventoryHolder, CustomGUI
             {
                 String buttonType = cont.get(key, PersistentDataType.STRING);
     
-                int nextPage = page;
-    
                 if(buttonType == null) return;
     
+                int nextPage = page;
+                
                 if(buttonType.equalsIgnoreCase("Next")) nextPage = page + 1;
                 else if(buttonType.equalsIgnoreCase("Previous")) nextPage = page - 1;
     
@@ -192,7 +192,7 @@ public class ConditionalGUIInventory implements InventoryHolder, CustomGUI
     
     private int adjustSize()
     {
-        int size = cfg.GUI_SIZE();
+        int size = cfg.getGuiSize();
     
         if (size < 18)
             return 18;
@@ -213,7 +213,7 @@ public class ConditionalGUIInventory implements InventoryHolder, CustomGUI
     @NotNull
     private List<Player> getByPage(int page)
     {
-        String permission = cfg.isPERMISSION_REQUIRED() ? cfg.getREQUIRED_PERMISSION() : null;
+        String permission = cfg.isPermissionRequired() ? cfg.getREQUIRED_PERMISSION() : null;
         
         List<Player> online = plugin.getGuiUtils().getOnline(permission, condition);
         
@@ -232,10 +232,10 @@ public class ConditionalGUIInventory implements InventoryHolder, CustomGUI
             availableSlots--;
         }
     
-        if(cfg.NEXT_PAGE_SLOT() < this.size - 9)
+        if(cfg.getNextPageSlot() < this.size - 9)
             availableSlots--;
     
-        if(cfg.PREV_PAGE_SLOT() < this.size - 9)
+        if(cfg.getPrevPageSlot() < this.size - 9)
             availableSlots--;
     
         int lowBound = availableSlots * page;
@@ -262,11 +262,11 @@ public class ConditionalGUIInventory implements InventoryHolder, CustomGUI
             
             ItemMeta meta = head.getItemMeta();
         
-            List<String> lore = cfg.HEAD_LORE().stream()
+            List<String> lore = cfg.getHeadLore().stream()
                     .map(str -> Utils.setPlaceholders(str, p))
                     .collect(Collectors.toList());
     
-            meta.setDisplayName(Utils.setPlaceholders(this.cfg.HEAD_DISPLAY_NAME(), p));
+            meta.setDisplayName(Utils.setPlaceholders(this.cfg.getHeadDisplay(), p));
         
             meta.setLore(lore);
         
@@ -295,7 +295,7 @@ public class ConditionalGUIInventory implements InventoryHolder, CustomGUI
     
     private void setButtons()
     {
-        boolean show = plugin.getCfg().ALWAYS_SHOW_BUTTONS();
+        boolean show = plugin.getCfg().areButtonsAlwaysOn();
         
         if(show)
             setNextButton();
@@ -310,10 +310,10 @@ public class ConditionalGUIInventory implements InventoryHolder, CustomGUI
     
     private void setNextButton()
     {
-        ItemStack nextButton = new ItemStack(cfg.NEXT_PAGE_MATERIAL());
+        ItemStack nextButton = new ItemStack(cfg.getNextPageMat());
         ItemMeta nextButtonMeta = nextButton.getItemMeta();
         
-        List<String> nextLore = cfg.NEXT_PAGE_LORE().stream()
+        List<String> nextLore = cfg.getNextPageLore().stream()
                 .map(str -> Utils.setPlaceholders(str, null))
                 .collect(Collectors.toList());
         
@@ -323,19 +323,19 @@ public class ConditionalGUIInventory implements InventoryHolder, CustomGUI
                 new NamespacedKey(plugin, "Button"),
                 PersistentDataType.STRING, "Next");
         
-        nextButtonMeta.setDisplayName(Utils.format(cfg.NEXT_PAGE_BUTTON_NAME()));
+        nextButtonMeta.setDisplayName(Utils.format(cfg.getNextPageName()));
         
         nextButton.setItemMeta(nextButtonMeta);
         
-        inv.setItem(cfg.NEXT_PAGE_SLOT(), nextButton);
+        inv.setItem(cfg.getNextPageSlot(), nextButton);
     }
     
     private void setPreviousButton()
     {
-        ItemStack prevButton = new ItemStack(cfg.PREV_PAGE_MATERIAL());
+        ItemStack prevButton = new ItemStack(cfg.getPrevPageMat());
         ItemMeta prevButtonMeta = prevButton.getItemMeta();
         
-        List<String> prevLore = cfg.PREV_PAGE_LORE().stream()
+        List<String> prevLore = cfg.getPrevPageLore().stream()
                 .map(str -> Utils.setPlaceholders(str, null))
                 .collect(Collectors.toList());
         
@@ -345,9 +345,9 @@ public class ConditionalGUIInventory implements InventoryHolder, CustomGUI
                 new NamespacedKey(plugin, "Button"),
                 PersistentDataType.STRING, "Previous");
         
-        prevButtonMeta.setDisplayName(Utils.format(cfg.PREV_PAGE_BUTTON_NAME()));
+        prevButtonMeta.setDisplayName(Utils.format(cfg.getPrevPageName()));
         prevButton.setItemMeta(prevButtonMeta);
         
-        inv.setItem(cfg.PREV_PAGE_SLOT(), prevButton);
+        inv.setItem(cfg.getPrevPageSlot(), prevButton);
     }
 }

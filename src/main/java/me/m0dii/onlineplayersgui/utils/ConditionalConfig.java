@@ -10,7 +10,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,21 +17,21 @@ import java.util.stream.Collectors;
 
 public class ConditionalConfig
 {
-    private String HEAD_NAME;
+    private String headName;
     
-    private String NEXT_PAGE_NAME, PREVIOUS_PAGE_NAME;
-    private String GUI_TITLE;
+    private String nextPageName, prevPageName;
+    private String guiTitle;
     
-    private List<String> HEAD_LORE, NEXT_PAGE_LORE, PREVIOUS_PAGE_LORE;
-    private List<String> LEFT_CLICK_COMMANDS, MIDDLE_CLICK_COMMANDS, RIGHT_CLICK_COMMANDS;
+    private List<String> headLore, nextPageLore, prevPageLore;
+    private List<String> leftClickCommands, middleClickCommands, rightClickCommands;
     
     private int GUI_SIZE;
     
-    private Material NEXT_PAGE_MATERIAL, PREVIOUS_PAGE_MATERIAL;
-    private int NEXT_PAGE_SLOT, PREVIOUS_PAGE_SLOT;
+    private Material nextPageMat, prevPageMat;
+    private int nextPageSlot, prevPageSlot;
     
-    private boolean PERMISSION_REQUIRED;
-    private String CONDITION, PERMISSION;
+    private boolean permissionRequired;
+    private String condition, permission;
     
     private final OnlineGUI plugin;
     
@@ -58,48 +57,47 @@ public class ConditionalConfig
     
     public void load()
     {
-        HEAD_NAME = getStringf("player-display.name");
+        headName = getStringf("player-display.name");
+        headLore = getStringList("player-display.lore");
     
-        HEAD_LORE = getStringList("player-display.lore");
+        guiTitle = getStringf("gui.title");
     
-        GUI_TITLE = getStringf("gui.title");
-    
-        LEFT_CLICK_COMMANDS = getStringList("player-display.commands.left-click");
-        MIDDLE_CLICK_COMMANDS = getStringList("player-display.commands.middle-click");
-        RIGHT_CLICK_COMMANDS = getStringList("player-display.commands.right-click");
+        leftClickCommands = getStringList("player-display.commands.left-click");
+        middleClickCommands = getStringList("player-display.commands.middle-click");
+        rightClickCommands = getStringList("player-display.commands.right-click");
     
         GUI_SIZE = cfg.getInt("gui.size");
     
         String mat1 = cfg.getString("next-button.material", "ENCHANTED_BOOK");
         String mat2 = cfg.getString("previous-button.material", "ENCHANTED_BOOK");
     
-        PREVIOUS_PAGE_MATERIAL = Material.getMaterial(mat1);
-        if(PREVIOUS_PAGE_MATERIAL == null) PREVIOUS_PAGE_MATERIAL = Material.BOOK;
+        prevPageMat = Material.getMaterial(mat1);
+        if(prevPageMat == null) prevPageMat = Material.BOOK;
     
-        NEXT_PAGE_MATERIAL = Material.getMaterial(mat2);
-        if(NEXT_PAGE_MATERIAL == null) NEXT_PAGE_MATERIAL = Material.BOOK;
+        nextPageMat = Material.getMaterial(mat2);
+        if(nextPageMat == null) nextPageMat = Material.BOOK;
     
-        PREVIOUS_PAGE_LORE = getStringList("previous-button.lore");
-        NEXT_PAGE_LORE = getStringList("next-button.lore");
+        prevPageLore = getStringList("previous-button.lore");
+        nextPageLore = getStringList("next-button.lore");
     
-        PREVIOUS_PAGE_NAME = getStringf("previous-button.name");
-        NEXT_PAGE_NAME = getStringf("next-button.name");
+        prevPageName = getStringf("previous-button.name");
+        nextPageName = getStringf("next-button.name");
         
-        PREVIOUS_PAGE_SLOT = cfg.getInt("previous-button.slot");
-        NEXT_PAGE_SLOT = cfg.getInt("next-button.slot");
+        prevPageSlot = cfg.getInt("previous-button.slot");
+        nextPageSlot = cfg.getInt("next-button.slot");
         
-        PERMISSION_REQUIRED = cfg.getBoolean("condition.permission.required");
-        CONDITION = cfg.getString("condition.placeholder");
-        PERMISSION = cfg.getString("condition.permission.node");
+        permissionRequired = cfg.getBoolean("condition.permission.required");
+        condition = cfg.getString("condition.placeholder");
+        permission = cfg.getString("condition.permission.node");
         
         setUpCustomItems(plugin);
     }
 
-    private Map<Integer, CustomItem> CUSTOM_ITEMS;
+    private Map<Integer, CustomItem> customItems;
     
     private void setUpCustomItems(OnlineGUI plugin)
     {
-        CUSTOM_ITEMS = new HashMap<>();
+        customItems = new HashMap<>();
         
         ConfigurationSection sec = cfg.getConfigurationSection("custom-items");
         
@@ -150,7 +148,7 @@ public class ConditionalConfig
             
                         for(int i = start; i <= end; i++)
                         {
-                            addCustomItem(meta, plugin, i, item, CUSTOM_ITEMS, lcc, mcc, rcc, customItemLore);
+                            addCustomItem(meta, i, item, lcc, mcc, rcc, customItemLore);
                         }
                     }
                     else
@@ -163,14 +161,14 @@ public class ConditionalConfig
                 
                             for(Integer slot : slotList)
                             {
-                                addCustomItem(meta, plugin, slot, item, CUSTOM_ITEMS, lcc, mcc, rcc, customItemLore);
+                                addCustomItem(meta, slot, item, lcc, mcc, rcc, customItemLore);
                             }
                         }
                         else
                         {
                             int slot = itemSec.getInt("slot", -1);
                 
-                            addCustomItem(meta, plugin, slot, item, CUSTOM_ITEMS, lcc, mcc, rcc, customItemLore);
+                            addCustomItem(meta, slot, item, lcc, mcc, rcc, customItemLore);
                         }
                     }
                 }
@@ -178,21 +176,20 @@ public class ConditionalConfig
                 {
                     int slot = itemSec.getInt("slot", -1);
         
-                    addCustomItem(meta, plugin, slot, item, CUSTOM_ITEMS, lcc, mcc, rcc, customItemLore);
+                    addCustomItem(meta, slot, item, lcc, mcc, rcc, customItemLore);
                 }
             }
         });
     }
     
-    private void addCustomItem(ItemMeta meta, OnlineGUI plugin, int slot, ItemStack item, Map<Integer, CustomItem> CUSTOM_ITEMS
-            , List<String> lcc, List<String> mcc, List<String> rcc, List<String> customItemLore)
+    private void addCustomItem(ItemMeta meta, int slot, ItemStack item, List<String> lcc, List<String> mcc, List<String> rcc, List<String> customItemLore)
     {
         meta.getPersistentDataContainer().set(
-                new NamespacedKey(plugin, "Slot"), PersistentDataType.INTEGER, slot);
+                new NamespacedKey(this.plugin, "Slot"), PersistentDataType.INTEGER, slot);
         
         item.setItemMeta(meta);
         
-        CUSTOM_ITEMS.put(slot, new CustomItem(item, slot, lcc, mcc, rcc, customItemLore));
+        customItems.put(slot, new CustomItem(item, slot, lcc, mcc, rcc, customItemLore));
     }
 
     private List<String> format(List<String> list)
@@ -200,94 +197,99 @@ public class ConditionalConfig
         return list.stream().map(Utils::format).collect(Collectors.toList());
     }
     
-    public int PREV_PAGE_SLOT()
+    public int getPrevPageSlot()
     {
-        return PREVIOUS_PAGE_SLOT;
+        return prevPageSlot;
     }
     
-    public int NEXT_PAGE_SLOT()
+    public int getNextPageSlot()
     {
-        return NEXT_PAGE_SLOT;
+        return nextPageSlot;
     }
     
     public Map<Integer, CustomItem> getCustomItems()
     {
-        return this.CUSTOM_ITEMS;
+        return this.customItems;
     }
     
-    public int GUI_SIZE()
+    public int getGuiSize()
     {
         return GUI_SIZE;
     }
     
-    public List<String> NEXT_PAGE_LORE()
+    public List<String> getNextPageLore()
     {
-        return NEXT_PAGE_LORE;
+        return nextPageLore;
     }
     
-    public List<String> PREV_PAGE_LORE()
+    public List<String> getPrevPageLore()
     {
-        return PREVIOUS_PAGE_LORE;
+        return prevPageLore;
     }
     
-    public List<String> RIGHT_CLICK_CMDS()
+    public List<String> getRightClickCmds()
     {
-        return RIGHT_CLICK_COMMANDS;
+        return rightClickCommands;
     }
     
-    public List<String> LEFT_CLICK_CMDS()
+    public List<String> getMiddleClickCmds()
     {
-        return LEFT_CLICK_COMMANDS;
+        return middleClickCommands;
     }
     
-    public List<String> HEAD_LORE()
+    public List<String> getLeftClickCmds()
     {
-        return HEAD_LORE;
+        return leftClickCommands;
     }
     
-    public String NEXT_PAGE_BUTTON_NAME()
+    public List<String> getHeadLore()
     {
-        return NEXT_PAGE_NAME;
+        return headLore;
     }
     
-    public String PREV_PAGE_BUTTON_NAME()
+    public String getNextPageName()
     {
-        return PREVIOUS_PAGE_NAME;
+        return nextPageName;
     }
     
-    public String HEAD_DISPLAY_NAME()
+    public String getPrevPageName()
     {
-        return HEAD_NAME;
+        return prevPageName;
     }
     
-    public Material NEXT_PAGE_MATERIAL()
+    public String getHeadDisplay()
     {
-        return NEXT_PAGE_MATERIAL;
+        return headName;
     }
     
-    public Material PREV_PAGE_MATERIAL()
+    public Material getNextPageMat()
     {
-        return PREVIOUS_PAGE_MATERIAL;
+        return nextPageMat;
+    }
+    
+    public Material getPrevPageMat()
+    {
+        return prevPageMat;
     }
     
     public String getCondition()
     {
-        return CONDITION;
+        return condition;
     }
-    public boolean isPERMISSION_REQUIRED()
+    
+    public boolean isPermissionRequired()
     {
-        return PERMISSION_REQUIRED;
+        return permissionRequired;
     }
+    
     public String getREQUIRED_PERMISSION()
     {
-        return PERMISSION;
+        return permission;
     }
-    public String getGUI_TITLE()
+    
+    public String getGuiTitle()
     {
-        return GUI_TITLE;
+        return guiTitle;
     }
-    public List<String> MIDDLE_CLICK_CMDS()
-    {
-        return MIDDLE_CLICK_COMMANDS;
-    }
+
 }

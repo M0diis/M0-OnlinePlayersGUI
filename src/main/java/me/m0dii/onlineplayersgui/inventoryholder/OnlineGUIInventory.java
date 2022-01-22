@@ -3,7 +3,6 @@ package me.m0dii.onlineplayersgui.inventoryholder;
 import me.m0dii.onlineplayersgui.CustomItem;
 import me.m0dii.onlineplayersgui.OnlineGUI;
 import me.m0dii.onlineplayersgui.utils.Config;
-import me.m0dii.onlineplayersgui.utils.Messenger;
 import me.m0dii.onlineplayersgui.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -68,31 +67,31 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI
                 List<String> cmds = new ArrayList<>();
                 
                 if(clickType.equals(ClickType.LEFT))
-                    cmds = this.plugin.getCfg().LEFT_CLICK_CMDS();
+                    cmds = this.plugin.getCfg().getLeftClickCmds();
     
                 if(clickType.equals(ClickType.MIDDLE))
-                    cmds = this.plugin.getCfg().MIDDLE_CLICK_CMDS();
+                    cmds = this.plugin.getCfg().getMiddleClickCmds();
     
                 if(clickType.equals(ClickType.RIGHT))
-                    cmds = this.plugin.getCfg().RIGHT_CLICK_CMDS();
+                    cmds = this.plugin.getCfg().getRightClickCmds();
                 
                 for(String cmd : cmds)
                     Utils.sendCommand(clickee, skullOwner, cmd);
             }
     
-            if(clickType.equals(ClickType.LEFT) && this.plugin.getCfg().LEFT_CLICK_CMDS().contains("[CLOSE]"))
+            if(clickType.equals(ClickType.LEFT) && this.plugin.getCfg().getLeftClickCmds().contains("[CLOSE]"))
                 clickee.closeInventory();
     
-            if(clickType.equals(ClickType.MIDDLE) && this.plugin.getCfg().MIDDLE_CLICK_CMDS().contains("[CLOSE]"))
+            if(clickType.equals(ClickType.MIDDLE) && this.plugin.getCfg().getMiddleClickCmds().contains("[CLOSE]"))
                 clickee.closeInventory();
             
-            if(clickType.equals(ClickType.RIGHT) && this.plugin.getCfg().RIGHT_CLICK_CMDS().contains("[CLOSE]"))
+            if(clickType.equals(ClickType.RIGHT) && this.plugin.getCfg().getRightClickCmds().contains("[CLOSE]"))
                 clickee.closeInventory();
         }
     
         if((clickedItem != null) &&
-        (clickedItem.getType().equals(this.plugin.getCfg().PREV_PAGE_MATERIAL())
-        || clickedItem.getType().equals(this.plugin.getCfg().NEXT_PAGE_MATERIAL())))
+        (clickedItem.getType().equals(this.plugin.getCfg().getPrevPageMat())
+        || clickedItem.getType().equals(this.plugin.getCfg().getNextPageMat())))
         {
             NamespacedKey key = new NamespacedKey(this.plugin, "Button");
             PersistentDataContainer cont = clickedItem.getItemMeta().getPersistentDataContainer();
@@ -177,7 +176,7 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI
     
     private int adjustSize(Config cfg)
     {
-        int size = cfg.GUI_SIZE();
+        int size = cfg.getGuiSize();
         
         if(size % 9 == 0)
             return size;
@@ -227,12 +226,12 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI
     
             ItemMeta meta = head.getItemMeta();
         
-            List<String> lore = plugin.getCfg().HEAD_LORE()
+            List<String> lore = plugin.getCfg().getHeadLore()
                     .stream()
                     .map(str -> Utils.setPlaceholders(str, player))
                     .collect(Collectors.toList());
         
-            meta.setDisplayName(Utils.setPlaceholders(plugin.getCfg().HEAD_DISPLAY_NAME(), player));
+            meta.setDisplayName(Utils.setPlaceholders(plugin.getCfg().getHeadDisplay(), player));
         
             meta.setLore(lore);
         
@@ -245,8 +244,8 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI
             {
                 if(inv.getItem(i) == null)
                 {
-                    if(plugin.getCfg().NEXT_PAGE_SLOT() != i &&
-                       plugin.getCfg().PREV_PAGE_SLOT() != i)
+                    if(plugin.getCfg().getNextPageSlot() != i &&
+                       plugin.getCfg().getPrevPageSlot() != i)
                     {
                         inv.setItem(i, head);
                     }
@@ -259,10 +258,10 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI
     @NotNull
     private List<Player> getByPage(int page)
     {
-        String permission = plugin.getCfg().isPERMISSION_REQUIRED() ? plugin.getCfg().getREQUIRED_PERMISSION()
+        String permission = plugin.getCfg().isPermissionRequired() ? plugin.getCfg().getRequiredPerm()
                 : null;
     
-        String condition = plugin.getCfg().isCONDITION_REQUIRED() ? plugin.getCfg().getCONDITION()
+        String condition = plugin.getCfg().isConditionRequired() ? plugin.getCfg().getCondition()
                 : null;
         
         List<Player> online = plugin.getGuiUtils().getOnline(permission, condition);
@@ -283,10 +282,10 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI
             availableSlots--;
         }
         
-        if(plugin.getCfg().NEXT_PAGE_SLOT() < this.size - 9)
+        if(plugin.getCfg().getNextPageSlot() < this.size - 9)
             availableSlots--;
         
-        if(plugin.getCfg().PREV_PAGE_SLOT() < this.size - 9)
+        if(plugin.getCfg().getPrevPageSlot() < this.size - 9)
             availableSlots--;
     
         int lowBound = availableSlots * page;
@@ -301,7 +300,7 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI
     
     private void setButtons()
     {
-        boolean show = plugin.getCfg().ALWAYS_SHOW_BUTTONS();
+        boolean show = plugin.getCfg().areButtonsAlwaysOn();
         
         if(show)
             setNextButton();
@@ -316,10 +315,10 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI
     
     private void setNextButton()
     {
-        ItemStack nextButton = new ItemStack(plugin.getCfg().NEXT_PAGE_MATERIAL());
+        ItemStack nextButton = new ItemStack(plugin.getCfg().getNextPageMat());
         ItemMeta nextButtonMeta = nextButton.getItemMeta();
     
-        List<String> nextLore = plugin.getCfg().NEXT_PAGE_LORE().stream()
+        List<String> nextLore = plugin.getCfg().getNextPageLore().stream()
                 .map(str -> Utils.setPlaceholders(str, null))
                 .collect(Collectors.toList());
     
@@ -329,19 +328,19 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI
                 new NamespacedKey(plugin, "Button"),
                 PersistentDataType.STRING, "Next");
         
-        nextButtonMeta.setDisplayName(plugin.getCfg().NEXT_PAGE_BUTTON_NAME());
+        nextButtonMeta.setDisplayName(plugin.getCfg().getNextPageName());
     
         nextButton.setItemMeta(nextButtonMeta);
     
-        inv.setItem(plugin.getCfg().NEXT_PAGE_SLOT(), nextButton);
+        inv.setItem(plugin.getCfg().getNextPageSlot(), nextButton);
     }
     
     private void setPreviousButton()
     {
-        ItemStack prevButton = new ItemStack(plugin.getCfg().PREV_PAGE_MATERIAL());
+        ItemStack prevButton = new ItemStack(plugin.getCfg().getPrevPageMat());
         ItemMeta prevButtonMeta = prevButton.getItemMeta();
         
-        List<String> prevLore = plugin.getCfg().PREV_PAGE_LORE().stream()
+        List<String> prevLore = plugin.getCfg().getPrevPageLore().stream()
                 .map(str -> Utils.setPlaceholders(str, null))
                 .collect(Collectors.toList());
     
@@ -351,9 +350,9 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI
                 new NamespacedKey(plugin, "Button"),
                 PersistentDataType.STRING, "Previous");
     
-        prevButtonMeta.setDisplayName(Utils.format(plugin.getCfg().PREV_PAGE_BUTTON_NAME()));
+        prevButtonMeta.setDisplayName(Utils.format(plugin.getCfg().getPrevPageName()));
         prevButton.setItemMeta(prevButtonMeta);
     
-        inv.setItem(plugin.getCfg().PREV_PAGE_SLOT(), prevButton);
+        inv.setItem(plugin.getCfg().getPrevPageSlot(), prevButton);
     }
 }

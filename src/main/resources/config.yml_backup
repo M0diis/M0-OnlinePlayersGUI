@@ -1,3 +1,5 @@
+# This is a backup configuration, in case you lose or corrupt your main config.
+# This file will re-generate if you modify or delete it.
 
 messages:
   reload: '&2Configuration has been reloaded.'
@@ -17,13 +19,15 @@ essentialsx-hook: false
 # https://github.com/PlaceholderAPI/PlaceholderAPI/wiki/Placeholders
 condition:
   required: false
-  # You can also use ==, !=, <, >, <=, >= for placeholders that return numbers
+  # You can use ==, !=, <, >, <=, >= for placeholders that return numbers
   # Ex.: %player_health% == 20
+  # Or use the placeholders that return yes/true/false/no
+  # Ex. %checkitem_mat:DIRT%
   placeholder: "%checkitem_mat:DIRT%" # Requires CheckItem PAPI extension
   permission:
     required: false
     node: "permission.to.include.player"
-    
+
 previous-button:
   material: ENCHANTED_BOOK
   name: '&cPrevious Page'
@@ -54,19 +58,19 @@ player-display:
     middle-click:
       - '[CLOSE]'
 
-# GUI Slots:
-# --------------------------
-# 0  1  2  3  4  5  6  7  8
-# 9  10 11 12 13 14 15 16 17
-# 18 19 20 21 22 23 24 25 26
-# 27 28 29 22 31 32 33 34 35
-# 36 37 38 39 40 41 42 43 44
-# 45 46 47 48 49 50 51 52 53
-# --------------------------
+# | Slots                      | Size |
+# |----------------------------|------|
+# | 0  1  2  3  4  5  6  7  8  | 9    |
+# | 9  10 11 12 13 14 15 16 17 | 18   |
+# | 18 19 20 21 22 23 24 25 26 | 27   |
+# | 27 28 29 22 31 32 33 34 35 | 36   |
+# | 36 37 38 39 40 41 42 43 44 | 45   |
+# | 45 46 47 48 49 50 51 52 53 | 54   |
 
 # Size should be in increments of 9 and not
 # lower than 9 or higher than 54
 # 9 slots is one row
+
 gui:
   size: 18
   title: '&2Online Players'
@@ -80,6 +84,8 @@ gui:
 custom-items:
   '1':
     material: WHITE_STAINED_GLASS_PANE
+	# You can define a single slot, ex. slot: 1
+	# Or specify start and end - it will fill slots from 0 to 8.
     slots:
       start: 0
       end: 8
@@ -92,8 +98,31 @@ custom-items:
         - '[CLOSE]'
       middle-click:
         - '[CLOSE]'
+
+	  # Available command actions:
+	  # [MESSAGE] or [TEXT] -> this will send a direct message to the player.
+	  # [PLAYER] -> a command will be sent by the player.
+	  # [CONSOLE] or none -> a command will be sent by the console.
+	  # [TITLE] -> will show a title to a player. A more detailed usage below.
+	  # [SOUND] -> this will play a sound to the player.
+	  #  - '[PLAYER] this will be executed by player'
+
+	  # Detailed explanation:
+	  # This will play a sound to the player.
+	  # The first argument is the sound, the second is the volume and the third is the pitch.
+	  # You can find a list of sounds here: https://www.digminecraft.com/lists/sound_list_pc.php
+	  #  - '[SOUND] ENTITY.PLAYER.LEVELUP, 1.0, 1.0'
+	  # This will show a title to the player.
+	  # The first argument is the title, the second is the subtitle.
+	  # The last three are: fade-in, stay and fade-out times.
+	  #  - '[TITLE] This is a title, This is a subtitle, 20, 60, 20'
+	  # Alternatively you can use opt out the subtitle or the times, or just the subtitle.
+	  #  - '[TITLE] This is a title'
+	  #  - '[TITLE] This is a title, 20, 60, 20'
+
   '2':
     material: WHITE_STAINED_GLASS_PANE
+	# You can also define a slot list
     slots:
       - 9
       - 17
@@ -106,5 +135,6 @@ custom-items:
       - 26
     name: '&r'
     lore: []
+	# You can omit the commands section if you don't use them.
 
 debug: false
