@@ -248,6 +248,7 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI
                        plugin.getCfg().getPrevPageSlot() != i)
                     {
                         inv.setItem(i, head);
+                        break;
                     }
                 }
             }

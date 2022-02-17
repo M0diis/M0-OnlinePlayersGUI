@@ -133,8 +133,10 @@ public class Config
     private void setUpCustomItems(OnlineGUI plugin)
     {
         customItems = new HashMap<>();
+        
+        plugin.reloadConfig();
     
-        ConfigurationSection sec = cfg.getConfigurationSection("custom-items");
+        ConfigurationSection sec = plugin.getConfig().getConfigurationSection("custom-items");
         
         if(sec == null)
         {
@@ -150,7 +152,7 @@ public class Config
                 return;
             }
 
-            String itemName = itemSec.getString("material", "BOOK");
+            String itemName = itemSec.getString("material", "WHITE_STAINED_GLASS_PANE");
     
             Material customItem = Material.getMaterial(itemName);
     

@@ -72,7 +72,7 @@ player-display:
 # 9 slots is one row
 
 gui:
-  size: 18
+  size: 27
   title: '&2Online Players'
   update-on:
     join: true

@@ -68,7 +68,7 @@ player-display:
 # lower than 9 or higher than 54
 # 9 slots is one row
 gui:
-  size: 18
+  size: 27
   title: '&2Online Players'
   update-on:
     join: true
@@ -79,7 +79,7 @@ gui:
 # the previous and next buttons are
 custom-items:
   '1':
-    material: WHITE_STAINED_GLASS_PANE
+    material: RED_STAINED_GLASS_PANE
     slots:
       start: 0
       end: 8
@@ -93,7 +93,7 @@ custom-items:
       middle-click:
         - '[CLOSE]'
   '2':
-    material: WHITE_STAINED_GLASS_PANE
+    material: RED_STAINED_GLASS_PANE
     slots:
       - 9
       - 17
