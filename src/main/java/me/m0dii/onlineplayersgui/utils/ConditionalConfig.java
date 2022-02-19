@@ -1,24 +1,24 @@
 package me.m0dii.onlineplayersgui.utils;
 
+import com.cryptomorin.xseries.XMaterial;
 import me.m0dii.onlineplayersgui.CustomItem;
 import me.m0dii.onlineplayersgui.OnlineGUI;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.persistence.PersistentDataType;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class ConditionalConfig
 {
     private String headName;
-    
+    private ItemStack playerHeadDisplay;
     private String nextPageName, prevPageName;
     private String guiTitle;
     
@@ -77,6 +77,36 @@ public class ConditionalConfig
         nextPageMat = Material.getMaterial(mat2);
         if(nextPageMat == null) nextPageMat = Material.BOOK;
     
+        if(Version.serverIsNewerThan(Version.v1_12_R1))
+        {
+            playerHeadDisplay = new ItemStack(Material.PLAYER_HEAD);
+        }
+        else
+        {
+            Optional<XMaterial> mat = XMaterial.matchXMaterial("PLAYER_HEAD");
+        
+            if(!mat.isPresent())
+            {
+                mat = XMaterial.matchXMaterial("SKULL_ITEM");
+            }
+        
+            if(mat.isPresent())
+            {
+                ItemStack item = mat.get().parseItem();
+            
+                if(item == null)
+                {
+                    return;
+                }
+            
+                item.setDurability((short) 3);
+                playerHeadDisplay = item;
+            }
+        }
+    
+        if(playerHeadDisplay == null) playerHeadDisplay = new ItemStack(XMaterial.PLAYER_HEAD.parseMaterial());
+    
+    
         prevPageLore = getStringList("previous-button.lore");
         nextPageLore = getStringList("next-button.lore");
     
@@ -90,12 +120,12 @@ public class ConditionalConfig
         condition = cfg.getString("condition.placeholder");
         permission = cfg.getString("condition.permission.node");
         
-        setUpCustomItems(plugin);
+        setUpCustomItems();
     }
 
     private Map<Integer, CustomItem> customItems;
     
-    private void setUpCustomItems(OnlineGUI plugin)
+    private void setUpCustomItems()
     {
         customItems = new HashMap<>();
         
@@ -135,10 +165,7 @@ public class ConditionalConfig
                 List<String> lcc = itemSec.getStringList("commands.left-click");
                 List<String> mcc = itemSec.getStringList("commands.middle-click");
                 List<String> rcc = itemSec.getStringList("commands.right-click");
-    
-                meta.getPersistentDataContainer().set(
-                        new NamespacedKey(plugin, "IsCustom"), PersistentDataType.STRING, "true");
-    
+                
                 if(itemSec.contains("slots"))
                 {
                     if(itemSec.contains("slots.start"))
@@ -184,9 +211,6 @@ public class ConditionalConfig
     
     private void addCustomItem(ItemMeta meta, int slot, ItemStack item, List<String> lcc, List<String> mcc, List<String> rcc, List<String> customItemLore)
     {
-        meta.getPersistentDataContainer().set(
-                new NamespacedKey(this.plugin, "Slot"), PersistentDataType.INTEGER, slot);
-        
         item.setItemMeta(meta);
         
         customItems.put(slot, new CustomItem(item, slot, lcc, mcc, rcc, customItemLore));
@@ -291,5 +315,9 @@ public class ConditionalConfig
     {
         return guiTitle;
     }
-
+    
+    public ItemStack getDisplay()
+    {
+        return this.playerHeadDisplay;
+    }
 }

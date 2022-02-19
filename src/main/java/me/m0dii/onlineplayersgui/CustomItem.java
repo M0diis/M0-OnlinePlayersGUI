@@ -7,13 +7,20 @@ import java.util.List;
 public class CustomItem
 {
     private final int itemSlot;
-    private final ItemStack itemStack;
+    private ItemStack itemStack;
     
-    private final List<String> leftClickCommands;
-    private final List<String> middleClickCommands;
-    private final List<String> rightClickCommands;
+    boolean isSkip = false;
     
-    private final List<String> lore;
+    private List<String> leftClickCommands;
+    private List<String> middleClickCommands;
+    private List<String> rightClickCommands;
+    
+    private List<String> lore;
+    
+    public CustomItem(int slot)
+    {
+        this.itemSlot = slot;
+    }
     
     public CustomItem(ItemStack itemStack, int slot,
                       List<String> lcc, List<String> mcc, List<String> rcc,
@@ -58,5 +65,15 @@ public class CustomItem
     public List<String> getRCC()
     {
         return this.rightClickCommands;
+    }
+    
+    public boolean isSkip()
+    {
+        return this.isSkip;
+    }
+    
+    public void setSkip(boolean skip)
+    {
+        this.isSkip = skip;
     }
 }

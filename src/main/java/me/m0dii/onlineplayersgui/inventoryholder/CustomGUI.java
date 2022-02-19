@@ -8,5 +8,5 @@ public interface CustomGUI
 {
     void refresh(Player p);
     
-    void execute(Player p, ItemStack item, ClickType clickType);
+    void execute(Player p, ItemStack item, ClickType clickType, int slot);
 }

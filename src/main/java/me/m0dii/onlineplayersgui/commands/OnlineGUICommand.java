@@ -51,8 +51,10 @@ public class OnlineGUICommand implements CommandExecutor, TabCompleter
             }
         }
         
-        if(sender instanceof Player p && args.length == 1)
+        if(sender instanceof Player && args.length == 1)
         {
+            Player p = (Player) sender;
+            
             if(cgis.isConditional(args[0]))
             {
                 if(p.hasPermission("m0onlinegui.conditional." + args[0]))
@@ -76,8 +78,10 @@ public class OnlineGUICommand implements CommandExecutor, TabCompleter
             }
         }
         
-        if(sender instanceof Player p && args.length == 0)
+        if(sender instanceof Player && args.length == 0)
         {
+            Player p = (Player) sender;
+            
             OnlineGUIInventory ogi = new OnlineGUIInventory(this.plugin,
                     this.plugin.getCfg().getGuiTitle(), 0, p);
             

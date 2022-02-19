@@ -66,10 +66,7 @@ public class Utils
             String sendAs = cmd.substring(cmd.indexOf("["), cmd.indexOf("]") + 1).toUpperCase();
             
             cmd = cmd.substring(cmd.indexOf("]") + 2);
-    
-            Messenger.info(sendAs);
-            Messenger.info(cmd);
-    
+            
             if(sendAs.equalsIgnoreCase("[MESSAGE]") || sendAs.equalsIgnoreCase("[TEXT]"))
             {
                 sender.sendMessage(cmd);
@@ -84,9 +81,13 @@ public class Utils
     
                 switch(split.length)
                 {
-                    case 1 -> sender.sendTitle(split[0], "", fadeIn, stay, fadeOut);
-                    case 2 -> sender.sendTitle(split[0], split[1], fadeIn, stay, fadeOut);
-                    case 4 -> {
+                    case 1:
+                        sender.sendTitle(split[0], "", fadeIn, stay, fadeOut);
+                    break;
+                    case 2:
+                        sender.sendTitle(split[0], split[1], fadeIn, stay, fadeOut);
+                    break;
+                    case 4:
                         try
                         {
                             fadeIn = Integer.parseInt(split[1]);
@@ -98,8 +99,8 @@ public class Utils
                             Messenger.warn("Invalid fadeIn, stay, or fadeOut time for title action.");
                         }
                         sender.sendTitle(split[0], "", fadeIn, stay, fadeOut);
-                    }
-                    case 5 -> {
+                    break;
+                    case 5:
                         String subtitle = split[1];
                         try
                         {
@@ -112,7 +113,7 @@ public class Utils
                             Messenger.warn("Invalid fadeIn, stay, or fadeOut time for title action.");
                         }
                         sender.sendTitle(split[0], subtitle, fadeIn, stay, fadeOut);
-                    }
+                    break;
                 }
             }
             else if(sendAs.equalsIgnoreCase("[CHAT]"))

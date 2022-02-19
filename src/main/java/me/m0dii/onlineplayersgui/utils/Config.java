@@ -1,23 +1,24 @@
 package me.m0dii.onlineplayersgui.utils;
 
+import com.cryptomorin.xseries.XMaterial;
 import me.m0dii.onlineplayersgui.CustomItem;
 import me.m0dii.onlineplayersgui.OnlineGUI;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.persistence.PersistentDataType;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class Config
 {
     private String playerHeadName;
+    private ItemStack playerHeadDisplay;
     private String configReloadedMsg, noPermissionMsg, noPermissionCondMsg;
     
     private String nextPageName, prevPageName;
@@ -109,6 +110,35 @@ public class Config
         nextPageMat = Material.getMaterial(mat2);
         if(nextPageMat == null) nextPageMat = Material.BOOK;
         
+        if(Version.serverIsNewerThan(Version.v1_12_R1))
+        {
+            playerHeadDisplay = new ItemStack(Material.PLAYER_HEAD);
+        }
+        else
+        {
+            Optional<XMaterial> mat = XMaterial.matchXMaterial("PLAYER_HEAD");
+            
+            if(!mat.isPresent())
+            {
+                mat = XMaterial.matchXMaterial("SKULL_ITEM");
+            }
+            
+            if(mat.isPresent())
+            {
+                ItemStack item = mat.get().parseItem();
+                
+                if(item == null)
+                {
+                    return;
+                }
+                
+                item.setDurability((short) 3);
+                playerHeadDisplay = item;
+            }
+        }
+        
+        if(playerHeadDisplay == null) playerHeadDisplay = new ItemStack(XMaterial.PLAYER_HEAD.parseMaterial());
+        
         prevPageLore = getStringList("previous-button.lore");
         nextPageLore = getStringList("next-button.lore");
         
@@ -152,78 +182,103 @@ public class Config
                 return;
             }
 
-            String itemName = itemSec.getString("material", "WHITE_STAINED_GLASS_PANE");
-    
-            Material customItem = Material.getMaterial(itemName);
-    
-            if(customItem != null && !customItem.equals(Material.AIR))
+            String itemName = itemSec.getString("material");
+            
+            if(itemName == null)
             {
-                ItemStack item = new ItemStack(customItem);
-
-                String customItemName = Utils.format(itemSec.getString("name"));
-
-                List<String> customItemLore = format(itemSec.getStringList("lore"));
-
-                ItemMeta meta = item.getItemMeta();
+                Messenger.warn("Invalid material for custom item: " + key);
                 
-                meta.setDisplayName(customItemName);
-                meta.setLore(customItemLore);
-                
-                List<String> lcc = itemSec.getStringList("commands.left-click");
-                List<String> mcc = itemSec.getStringList("commands.middle-click");
-                List<String> rcc = itemSec.getStringList("commands.right-click");
+                return;
+            }
     
-                meta.getPersistentDataContainer().set(
-                        new NamespacedKey(plugin, "IsCustom"), PersistentDataType.STRING, "true");
+            Optional<XMaterial> xmat = Optional.empty();
+            
+            if(Utils.isDigit(itemName))
+            {
+                xmat = XMaterial.matchXMaterial(Integer.parseInt(itemName), (byte)0);
+            }
+            
+            if(itemName.contains(":"))
+            {
+                String[] split = itemName.split(":");
                 
-                if(itemSec.contains("slots"))
+                if(split.length == 2)
                 {
-                    if(itemSec.contains("slots.start"))
+                    xmat = XMaterial.matchXMaterial(Integer.parseInt(split[0]), Byte.parseByte(split[1]));
+                }
+            }
+            
+            if(!xmat.isPresent())
+            {
+                return;
+            }
+            
+            Material material = xmat.get().parseMaterial();
+    
+            if(material == null || material.equals(Material.AIR))
+            {
+                return;
+            }
+            
+            ItemStack item = new ItemStack(material);
+    
+            String customItemName = Utils.format(itemSec.getString("name"));
+    
+            List<String> customItemLore = format(itemSec.getStringList("lore"));
+    
+            ItemMeta meta = item.getItemMeta();
+    
+            meta.setDisplayName(customItemName);
+            meta.setLore(customItemLore);
+    
+            List<String> lcc = itemSec.getStringList("commands.left-click");
+            List<String> mcc = itemSec.getStringList("commands.middle-click");
+            List<String> rcc = itemSec.getStringList("commands.right-click");
+    
+            if(itemSec.contains("slots"))
+            {
+                if(itemSec.contains("slots.start"))
+                {
+                    int start = itemSec.getInt("slots.start");
+                    int end = itemSec.getInt("slots.end");
+
+                    for(int i = start; i <= end; i++)
                     {
-                        int start = itemSec.getInt("slots.start");
-                        int end = itemSec.getInt("slots.end");
-    
-                        for(int i = start; i <= end; i++)
-                        {
-                            addCustomItem(meta, i, item, lcc, mcc, rcc, customItemLore);
-                        }
-                    }
-                    else
-                    {
-                        Object slots = itemSec.get("slots");
-    
-                        if(slots instanceof List)
-                        {
-                            List<Integer> slotList = (List<Integer>)slots;
-        
-                            for(Integer slot : slotList)
-                            {
-                                addCustomItem(meta, slot, item, lcc, mcc, rcc, customItemLore);
-                            }
-                        }
-                        else
-                        {
-                            int slot = itemSec.getInt("slot", -1);
-    
-                            addCustomItem(meta, slot, item, lcc, mcc, rcc, customItemLore);
-                        }
+                        addCustomItem(meta, i, item, lcc, mcc, rcc, customItemLore);
                     }
                 }
                 else
                 {
-                    int slot = itemSec.getInt("slot", -1);
+                    Object slots = itemSec.get("slots");
+
+                    if(slots instanceof List)
+                    {
+                        List<Integer> slotList = (List<Integer>)slots;
     
-                    addCustomItem(meta, slot, item, lcc, mcc, rcc, customItemLore);
+                        for(Integer slot : slotList)
+                        {
+                            addCustomItem(meta, slot, item, lcc, mcc, rcc, customItemLore);
+                        }
+                    }
+                    else
+                    {
+                        int slot = itemSec.getInt("slot", -1);
+
+                        addCustomItem(meta, slot, item, lcc, mcc, rcc, customItemLore);
+                    }
                 }
+            }
+            else
+            {
+                int slot = itemSec.getInt("slot", -1);
+
+                addCustomItem(meta, slot, item, lcc, mcc, rcc, customItemLore);
             }
         });
     }
     
     private void addCustomItem(ItemMeta meta, int slot, ItemStack item, List<String> lcc, List<String> mcc, List<String> rcc, List<String> customItemLore)
     {
-        meta.getPersistentDataContainer().set(
-                new NamespacedKey(this.plugin, "Slot"), PersistentDataType.INTEGER, slot);
-        
         item.setItemMeta(meta);
         
         this.customItems.put(slot, new CustomItem(item, slot, lcc, mcc, rcc, customItemLore));
@@ -237,11 +292,6 @@ public class Config
     public Map<Integer, CustomItem> getCustomItems()
     {
         return this.customItems;
-    }
-    
-    public List<Integer> getCustomItemSlots()
-    {
-        return this.customItems.keySet().stream().sorted().collect(Collectors.toList());
     }
     
     public int getGuiSize()
@@ -385,5 +435,10 @@ public class Config
     public boolean DEBUG_ENABLED()
     {
         return this.DEBUG_ENABLED;
+    }
+    
+    public ItemStack getDisplay()
+    {
+        return this.playerHeadDisplay;
     }
 }

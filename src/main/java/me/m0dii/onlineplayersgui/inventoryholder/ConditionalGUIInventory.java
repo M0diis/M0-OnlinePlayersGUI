@@ -5,9 +5,9 @@ import me.m0dii.onlineplayersgui.OnlineGUI;
 import me.m0dii.onlineplayersgui.utils.ConditionalConfig;
 import me.m0dii.onlineplayersgui.utils.Messenger;
 import me.m0dii.onlineplayersgui.utils.Utils;
+import me.m0dii.onlineplayersgui.utils.Version;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -16,8 +16,6 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
-import org.bukkit.persistence.PersistentDataContainer;
-import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -31,8 +29,6 @@ public class ConditionalGUIInventory implements InventoryHolder, CustomGUI
     private final String name;
     private final int size, page;
     private final OnlineGUI plugin;
-    
-    private final List<Integer> customItemSlots;
     
     private final String condition;
     
@@ -57,16 +53,21 @@ public class ConditionalGUIInventory implements InventoryHolder, CustomGUI
         this.inv = Bukkit.createInventory(this, this.size,
                 Utils.format(this.cfg.getGuiTitle()));
         
-        this.customItemSlots = plugin.getCfg().getCustomItemSlots();
-        
         initByPage(page);
     }
     
-    public void execute(Player clickee, ItemStack clickedItem, ClickType clickType)
+    public void execute(Player clickee, ItemStack clicked, ClickType clickType, int slot)
     {
-        if(clickedItem != null && clickedItem.getType().equals(Material.PLAYER_HEAD))
+        if(clicked == null)
         {
-            SkullMeta sm = (SkullMeta)clickedItem.getItemMeta();
+            return;
+        }
+    
+        Material type = clicked.getType();
+        
+        if(type.equals(cfg.getDisplay().getType()))
+        {
+            SkullMeta sm = (SkullMeta)clicked.getItemMeta();
     
             Player skullOwner = sm.getOwningPlayer() != null ? sm.getOwningPlayer().getPlayer() : null;
     
@@ -96,78 +97,49 @@ public class ConditionalGUIInventory implements InventoryHolder, CustomGUI
             }
         }
     
-        if((clickedItem != null) &&
-            (clickedItem.getType().equals(this.cfg.getPrevPageMat())
-            || clickedItem.getType().equals(this.cfg.getNextPageMat())))
+        if(type.equals(this.cfg.getPrevPageMat()) ||
+           type.equals(this.cfg.getNextPageMat()))
         {
-            NamespacedKey key = new NamespacedKey(this.plugin, "Button");
-            PersistentDataContainer cont = clickedItem.getItemMeta().getPersistentDataContainer();
-    
-            if(cont.has(key, PersistentDataType.STRING))
-            {
-                String buttonType = cont.get(key, PersistentDataType.STRING);
-    
-                if(buttonType == null) return;
-    
-                int nextPage = page;
-                
-                if(buttonType.equalsIgnoreCase("Next")) nextPage = page + 1;
-                else if(buttonType.equalsIgnoreCase("Previous")) nextPage = page - 1;
-    
-                try
-                {
-                    ConditionalGUIInventory newinv = new ConditionalGUIInventory(this.plugin, this.name, nextPage, fileCfg);
-                    
-                    if(newinv.hasPlayers())
-                        clickee.openInventory(newinv.getInventory());
-                }
-                catch(IndexOutOfBoundsException ex)
-                {
-                    Messenger.debug("IndexOutOfBoundsException: " + ex.getMessage());
-                }
-            }
-        }
-    
-        if(clickedItem != null)
-        {
-            NamespacedKey key = new NamespacedKey(this.plugin, "IsCustom");
-            PersistentDataContainer cont = clickedItem.getItemMeta()
-                    .getPersistentDataContainer();
-        
-            if(cont.has(key, PersistentDataType.STRING))
-            {
-                key = new NamespacedKey(this.plugin, "Slot");
+            int nextPage = page;
             
-                if(cont.has(key, PersistentDataType.INTEGER))
-                {
-                    //noinspection ConstantConditions
-                    int slot = cont.get(key, PersistentDataType.INTEGER);
+            if(cfg.getNextPageSlot() == slot) nextPage = page + 1;
+            else if(cfg.getPrevPageSlot() == slot) nextPage = page - 1;
+
+            try
+            {
+                ConditionalGUIInventory newinv = new ConditionalGUIInventory(this.plugin, this.name, nextPage, fileCfg);
                 
-                    CustomItem c = this.getCustomItemBySlot(slot);
-    
-                    if(c == null)
-                    {
-                        return;
-                    }
-                    
-                    List<String> cicmds = new ArrayList<>();
-    
-                    if(clickType.equals(ClickType.LEFT))
-                        cicmds = c.getLCC();
-    
-                    if(clickType.equals(ClickType.MIDDLE))
-                        cicmds = c.getMCC();
-    
-                    if(clickType.equals(ClickType.RIGHT))
-                        cicmds = c.getRCC();
-    
-                    cicmds.forEach(cmd -> Utils.sendCommand(clickee, clickee, cmd));
-    
-                    if(cicmds.contains("[CLOSE]"))
-                        clickee.closeInventory();
-                }
+                if(newinv.hasPlayers())
+                    clickee.openInventory(newinv.getInventory());
+            }
+            catch(IndexOutOfBoundsException ex)
+            {
+                Messenger.debug("IndexOutOfBoundsException: " + ex.getMessage());
             }
         }
+        
+        CustomItem c = this.getCustomItemBySlot(slot);
+
+        if(c == null)
+        {
+            return;
+        }
+        
+        List<String> cicmds = new ArrayList<>();
+
+        if(clickType.equals(ClickType.LEFT))
+            cicmds = c.getLCC();
+
+        if(clickType.equals(ClickType.MIDDLE))
+            cicmds = c.getMCC();
+
+        if(clickType.equals(ClickType.RIGHT))
+            cicmds = c.getRCC();
+
+        cicmds.forEach(cmd -> Utils.sendCommand(clickee, clickee, cmd));
+
+        if(cicmds.contains("[CLOSE]"))
+            clickee.closeInventory();
     }
     
     public void refresh(Player p)
@@ -252,32 +224,48 @@ public class ConditionalGUIInventory implements InventoryHolder, CustomGUI
     {
         List<Player> byPage = getByPage(page);
         
-        int curr = 0;
-    
-        for(int slot = 0; slot < byPage.size(); slot++)
+        for(Player player : byPage)
         {
             ItemStack head = new ItemStack(Material.PLAYER_HEAD);
-        
-            Player p = byPage.get(curr);
             
             ItemMeta meta = head.getItemMeta();
         
             List<String> lore = cfg.getHeadLore().stream()
-                    .map(str -> Utils.setPlaceholders(str, p))
+                    .map(str -> Utils.setPlaceholders(str, player))
                     .collect(Collectors.toList());
     
-            meta.setDisplayName(Utils.setPlaceholders(this.cfg.getHeadDisplay(), p));
+            meta.setDisplayName(Utils.setPlaceholders(this.cfg.getHeadDisplay(), player));
         
             meta.setLore(lore);
-        
-            SkullMeta sm = (SkullMeta)meta;
             
-            sm.setOwningPlayer(p);
-            head.setItemMeta(sm);
+            if(meta instanceof SkullMeta)
+            {
+                SkullMeta sm = (SkullMeta)meta;
         
-            inv.setItem(slot, head);
+                if(Version.getServerVersion(Bukkit.getServer()).isNewerThan(Version.v1_12_R1))
+                {
+                    sm.setOwningPlayer(player);
+                }
+                else
+                {
+                    sm.setOwner(player.getName());
+                }
         
-            curr++;
+                head.setItemMeta(sm);
+            }
+    
+            for(int i = 0; i < inv.getSize(); i++)
+            {
+                if(inv.getItem(i) == null)
+                {
+                    if(cfg.getNextPageSlot() != i &&
+                       cfg.getPrevPageSlot() != i)
+                    {
+                        inv.setItem(i, head);
+                        break;
+                    }
+                }
+            }
         }
         
         setButtons();
@@ -319,10 +307,6 @@ public class ConditionalGUIInventory implements InventoryHolder, CustomGUI
         
         nextButtonMeta.setLore(nextLore);
         
-        nextButtonMeta.getPersistentDataContainer().set(
-                new NamespacedKey(plugin, "Button"),
-                PersistentDataType.STRING, "Next");
-        
         nextButtonMeta.setDisplayName(Utils.format(cfg.getNextPageName()));
         
         nextButton.setItemMeta(nextButtonMeta);
@@ -340,10 +324,6 @@ public class ConditionalGUIInventory implements InventoryHolder, CustomGUI
                 .collect(Collectors.toList());
         
         prevButtonMeta.setLore(prevLore);
-        
-        prevButtonMeta.getPersistentDataContainer().set(
-                new NamespacedKey(plugin, "Button"),
-                PersistentDataType.STRING, "Previous");
         
         prevButtonMeta.setDisplayName(Utils.format(cfg.getPrevPageName()));
         prevButton.setItemMeta(prevButtonMeta);
