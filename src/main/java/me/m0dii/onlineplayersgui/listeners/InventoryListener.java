@@ -22,27 +22,27 @@ public class InventoryListener implements Listener
 {
     private final OnlineGUI plugin;
     
+    private final List<HumanEntity> viewers;
+    
     public InventoryListener(OnlineGUI plugin)
     {
         this.plugin = plugin;
         
-        this.guiViewers = new ArrayList<>();
+        this.viewers = new ArrayList<>();
     }
-    
-    private final List<HumanEntity> guiViewers;
     
     @EventHandler
     public void addOnOpen(InventoryOpenEvent e)
     {
         if(e.getInventory().getHolder() instanceof CustomGUI)
-            this.guiViewers.add(e.getPlayer());
+            viewers.add(e.getPlayer());
     }
     
     @EventHandler
     public void removeOnClose(InventoryCloseEvent e)
     {
         if(e.getInventory().getHolder() instanceof CustomGUI)
-            this.guiViewers.remove(e.getPlayer());
+            viewers.remove(e.getPlayer());
     }
     
     @EventHandler
@@ -71,7 +71,7 @@ public class InventoryListener implements Listener
         {
             updateView();
             
-            guiViewers.remove(e.getPlayer());
+            viewers.remove(e.getPlayer());
         }
     }
     
@@ -79,7 +79,7 @@ public class InventoryListener implements Listener
     {
         Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () ->
         {
-            for(HumanEntity p : guiViewers)
+            for(HumanEntity p : viewers)
             {
                 Inventory inv = p.getOpenInventory().getTopInventory();
     
@@ -99,6 +99,11 @@ public class InventoryListener implements Listener
             e.setCancelled(true);
     
             ((CustomGUI)inv.getHolder()).execute((Player)e.getWhoClicked(), e.getCurrentItem(), e.getClick(), e.getSlot());
+        }
+        
+        if(e.getView().getTopInventory().getHolder() instanceof CustomGUI && e.getClick().isShiftClick())
+        {
+            e.setCancelled(true);
         }
     }
     

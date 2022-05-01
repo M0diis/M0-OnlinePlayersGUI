@@ -19,12 +19,12 @@ import java.util.List;
 public class OnlineGUICommand implements CommandExecutor, TabCompleter
 {
     private final OnlineGUI plugin;
-    private final Config config;
+    private final Config cfg;
     
     public OnlineGUICommand(OnlineGUI plugin)
     {
         this.plugin = plugin;
-        this.config = plugin.getCfg();
+        this.cfg = plugin.getCfg();
     }
     
     @Override
@@ -46,9 +46,9 @@ public class OnlineGUICommand implements CommandExecutor, TabCompleter
             
                     cgis.loadGUIs();
             
-                    sender.sendMessage(this.config.getCfgReloadMsg());
+                    sender.sendMessage(this.cfg.getCfgReloadMsg());
                 }
-                else sender.sendMessage(this.config.getNoPermMsg());
+                else sender.sendMessage(this.cfg.getNoPermMsg());
             }
         }
         
@@ -64,7 +64,7 @@ public class OnlineGUICommand implements CommandExecutor, TabCompleter
     
                     return true;
                 }
-                else p.sendMessage(this.config.getNoPermissionCondMsg());
+                else p.sendMessage(this.cfg.getNoPermissionCondMsg());
             }
             
             if(alias(args[0], "toggleself"))
@@ -73,15 +73,17 @@ public class OnlineGUICommand implements CommandExecutor, TabCompleter
                 {
                     this.plugin.toggleHiddenPlayer(p);
         
-                    p.sendMessage(this.config.getToggleMsg());
+                    p.sendMessage(this.cfg.getToggleMsg());
                 }
-                else p.sendMessage(this.config.getNoPermMsg());
+                else p.sendMessage(this.cfg.getNoPermMsg());
             }
             
-            if(alias(args[0], "version"))
+            if(alias(args[0], "version") )
             {
-                p.sendMessage(Utils.format(
+                if(p.hasPermission("m0onlinegui.command.version"))
+                    p.sendMessage(Utils.format(
                         "&aYou are using M0-OnlinePlayersGUI version &2" + this.plugin.getDescription().getVersion()) + ".");
+                else p.sendMessage(this.cfg.getNoPermMsg());
             }
         }
         
@@ -111,11 +113,19 @@ public class OnlineGUICommand implements CommandExecutor, TabCompleter
         
         if(args.length == 1)
         {
+            String arg0 = args[0].toLowerCase();
+            
             if(sender.hasPermission("m0onlinegui.command.reload"))
-                completes.add("reload");
+                if("reload".contains(arg0))
+                    completes.add("reload");
             
             if(sender.hasPermission("m0onlinegui.command.toggleself"))
-                completes.add("toggleself");
+                if("toggleself".contains(arg0))
+                    completes.add("toggleself");
+            
+            if(sender.hasPermission("m0onlinegui.command.version"))
+                if("version".contains(arg0))
+                    completes.add("version");
             
             for(String cond : this.plugin.getCgis().getConditionalNames())
                 if(sender.hasPermission("m0onlinegui.conditional." + cond.toLowerCase()))
