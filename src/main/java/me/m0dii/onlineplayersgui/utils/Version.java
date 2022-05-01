@@ -28,7 +28,8 @@ public enum Version implements Comparable<Version>
     
     private final int value;
     
-    Version(int value) {
+    Version(int value)
+    {
         this.value = value;
     }
     
@@ -43,15 +44,19 @@ public enum Version implements Comparable<Version>
      * @throws IllegalArgumentException if server is null
      */
     @NotNull
-    public static Version getServerVersion(@NotNull Server server) {
+    public static Version getServerVersion(@NotNull Server server)
+    {
         Validate.notNull(server, "Server cannot be null");
         
         String packageName = server.getClass().getPackage().getName();
         String version = packageName.substring(packageName.lastIndexOf('.') + 1);
         
-        try {
+        try
+        {
             return valueOf(version.trim());
-        } catch (final IllegalArgumentException e) {
+        }
+        catch (final IllegalArgumentException e)
+        {
             return Version.UNKNOWN;
         }
     }
@@ -61,7 +66,8 @@ public enum Version implements Comparable<Version>
      * @return true if the server is Paper or false of not
      * @throws IllegalArgumentException if server is null
      */
-    public static boolean isPaper(@NotNull Server server) {
+    public static boolean isPaper(@NotNull Server server)
+    {
         Validate.notNull(server, "Server cannot be null");
         
         return server.getName().equalsIgnoreCase("Paper");
@@ -77,10 +83,21 @@ public enum Version implements Comparable<Version>
      * @throws IllegalArgumentException if version is null
      * @throws IllegalArgumentException if this version or the given version, is the version UNKNOWN
      */
-    public boolean isNewerThan(@NotNull Version version) {
-        Validate.notNull(version, "Version cannot be null");
-        Validate.isTrue(this != UNKNOWN, "Cannot check, if version UNKNOWN is newer");
-        Validate.isTrue(version != UNKNOWN, "Cannot check, if version UNKNOWN is newer");
+    public boolean isNewerThan(@NotNull Version version)
+    {
+        Validate.notNull(version, "Version cannot be null.");
+
+        if(version == UNKNOWN)
+        {
+            Messenger.error("Provided version is UNKNOWN. Some features may not work correctly.");
+        }
+        
+        if(this == UNKNOWN)
+        {
+            Messenger.error("Server version is UNKNOWN. Some features may not work correctly.");
+            
+            return true;
+        }
         
         return value > version.value;
     }
@@ -93,10 +110,21 @@ public enum Version implements Comparable<Version>
      * @throws IllegalArgumentException if version is null
      * @throws IllegalArgumentException if this version or the given version, is the version UNKNOWN
      */
-    public boolean isNewerOrSameThan(@NotNull Version version) {
+    public boolean isNewerOrSameThan(@NotNull Version version)
+    {
         Validate.notNull(version, "Version cannot be null");
-        Validate.isTrue(this != UNKNOWN, "Cannot check, if version UNKNOWN is newer or same");
-        Validate.isTrue(version != UNKNOWN, "Cannot check, if version UNKNOWN is newer or same");
+        
+        if(version == UNKNOWN)
+        {
+            Messenger.error("Provided version is UNKNOWN. Some features may not work correctly.");
+        }
+    
+        if(this == UNKNOWN)
+        {
+            Messenger.error("Server version is UNKNOWN. Some features may not work correctly.");
+        
+            return true;
+        }
         
         return value >= version.value;
     }
@@ -109,10 +137,21 @@ public enum Version implements Comparable<Version>
      * @throws IllegalArgumentException if version is null
      * @throws IllegalArgumentException if this version or the given version, is the version UNKNOWN
      */
-    public boolean isOlderThan(@NotNull Version version) {
+    public boolean isOlderThan(@NotNull Version version)
+    {
         Validate.notNull(version, "Version cannot be null");
-        Validate.isTrue(this != UNKNOWN, "Cannot check, if version UNKNOWN is older");
-        Validate.isTrue(version != UNKNOWN, "Cannot check, if version UNKNOWN is older");
+    
+        if(version == UNKNOWN)
+        {
+            Messenger.error("Provided version is UNKNOWN. Some features may not work correctly.");
+        }
+    
+        if(this == UNKNOWN)
+        {
+            Messenger.error("Server version is UNKNOWN. Some features may not work correctly.");
+        
+            return true;
+        }
         
         return value < version.value;
     }
@@ -125,10 +164,21 @@ public enum Version implements Comparable<Version>
      * @throws IllegalArgumentException if version is null
      * @throws IllegalArgumentException if this version or the given version, is the version UNKNOWN
      */
-    public boolean isOlderOrSameThan(@NotNull Version version) {
+    public boolean isOlderOrSameThan(@NotNull Version version)
+    {
         Validate.notNull(version, "Version cannot be null");
-        Validate.isTrue(this != UNKNOWN, "Cannot check, if version UNKNOWN is older or same");
-        Validate.isTrue(version != UNKNOWN, "Cannot check, if version UNKNOWN is older or same");
+        
+        if(version == UNKNOWN)
+        {
+            Messenger.error("Provided version is UNKNOWN. Some features may not work correctly.");
+        }
+    
+        if(this == UNKNOWN)
+        {
+            Messenger.error("Server version is UNKNOWN. Some features may not work correctly.");
+        
+            return true;
+        }
         
         return value <= version.value;
     }

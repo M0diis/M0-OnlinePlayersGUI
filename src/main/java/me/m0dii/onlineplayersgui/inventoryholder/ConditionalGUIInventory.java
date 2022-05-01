@@ -2,13 +2,9 @@ package me.m0dii.onlineplayersgui.inventoryholder;
 
 import me.m0dii.onlineplayersgui.CustomItem;
 import me.m0dii.onlineplayersgui.OnlineGUI;
-import me.m0dii.onlineplayersgui.utils.ConditionalConfig;
-import me.m0dii.onlineplayersgui.utils.Messenger;
-import me.m0dii.onlineplayersgui.utils.Utils;
-import me.m0dii.onlineplayersgui.utils.Version;
+import me.m0dii.onlineplayersgui.utils.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.Inventory;
@@ -33,15 +29,12 @@ public class ConditionalGUIInventory implements InventoryHolder, CustomGUI
     private final String condition;
     
     private final ConditionalConfig cfg;
-    private final FileConfiguration fileCfg;
     
-    public ConditionalGUIInventory(OnlineGUI plugin, String name, int page, FileConfiguration cfg)
+    public ConditionalGUIInventory(OnlineGUI plugin, String name, int page, ConditionalConfig cfg)
     {
-        this.cfg = new ConditionalConfig(plugin, cfg);
+        this.size = adjustSize();
         
-        this.size = this.adjustSize();
-        
-        this.fileCfg = cfg;
+        this.cfg = cfg;
         
         this.name = name;
         this.page = page;
@@ -67,34 +60,25 @@ public class ConditionalGUIInventory implements InventoryHolder, CustomGUI
         
         if(type.equals(cfg.getDisplay().getType()))
         {
-            SkullMeta sm = (SkullMeta)clicked.getItemMeta();
-    
-            Player skullOwner = sm.getOwningPlayer() != null ? sm.getOwningPlayer().getPlayer() : null;
+            Player skullOwner = VersionUtils.getSkullOwner(clicked);
     
             if(skullOwner == null)
             {
-                String owner = sm.getOwner();
-                
-                if(owner != null)
-                    skullOwner = Bukkit.getPlayer(owner);
+                return;
             }
+            
+            List<String> cmds = new ArrayList<>();
     
-            if(skullOwner != null)
-            {
-                List<String> cmds = new ArrayList<>();
-        
-                if(clickType.equals(ClickType.LEFT))
-                    cmds = this.cfg.getLeftClickCmds();
+            if(clickType.equals(ClickType.LEFT))
+                cmds = this.cfg.getLeftClickCmds();
     
-                if(clickType.equals(ClickType.MIDDLE))
-                    cmds = this.cfg.getMiddleClickCmds();
-        
-                if(clickType.equals(ClickType.RIGHT))
-                    cmds = this.cfg.getRightClickCmds();
-        
-                for(String cmd : cmds)
-                    Utils.sendCommand(clickee, skullOwner, cmd);
-            }
+            if(clickType.equals(ClickType.MIDDLE))
+                cmds = this.cfg.getMiddleClickCmds();
+    
+            if(clickType.equals(ClickType.RIGHT))
+                cmds = this.cfg.getRightClickCmds();
+    
+            cmds.forEach(cmd -> Utils.sendCommand(clickee, skullOwner, cmd));
         }
     
         if(type.equals(this.cfg.getPrevPageMat()) ||
@@ -107,7 +91,7 @@ public class ConditionalGUIInventory implements InventoryHolder, CustomGUI
 
             try
             {
-                ConditionalGUIInventory newinv = new ConditionalGUIInventory(this.plugin, this.name, nextPage, fileCfg);
+                ConditionalGUIInventory newinv = new ConditionalGUIInventory(this.plugin, this.name, nextPage, cfg);
                 
                 if(newinv.hasPlayers())
                     clickee.openInventory(newinv.getInventory());
@@ -137,9 +121,6 @@ public class ConditionalGUIInventory implements InventoryHolder, CustomGUI
             cicmds = c.getRCC();
 
         cicmds.forEach(cmd -> Utils.sendCommand(clickee, clickee, cmd));
-
-        if(cicmds.contains("[CLOSE]"))
-            clickee.closeInventory();
     }
     
     public void refresh(Player p)
@@ -185,16 +166,16 @@ public class ConditionalGUIInventory implements InventoryHolder, CustomGUI
     @NotNull
     private List<Player> getByPage(int page)
     {
-        String permission = cfg.isPermissionRequired() ? cfg.getREQUIRED_PERMISSION() : null;
+        String permission = cfg.isPermissionRequired() ? cfg.getRequiredPermission() : null;
+        String cond = condition.isEmpty() ? null : condition;
         
-        List<Player> online = plugin.getGuiUtils().getOnline(permission, condition);
+        List<Player> online = plugin.getGuiUtils().getOnline(permission, cond);
         
         List<Player> byPage = new ArrayList<>();
     
         int availableSlots = this.size - 9;
     
-        for(Map.Entry<Integer, CustomItem> entry : cfg.getCustomItems()
-                                                    .entrySet())
+        for(Map.Entry<Integer, CustomItem> entry : cfg.getCustomItems().entrySet())
         {
             if(entry.getKey() >= this.size - 9)
             {
@@ -226,33 +207,7 @@ public class ConditionalGUIInventory implements InventoryHolder, CustomGUI
         
         for(Player player : byPage)
         {
-            ItemStack head = new ItemStack(Material.PLAYER_HEAD);
-            
-            ItemMeta meta = head.getItemMeta();
-        
-            List<String> lore = cfg.getHeadLore().stream()
-                    .map(str -> Utils.setPlaceholders(str, player))
-                    .collect(Collectors.toList());
-    
-            meta.setDisplayName(Utils.setPlaceholders(this.cfg.getHeadDisplay(), player));
-        
-            meta.setLore(lore);
-            
-            if(meta instanceof SkullMeta)
-            {
-                SkullMeta sm = (SkullMeta)meta;
-        
-                if(Version.getServerVersion(Bukkit.getServer()).isNewerThan(Version.v1_12_R1))
-                {
-                    sm.setOwningPlayer(player);
-                }
-                else
-                {
-                    sm.setOwner(player.getName());
-                }
-        
-                head.setItemMeta(sm);
-            }
+            ItemStack head = VersionUtils.getSkull(player, cfg.getHeadLore(), cfg.getHeadText());
     
             for(int i = 0; i < inv.getSize(); i++)
             {
@@ -306,9 +261,7 @@ public class ConditionalGUIInventory implements InventoryHolder, CustomGUI
                 .collect(Collectors.toList());
         
         nextButtonMeta.setLore(nextLore);
-        
         nextButtonMeta.setDisplayName(Utils.format(cfg.getNextPageName()));
-        
         nextButton.setItemMeta(nextButtonMeta);
         
         inv.setItem(cfg.getNextPageSlot(), nextButton);
@@ -324,7 +277,6 @@ public class ConditionalGUIInventory implements InventoryHolder, CustomGUI
                 .collect(Collectors.toList());
         
         prevButtonMeta.setLore(prevLore);
-        
         prevButtonMeta.setDisplayName(Utils.format(cfg.getPrevPageName()));
         prevButton.setItemMeta(prevButtonMeta);
         

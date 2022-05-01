@@ -1,92 +1,74 @@
 package me.m0dii.onlineplayersgui.utils;
 
+import me.m0dii.onlineplayersgui.OnlineGUI;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
-import java.lang.reflect.Constructor;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class VersionUtils
 {
-    private static String OBC_PREFIX;
-    
-    static
+    public static Player getSkullOwner(ItemStack item)
     {
-        try {
-            OBC_PREFIX = Bukkit.getServer().getClass().getPackage().getName();
+        SkullMeta sm = (SkullMeta)item.getItemMeta();
+    
+        Player skullOwner = null;
+    
+        if(Version.serverIsNewerThan(Version.v1_12_R1))
+        {
+            skullOwner = sm.getOwningPlayer() != null ? sm.getOwningPlayer().getPlayer() : null;
         }
-        catch (Exception ex) {
-            ex.printStackTrace();
+        else
+        {
+            String owner = sm.getOwner();
+        
+            if(owner != null)
+            {
+                skullOwner = Bukkit.getPlayer(owner);
+            }
         }
+    
+        if(skullOwner == null)
+        {
+            skullOwner = Bukkit.getPlayer(Utils.clearFormat(item.getItemMeta().getDisplayName()));
+        }
+        
+        return skullOwner;
     }
     
-    public static ItemStack getItemStack(final String item)
+    public static ItemStack getSkull(Player player, List<String> lore, String name)
     {
-        if (item.contains(":"))
+        ItemStack head = OnlineGUI.getInstance().getCfg().getDisplay();
+    
+        ItemMeta meta = head.getItemMeta();
+    
+        lore = lore.stream()
+                .map(str -> Utils.setPlaceholders(str, player))
+                .collect(Collectors.toList());
+        
+        meta.setDisplayName(Utils.setPlaceholders(name, player));
+        meta.setLore(lore);
+    
+        if(meta instanceof SkullMeta)
         {
-            final String[] split = item.split(":");
-            
-            if (split[0].matches("\\d+"))
+            SkullMeta sm = (SkullMeta)meta;
+        
+            if(Version.getServerVersion(Bukkit.getServer()).isNewerThan(Version.v1_12_R1))
             {
-                String ID = split[0];
-                short metadata = 0;
-                
-                try
-                {
-                    metadata = Short.parseShort(split[1]);
-                }
-                catch (NumberFormatException ignored) { }
-                
-                try
-                {
-                    final Constructor<?> constructor = Class.forName(OBC_PREFIX + ".inventory.CraftItemStack")
-                            .getDeclaredConstructor(int.class, int.class, short.class,
-                                    ItemMeta.class);
-                    constructor.setAccessible(true);
-                    
-                    return (ItemStack) constructor.newInstance(Integer.parseInt(ID), 1, metadata, null);
-                }
-                catch (Exception ex)
-                {
-                    Messenger.debug("Failed to get " + OBC_PREFIX + ".inventory.CraftItemStack Constructor");
-                    
-                    Material m = Material.getMaterial(split[0]);
-                    
-                    try
-                    {
-                        if(m == null)
-                        {
-                            return new ItemStack(Material.getMaterial(split[0]), 1, metadata);
-                        }
-                    }
-                    catch (NumberFormatException ignored) { }
-                    
-                    return new ItemStack(Material.getMaterial(split[0]), 1, metadata);
-                }
+                sm.setOwningPlayer(player);
             }
+            else
+            {
+                sm.setOwner(player.getName());
+            }
+        
+            head.setItemMeta(sm);
         }
         
-        if (item.matches("\\d+"))
-        {
-            try
-            {
-                final Constructor<?> constructor = Class.forName(OBC_PREFIX + ".inventory.CraftItemStack")
-                        .getDeclaredConstructor(int.class, int.class, short.class, ItemMeta.class);
-                
-                constructor.setAccessible(true);
-                
-                return (ItemStack) constructor.newInstance(Integer.parseInt(item), 1, (short) 0, null);
-            }
-            catch (Exception ex)
-            {
-                Messenger.debug("Failed to get " + OBC_PREFIX + ".inventory.CraftItemStack Constructor");
-                
-                return new ItemStack(Material.getMaterial(item));
-            }
-        }
-        
-        return new ItemStack(Material.getMaterial(item));
+        return head;
     }
 }

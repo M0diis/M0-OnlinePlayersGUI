@@ -4,6 +4,7 @@ import me.m0dii.onlineplayersgui.ConditionalGUIs;
 import me.m0dii.onlineplayersgui.inventoryholder.OnlineGUIInventory;
 import me.m0dii.onlineplayersgui.OnlineGUI;
 import me.m0dii.onlineplayersgui.utils.Config;
+import me.m0dii.onlineplayersgui.utils.Utils;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -75,6 +76,12 @@ public class OnlineGUICommand implements CommandExecutor, TabCompleter
                     p.sendMessage(this.config.getToggleMsg());
                 }
                 else p.sendMessage(this.config.getNoPermMsg());
+            }
+            
+            if(alias(args[0], "version"))
+            {
+                p.sendMessage(Utils.format(
+                        "&aYou are using M0-OnlinePlayersGUI version &2" + this.plugin.getDescription().getVersion()) + ".");
             }
         }
         

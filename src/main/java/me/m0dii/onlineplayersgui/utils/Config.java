@@ -379,7 +379,7 @@ public class Config
         return configReloadedMsg;
     }
     
-    public String getHeadDisplay()
+    public String getHeadText()
     {
         return playerHeadName;
     }

@@ -281,7 +281,7 @@ public class ConditionalConfig
         return prevPageName;
     }
     
-    public String getHeadDisplay()
+    public String getHeadText()
     {
         return headName;
     }
@@ -306,7 +306,7 @@ public class ConditionalConfig
         return permissionRequired;
     }
     
-    public String getREQUIRED_PERMISSION()
+    public String getRequiredPermission()
     {
         return permission;
     }

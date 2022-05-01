@@ -58,8 +58,8 @@ public class Utils
         
         cmd = setPlaceholders(cmd, placeholderHolder);
         
-        if(cmd.startsWith("[CLOSE]"))
-            return;
+        if(cmd.startsWith("[CLOSE]") || cmd.equalsIgnoreCase("[CLOSE]"))
+            sender.closeInventory();
         
         if(cmd.startsWith("["))
         {

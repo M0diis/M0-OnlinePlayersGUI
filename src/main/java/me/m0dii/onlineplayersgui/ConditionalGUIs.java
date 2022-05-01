@@ -1,6 +1,7 @@
 package me.m0dii.onlineplayersgui;
 
 import me.m0dii.onlineplayersgui.inventoryholder.ConditionalGUIInventory;
+import me.m0dii.onlineplayersgui.utils.ConditionalConfig;
 import me.m0dii.onlineplayersgui.utils.Utils;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -73,7 +74,7 @@ public class ConditionalGUIs
         YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
     
         ConditionalGUIInventory cgi = new ConditionalGUIInventory(plugin,
-                Utils.format(cfg.getString("GUI.Title")), 0, cfg);
+                Utils.format(cfg.getString("GUI.Title")), 0, new ConditionalConfig(plugin, cfg));
     
         cgi.setCustomItems(p);
     

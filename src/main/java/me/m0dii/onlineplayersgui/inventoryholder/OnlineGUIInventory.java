@@ -4,7 +4,7 @@ import me.m0dii.onlineplayersgui.CustomItem;
 import me.m0dii.onlineplayersgui.OnlineGUI;
 import me.m0dii.onlineplayersgui.utils.Config;
 import me.m0dii.onlineplayersgui.utils.Utils;
-import me.m0dii.onlineplayersgui.utils.Version;
+import me.m0dii.onlineplayersgui.utils.VersionUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -12,7 +12,6 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.SkullMeta;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -54,55 +53,25 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI
         
         if(clicked.getType().equals(cfg.getDisplay().getType()))
         {
-            SkullMeta sm = (SkullMeta)clicked.getItemMeta();
+            Player skullOwner = VersionUtils.getSkullOwner(clicked);
     
-            
-            Player skullOwner = null;
-            
-            if(Version.serverIsNewerThan(Version.v1_12_R1))
-            {
-                skullOwner = sm.getOwningPlayer() != null ? sm.getOwningPlayer().getPlayer() : null;
-            }
-            else
-            {
-                String owner = sm.getOwner();
-    
-                if(owner != null)
-                {
-                    skullOwner = Bukkit.getPlayer(owner);
-                }
-            }
-            
             if(skullOwner == null)
             {
-                skullOwner = Bukkit.getPlayer(Utils.clearFormat(clicked.getItemMeta().getDisplayName()));
+                return;
             }
             
-            if(skullOwner != null)
-            {
-                List<String> cmds = new ArrayList<>();
-                
-                if(clickType.equals(ClickType.LEFT))
-                    cmds = this.cfg.getLeftClickCmds();
-    
-                if(clickType.equals(ClickType.MIDDLE))
-                    cmds = this.cfg.getMiddleClickCmds();
-    
-                if(clickType.equals(ClickType.RIGHT))
-                    cmds = this.cfg.getRightClickCmds();
-                
-                for(String cmd : cmds)
-                    Utils.sendCommand(clickee, skullOwner, cmd);
-            }
-    
-            if(clickType.equals(ClickType.LEFT) && this.cfg.getLeftClickCmds().contains("[CLOSE]"))
-                clickee.closeInventory();
-    
-            if(clickType.equals(ClickType.MIDDLE) && this.cfg.getMiddleClickCmds().contains("[CLOSE]"))
-                clickee.closeInventory();
+            List<String> cmds = new ArrayList<>();
             
-            if(clickType.equals(ClickType.RIGHT) && this.cfg.getRightClickCmds().contains("[CLOSE]"))
-                clickee.closeInventory();
+            if(clickType.equals(ClickType.LEFT))
+                cmds = this.cfg.getLeftClickCmds();
+
+            if(clickType.equals(ClickType.MIDDLE))
+                cmds = this.cfg.getMiddleClickCmds();
+
+            if(clickType.equals(ClickType.RIGHT))
+                cmds = this.cfg.getRightClickCmds();
+    
+            cmds.forEach(cmd -> Utils.sendCommand(clickee, skullOwner, cmd));
         }
     
         if(clicked.getType().equals(this.cfg.getPrevPageMat()) ||
@@ -145,9 +114,6 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI
             cicmds = c.getRCC();
     
         cicmds.forEach(cmd -> Utils.sendCommand(clickee, clickee, cmd));
-    
-        if(cicmds.contains("[CLOSE]"))
-            clickee.closeInventory();
     }
     
     private CustomItem getCustomItemBySlot(int slot)
@@ -208,33 +174,7 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI
         
         for(Player player : byPage)
         {
-            ItemStack head = new ItemStack(cfg.getDisplay());
-    
-            ItemMeta meta = head.getItemMeta();
-        
-            List<String> lore = cfg.getHeadLore()
-                    .stream()
-                    .map(str -> Utils.setPlaceholders(str, player))
-                    .collect(Collectors.toList());
-        
-            meta.setDisplayName(Utils.setPlaceholders(cfg.getHeadDisplay(), player));
-            meta.setLore(lore);
-            
-            if(meta instanceof SkullMeta)
-            {
-                SkullMeta sm = (SkullMeta)meta;
-    
-                if(Version.getServerVersion(Bukkit.getServer()).isNewerThan(Version.v1_12_R1))
-                {
-                    sm.setOwningPlayer(player);
-                }
-                else
-                {
-                    sm.setOwner(player.getName());
-                }
-                
-                head.setItemMeta(sm);
-            }
+            ItemStack head = VersionUtils.getSkull(player, cfg.getHeadLore(), cfg.getHeadText());
             
             for(int i = 0; i < inv.getSize(); i++)
             {
@@ -266,9 +206,7 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI
         
         int availableSlots = this.size - 9;
     
-        for(Map.Entry<Integer, CustomItem> entry : cfg
-                .getCustomItems()
-                .entrySet())
+        for(Map.Entry<Integer, CustomItem> entry : cfg.getCustomItems().entrySet())
         {
             if(entry.getKey() >= this.size - 9)
             {
