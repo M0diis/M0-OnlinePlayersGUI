@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull;
 
 public enum Version implements Comparable<Version>
 {
+    v1_18_R2(17),
     v1_18_R1(16),
     v1_17_R1(15),
     v1_16_R3(14),
@@ -51,6 +52,8 @@ public enum Version implements Comparable<Version>
         String packageName = server.getClass().getPackage().getName();
         String version = packageName.substring(packageName.lastIndexOf('.') + 1);
         
+        Messenger.debug("Package name: " + packageName + ", using server version: " + version);
+        
         try
         {
             return valueOf(version.trim());
@@ -89,12 +92,12 @@ public enum Version implements Comparable<Version>
 
         if(version == UNKNOWN)
         {
-            Messenger.error("Provided version is UNKNOWN. Some features may not work correctly.");
+            Messenger.warn("Provided version is UNKNOWN. Some features may not work correctly.");
         }
         
         if(this == UNKNOWN)
         {
-            Messenger.error("Server version is UNKNOWN. Some features may not work correctly.");
+            Messenger.warn("Server version is UNKNOWN. Some features may not work correctly.");
             
             return true;
         }

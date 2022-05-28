@@ -5,6 +5,7 @@ plugins {
 
 group 'me.m0dii'
 version '5.1.0-j8-beta'
+
 sourceCompatibility = '8'
 targetCompatibility = '8'
 
@@ -12,6 +13,14 @@ shadowJar {
     relocate 'org.bstats', 'me.m0dii.onlineplayersgui'
 
     archiveFileName = "M0-OnlinePlayersGUI-${version}.jar"
+}
+
+processResources {
+    eachFile {
+        if (file.name.endsWith(".yml")) {
+            expand version: version
+        }
+    }
 }
 
 repositories {
@@ -50,7 +59,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.bstats:bstats-bukkit:2.2.1'
+    implementation 'org.bstats:bstats-bukkit:3.0.0'
 
     compileOnly 'com.destroystokyo.paper:paper-api:1.16.5-R0.1-SNAPSHOT'
     compileOnly 'org.spigotmc:spigot-api:1.16.5-R0.1-SNAPSHOT'

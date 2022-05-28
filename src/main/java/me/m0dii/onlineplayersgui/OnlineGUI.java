@@ -164,8 +164,7 @@ public class OnlineGUI extends JavaPlugin
     {
         new UpdateChecker(this, 86813).getVersion(ver ->
         {
-            if (!this.getDescription().getVersion().equalsIgnoreCase(
-                    ver.replace("v", "")))
+            if (!this.getDescription().getVersion().equalsIgnoreCase(ver.replace("v", "")))
             {
                 Messenger.info("You are running an outdated version of M0-OnlinePlayersGUI.");
                 Messenger.info("You can download the latest version on Spigot:");
