@@ -12,177 +12,166 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class OnlineGUIInventory implements InventoryHolder, CustomGUI
-{
+public class OnlineGUIInventory implements InventoryHolder, CustomGUI {
     private Inventory inv;
     private final String name;
     private final int size, page;
     private final OnlineGUI plugin;
     private final Config cfg;
 
-    public OnlineGUIInventory(OnlineGUI plugin, String name, int page, Player p)
-    {
+    public OnlineGUIInventory(OnlineGUI plugin, String name, int page, Player p) {
         this.name = name;
         this.page = page;
-        
+
         this.plugin = plugin;
         this.cfg = plugin.getCfg();
-    
+
         this.size = this.adjustSize(cfg);
-    
+
         this.inv = Bukkit.createInventory(this, this.size, name);
-    
+
         setCustomItems(p);
-        
+
         initByPage(page);
     }
-    
-    public void execute(Player clickee, ItemStack clicked, ClickType clickType, int slot)
-    {
-        if(clicked == null)
-        {
+
+    public void execute(Player clickee, ItemStack clicked, ClickType clickType, int slot) {
+        if (clicked == null) {
             return;
         }
-        
-        if(clicked.getType().equals(cfg.getDisplay().getType()))
-        {
+
+        if (clicked.getType().equals(cfg.getDisplay().getType())) {
             Player skullOwner = VersionUtils.getSkullOwner(clicked);
-    
-            if(skullOwner == null)
-            {
+
+            if (skullOwner == null) {
                 return;
             }
-            
+
             List<String> cmds = new ArrayList<>();
-            
-            if(clickType.equals(ClickType.LEFT))
+
+            if (clickType.equals(ClickType.LEFT)) {
                 cmds = this.cfg.getLeftClickCmds();
+            }
 
-            if(clickType.equals(ClickType.MIDDLE))
+            if (clickType.equals(ClickType.MIDDLE)) {
                 cmds = this.cfg.getMiddleClickCmds();
+            }
 
-            if(clickType.equals(ClickType.RIGHT))
+            if (clickType.equals(ClickType.RIGHT)) {
                 cmds = this.cfg.getRightClickCmds();
-    
+            }
+
             cmds.forEach(cmd -> Utils.sendCommand(clickee, skullOwner, cmd));
         }
-    
-        if(clicked.getType().equals(this.cfg.getPrevPageMat()) ||
-           clicked.getType().equals(this.cfg.getNextPageMat()))
-        {
-            int nextPage = page;
-            
-            if(cfg.getNextPageSlot() == slot) nextPage = page + 1;
-            else if(cfg.getPrevPageSlot() == slot) nextPage = page - 1;
 
-            try
-            {
-                OnlineGUIInventory newinv = new OnlineGUIInventory(this.plugin, this.name, nextPage, clickee);
-                
-                if(newinv.hasPlayers())
-                    clickee.openInventory(newinv.getInventory());
+        if (clicked.getType().equals(this.cfg.getPrevPageMat()) || clicked.getType().equals(this.cfg.getNextPageMat())) {
+            int nextPage = page;
+
+            if (cfg.getNextPageSlot() == slot) {
+                nextPage = page + 1;
             }
-            catch(IndexOutOfBoundsException ex)
-            {
+            else if (cfg.getPrevPageSlot() == slot) {
+                nextPage = page - 1;
+            }
+
+            try {
+                OnlineGUIInventory newinv = new OnlineGUIInventory(this.plugin, this.name, nextPage, clickee);
+
+                if (newinv.hasPlayers()) {
+                    clickee.openInventory(newinv.getInventory());
+                }
+            }
+            catch (IndexOutOfBoundsException ex) {
                 // TODO
             }
         }
-    
+
         CustomItem c = getCustomItemBySlot(slot);
-    
-        if(c == null)
-        {
+
+        if (c == null) {
             return;
         }
-    
+
         List<String> cicmds = new ArrayList<>();
-    
-        if(clickType.equals(ClickType.LEFT))
+
+        if (clickType.equals(ClickType.LEFT)) {
             cicmds = c.getLCC();
-    
-        if(clickType.equals(ClickType.MIDDLE))
+        }
+
+        if (clickType.equals(ClickType.MIDDLE)) {
             cicmds = c.getMCC();
-    
-        if(clickType.equals(ClickType.RIGHT))
+        }
+
+        if (clickType.equals(ClickType.RIGHT)) {
             cicmds = c.getRCC();
-    
+        }
+
         cicmds.forEach(cmd -> Utils.sendCommand(clickee, clickee, cmd));
     }
-    
-    private CustomItem getCustomItemBySlot(int slot)
-    {
+
+    private CustomItem getCustomItemBySlot(int slot) {
         return cfg.getCustomItems().getOrDefault(slot, null);
     }
-    
-    public void setCustomItems(Player p)
-    {
+
+    public void setCustomItems(Player p) {
         plugin.getGuiUtils().setCustomItems(inv, p, cfg.getCustomItems());
     }
-    
-    private int adjustSize(Config cfg)
-    {
+
+    private int adjustSize(Config cfg) {
         int size = cfg.getGuiSize();
-        
-        if(size % 9 == 0)
+
+        if (size % 9 == 0) {
             return size;
-        else if (size < 18)
+        }
+        else if (size < 18) {
             return 18;
-        else if (size > 54)
+        }
+        else if (size > 54) {
             return 54;
-        
+        }
+
         return 54;
     }
-    
+
     @Override
-    public @NotNull Inventory getInventory()
-    {
+    public Inventory getInventory() {
         return inv;
     }
-    
-    public void refresh(Player p)
-    {
+
+    public void refresh(Player p) {
         this.inv = Bukkit.createInventory(this, this.size, this.name);
-        
+
         initByPage(this.page);
         setCustomItems(p);
-        
+
         p.openInventory(this.inv);
     }
-    
-    public boolean hasPlayers()
-    {
+
+    public boolean hasPlayers() {
         return getByPage(page).size() != 0;
     }
-    
-    public boolean hasPlayers(int offset)
-    {
+
+    public boolean hasPlayers(int offset) {
         return getByPage(page + offset).size() != 0;
     }
-    
-    private void initByPage(int page)
-    {
+
+    private void initByPage(int page) {
         setButtons();
-        
+
         List<Player> byPage = getByPage(page);
-        
-        for(Player player : byPage)
-        {
+
+        for (Player player : byPage) {
             ItemStack head = VersionUtils.getSkull(player, cfg.getHeadLore(), cfg.getHeadText());
-            
-            for(int i = 0; i < inv.getSize(); i++)
-            {
-                if(inv.getItem(i) == null)
-                {
-                    if(cfg.getNextPageSlot() != i &&
-                       cfg.getPrevPageSlot() != i)
-                    {
+
+            for (int i = 0; i < inv.getSize(); i++) {
+                if (inv.getItem(i) == null) {
+                    if (cfg.getNextPageSlot() != i && cfg.getPrevPageSlot() != i) {
                         inv.setItem(i, head);
                         break;
                     }
@@ -190,92 +179,89 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI
             }
         }
     }
-    
-    @NotNull
-    private List<Player> getByPage(int page)
-    {
-        String permission = cfg.isPermissionRequired() ? cfg.getRequiredPerm()
-                : null;
-    
-        String condition = cfg.isConditionRequired() ? cfg.getCondition()
-                : null;
-        
+
+    private List<Player> getByPage(int page) {
+        String permission = cfg.isPermissionRequired() ? cfg.getRequiredPerm() : null;
+
+        String condition = cfg.isConditionRequired() ? cfg.getCondition() : null;
+
         List<Player> online = plugin.getGuiUtils().getOnline(permission, condition);
-        
+
         List<Player> byPage = new ArrayList<>();
-        
+
         int availableSlots = this.size - 9;
-    
-        for(Map.Entry<Integer, CustomItem> entry : cfg.getCustomItems().entrySet())
-        {
-            if(entry.getKey() >= this.size - 9)
-            {
+
+        for (Map.Entry<Integer, CustomItem> entry : cfg.getCustomItems().entrySet()) {
+            if (entry.getKey() >= this.size - 9) {
                 continue;
             }
-            
+
             availableSlots--;
         }
-        
-        if(cfg.getNextPageSlot() < this.size - 9)
+
+        if (cfg.getNextPageSlot() < this.size - 9) {
             availableSlots--;
-        
-        if(cfg.getPrevPageSlot() < this.size - 9)
+        }
+
+        if (cfg.getPrevPageSlot() < this.size - 9) {
             availableSlots--;
-    
+        }
+
         int lowBound = availableSlots * page;
         int highBound = availableSlots * (page == 0 ? 1 : page + 1);
-        
-        for(int i = lowBound; i < highBound; i++)
-            if(lowBound < online.size() && i < online.size())
+
+        for (int i = lowBound; i < highBound; i++) {
+            if (lowBound < online.size() && i < online.size()) {
                 byPage.add(online.get(i));
- 
+            }
+        }
+
         return byPage;
     }
-    
-    private void setButtons()
-    {
+
+    private void setButtons() {
         boolean show = cfg.areButtonsAlwaysOn();
-        
-        if(show)
+
+        if (show) {
             setNextButton();
-        else if(hasPlayers(1))
+        }
+        else if (hasPlayers(1)) {
             setNextButton();
-    
-        if(show)
+        }
+
+        if (show) {
             setPreviousButton();
-        else if(page != 0)
+        }
+        else if (page != 0) {
             setPreviousButton();
+        }
     }
-    
-    private void setNextButton()
-    {
+
+    private void setNextButton() {
         ItemStack nextButton = new ItemStack(cfg.getNextPageMat());
         ItemMeta nextButtonMeta = nextButton.getItemMeta();
-    
-        List<String> nextLore = cfg.getNextPageLore().stream()
-                .map(str -> Utils.setPlaceholders(str, null))
-                .collect(Collectors.toList());
-    
+
+        List<String> nextLore =
+                cfg.getNextPageLore().stream().map(str -> Utils.setPlaceholders(str, null)).collect(Collectors.toList());
+
         nextButtonMeta.setLore(nextLore);
         nextButtonMeta.setDisplayName(cfg.getNextPageName());
         nextButton.setItemMeta(nextButtonMeta);
-    
+
         inv.setItem(cfg.getNextPageSlot(), nextButton);
     }
-    
-    private void setPreviousButton()
-    {
+
+    private void setPreviousButton() {
         ItemStack prevButton = new ItemStack(cfg.getPrevPageMat());
         ItemMeta prevButtonMeta = prevButton.getItemMeta();
-        
-        List<String> prevLore = cfg.getPrevPageLore().stream()
-                .map(str -> Utils.setPlaceholders(str, null))
-                .collect(Collectors.toList());
-    
+
+        List<String> prevLore =
+                cfg.getPrevPageLore().stream().map(str -> Utils.setPlaceholders(str, null)).collect(Collectors.toList());
+
         prevButtonMeta.setLore(prevLore);
         prevButtonMeta.setDisplayName(Utils.format(cfg.getPrevPageName()));
         prevButton.setItemMeta(prevButtonMeta);
-    
+
         inv.setItem(cfg.getPrevPageSlot(), prevButton);
     }
 }
