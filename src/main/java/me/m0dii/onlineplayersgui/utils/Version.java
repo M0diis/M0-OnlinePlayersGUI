@@ -1,10 +1,13 @@
 package me.m0dii.onlineplayersgui.utils;
 
-import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
 
 public enum Version implements Comparable<Version> {
+    v1_21_R1(21),
+    v1_20_R1(20),
+    v1_19_R2(19),
+    v1_19_R1(18),
     v1_18_R2(17),
     v1_18_R1(16),
     v1_17_R1(15),
@@ -41,8 +44,6 @@ public enum Version implements Comparable<Version> {
      * @throws IllegalArgumentException if server is null
      */
     public static Version getServerVersion(Server server) {
-        Validate.notNull(server, "Server cannot be null");
-
         String packageName = server.getClass().getPackage().getName();
         String version = packageName.substring(packageName.lastIndexOf('.') + 1);
 
