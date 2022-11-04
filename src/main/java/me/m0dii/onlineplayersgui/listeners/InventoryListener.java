@@ -1,7 +1,7 @@
 package me.m0dii.onlineplayersgui.listeners;
 
-import me.m0dii.onlineplayersgui.inventoryholder.CustomGUI;
 import me.m0dii.onlineplayersgui.OnlineGUI;
+import me.m0dii.onlineplayersgui.inventoryholder.CustomGUI;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
@@ -18,88 +18,83 @@ import org.bukkit.inventory.Inventory;
 import java.util.ArrayList;
 import java.util.List;
 
-public class InventoryListener implements Listener
-{
+public class InventoryListener implements Listener {
     private final OnlineGUI plugin;
-    
-    public InventoryListener(OnlineGUI plugin)
-    {
+
+    private final List<HumanEntity> viewers;
+
+    public InventoryListener(OnlineGUI plugin) {
         this.plugin = plugin;
-        
-        this.guiViewers = new ArrayList<>();
+
+        this.viewers = new ArrayList<>();
     }
-    
-    private final List<HumanEntity> guiViewers;
-    
+
     @EventHandler
-    public void addOnOpen(InventoryOpenEvent e)
-    {
-        if(e.getInventory().getHolder() instanceof CustomGUI)
-            this.guiViewers.add(e.getPlayer());
+    public void addOnOpen(InventoryOpenEvent e) {
+        if (e.getInventory().getHolder() instanceof CustomGUI) {
+            viewers.add(e.getPlayer());
+        }
     }
-    
+
     @EventHandler
-    public void removeOnClose(InventoryCloseEvent e)
-    {
-        if(e.getInventory().getHolder() instanceof CustomGUI)
-            this.guiViewers.remove(e.getPlayer());
+    public void removeOnClose(InventoryCloseEvent e) {
+        if (e.getInventory().getHolder() instanceof CustomGUI) {
+            viewers.remove(e.getPlayer());
+        }
     }
-    
+
     @EventHandler
-    public void onInteract(InventoryMoveItemEvent e)
-    {
-        if(e.getSource() instanceof CustomGUI)
+    public void onInteract(InventoryMoveItemEvent e) {
+        if (e.getSource() instanceof CustomGUI) {
             e.setCancelled(true);
-        
-        if(e.getDestination() instanceof CustomGUI)
+        }
+
+        if (e.getDestination() instanceof CustomGUI) {
             e.setCancelled(true);
+        }
     }
-    
+
     @EventHandler
-    public void updateOnJoin(PlayerJoinEvent e)
-    {
-        if(this.plugin.getCfg().doUpdateOnJoin())
-        {
+    public void updateOnJoin(PlayerJoinEvent e) {
+        if (this.plugin.getCfg().doUpdateOnJoin()) {
             updateView();
         }
     }
-    
+
     @EventHandler
-    public void updateOnLeave(PlayerQuitEvent e)
-    {
-        if(this.plugin.getCfg().doUpdateOnLeave())
-        {
+    public void updateOnLeave(PlayerQuitEvent e) {
+        if (this.plugin.getCfg().doUpdateOnLeave()) {
             updateView();
-            
-            guiViewers.remove(e.getPlayer());
+
+            viewers.remove(e.getPlayer());
         }
     }
-    
-    private void updateView()
-    {
-        Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () ->
-        {
-            for(HumanEntity p : guiViewers)
-            {
+
+    private void updateView() {
+        Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () -> {
+            for (HumanEntity p : viewers) {
                 Inventory inv = p.getOpenInventory().getTopInventory();
-    
-                if(inv.getHolder() instanceof CustomGUI cg)
-                    cg.refresh((Player)p);
+
+                if (inv.getHolder() instanceof CustomGUI) {
+                    ((CustomGUI) inv.getHolder()).refresh((Player) p);
+                }
             }
         });
     }
-    
+
     @EventHandler
-    public void onInventoryClick(InventoryClickEvent e)
-    {
+    public void onInventoryClick(InventoryClickEvent e) {
         Inventory inv = e.getClickedInventory();
-        
-        if(inv != null && inv.getHolder() instanceof CustomGUI cg)
-        {
+
+        if (inv != null && inv.getHolder() instanceof CustomGUI) {
             e.setCancelled(true);
-    
-            cg.execute((Player)e.getWhoClicked(), e.getCurrentItem(), e.getClick());
+
+            ((CustomGUI) inv.getHolder()).execute((Player) e.getWhoClicked(), e.getCurrentItem(), e.getClick(), e.getSlot());
+        }
+
+        if (e.getView().getTopInventory().getHolder() instanceof CustomGUI && e.getClick().isShiftClick()) {
+            e.setCancelled(true);
         }
     }
-    
+
 }

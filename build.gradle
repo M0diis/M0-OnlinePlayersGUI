@@ -4,13 +4,23 @@ plugins {
 }
 
 group 'me.m0dii'
-version '4.1.0'
-sourceCompatibility = '16'
+version '5.1.0-j8-beta'
+
+sourceCompatibility = '8'
+targetCompatibility = '8'
 
 shadowJar {
     relocate 'org.bstats', 'me.m0dii.onlineplayersgui'
 
     archiveFileName = "M0-OnlinePlayersGUI-${version}.jar"
+}
+
+processResources {
+    eachFile {
+        if (file.name.endsWith(".yml")) {
+            expand version: version
+        }
+    }
 }
 
 repositories {
@@ -32,15 +42,33 @@ repositories {
     maven {
         url = 'https://ci.ender.zone/plugin/repository/everything/'
     }
+
+    // EssentialsX releases
+    maven {
+        url = 'https://repo.essentialsx.net/releases/'
+    }
+
+    // EssentialsX Snapshots
+    maven {
+        url = 'https://repo.essentialsx.net/snapshots/'
+    }
+
+    // Latest release	net.essentialsx	EssentialsX	2.19.4
+    // Snapshots	    net.essentialsx	EssentialsX	2.20.0-SNAPSHOT
+    // Older releases	net.ess3	    EssentialsX	2.18.2
 }
 
 dependencies {
-    implementation 'org.bstats:bstats-bukkit:2.2.1'
+    implementation 'org.bstats:bstats-bukkit:3.0.0'
 
-    compileOnly 'com.destroystokyo.paper:paper-api:1.16.5-R0.1-SNAPSHOT'
+    //compileOnly 'com.destroystokyo.paper:paper-api:1.16.5-R0.1-SNAPSHOT'
     compileOnly 'org.spigotmc:spigot-api:1.16.5-R0.1-SNAPSHOT'
     compileOnly 'me.clip:placeholderapi:2.10.10'
+
+    // compileOnly 'net.essentialsx:EssentialsX:2.19.4'
     compileOnly 'net.ess3:EssentialsX:2.18.2'
+
+    implementation 'com.github.cryptomorin:XSeries:8.6.1'
 }
 
 compileJava.options.encoding = 'UTF-8'

@@ -23,7 +23,9 @@ condition:
   permission:
     required: false
     node: "permission.to.include.player"
-    
+
+player-display-material: 'PLAYER_HEAD'
+
 previous-button:
   material: ENCHANTED_BOOK
   name: '&cPrevious Page'
