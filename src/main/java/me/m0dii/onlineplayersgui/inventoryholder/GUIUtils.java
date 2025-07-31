@@ -13,7 +13,10 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class GUIUtils {
@@ -23,7 +26,7 @@ public class GUIUtils {
         this.plugin = plugin;
     }
 
-    public List<Player> getOnline(@Nullable String permission, @Nullable String condition) {
+    public List<Player> getOnline(@Nullable List<String> permissions, @Nullable String condition) {
         List<Player> online;
 
         List<Player> toggled = plugin.getHiddenPlayersToggled();
@@ -40,8 +43,10 @@ public class GUIUtils {
                     .collect(Collectors.toList());
         }
 
-        if (permission != null) {
-            online = online.stream().filter(p -> p.hasPermission(permission)).collect(Collectors.toList());
+        if (permissions != null && !permissions.isEmpty()) {
+            online = online.stream().filter(onlinePlayer -> permissions.stream()
+                            .anyMatch(onlinePlayer::hasPermission))
+                    .toList();
         }
 
         if (condition != null) {
@@ -101,7 +106,7 @@ public class GUIUtils {
                     final String leftStrPlaceholders = PlaceholderAPI.setPlaceholders(p, leftStr);
                     final String rightStrPlaceholders = PlaceholderAPI.setPlaceholders(p, rightStr);
 
-                    switch(op) {
+                    switch (op) {
                         case "=", "==", "eq", "equal_to", "equals" -> {
                             if (leftStrPlaceholders.equalsIgnoreCase(rightStrPlaceholders)) {
                                 filtered.add(p);

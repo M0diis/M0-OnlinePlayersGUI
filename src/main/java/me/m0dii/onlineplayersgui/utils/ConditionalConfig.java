@@ -32,7 +32,8 @@ public class ConditionalConfig {
     private int nextPageSlot, prevPageSlot;
 
     private boolean permissionRequired;
-    private String condition, requiredPermission;
+    private String condition;
+    private List<String> requiredPermissions;
 
     public ConditionalConfig(@NotNull FileConfiguration cfg) {
         this.cfg = cfg;
@@ -115,7 +116,12 @@ public class ConditionalConfig {
 
         permissionRequired = cfg.getBoolean("condition.permission.required");
         condition = cfg.getString("condition.placeholder");
-        requiredPermission = cfg.getString("condition.permission.node");
+
+        String requiredPermission = cfg.getString("condition.permission.node");
+        requiredPermissions = cfg.getStringList("condition.permission.nodes");
+        if (requiredPermission != null && !requiredPermission.isEmpty()) {
+            requiredPermissions.add(requiredPermission);
+        }
 
         setUpCustomItems();
     }

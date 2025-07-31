@@ -30,6 +30,11 @@ condition:
   permission:
     required: false
     node: "permission.to.include.player"
+    # Or you can specify a list of permissions. The player will be included
+    # if they have at least one of the permissions in the list.
+    # nodes:
+    # - "permission.to.include.player"
+    # - "another.permission.to.include.player"
 
 previous-button:
   material: ENCHANTED_BOOK

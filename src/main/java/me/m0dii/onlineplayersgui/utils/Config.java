@@ -40,7 +40,8 @@ public class Config {
     private boolean essxHook;
 
     private boolean conditionRequired, permissionRequired;
-    private String condition, requiredPermission;
+    private String condition;
+    private List<String> requiredPermissions;
 
     private boolean DEBUG_ENABLED;
 
@@ -153,7 +154,11 @@ public class Config {
         conditionRequired = getBool("condition.required");
         permissionRequired = getBool("condition.permission.required");
         condition = cfg.getString("condition.placeholder");
-        requiredPermission = cfg.getString("condition.permission.node");
+        String requiredPermission = cfg.getString("condition.permission.node");
+        requiredPermissions = cfg.getStringList("condition.permission.nodes");
+        if (requiredPermission != null && !requiredPermission.isEmpty()) {
+            requiredPermissions.add(requiredPermission);
+        }
 
         setUpCustomItems(plugin);
     }

@@ -176,7 +176,7 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI {
     }
 
     private List<Player> getByPage(int page) {
-        String permission = cfg.isPermissionRequired() ? cfg.getRequiredPermission() : null;
+        List<String> permission = cfg.isPermissionRequired() ? cfg.getRequiredPermissions() : List.of();
 
         String condition = cfg.isConditionRequired() ? cfg.getCondition() : null;
 
