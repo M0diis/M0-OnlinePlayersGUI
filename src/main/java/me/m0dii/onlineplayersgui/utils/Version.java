@@ -125,10 +125,18 @@ public enum Version implements Comparable<Version> {
         return value < version.value;
     }
 
+    private static boolean NOTIFIED_UNKNOWN = false;
+
     private boolean checkUnknown(Version version) {
+        if(NOTIFIED_UNKNOWN) {
+            return true;
+        }
+
         if (version == UNKNOWN) {
             Messenger.warn("Provided version is UNKNOWN. Some features may not work correctly.");
             Messenger.warn("Assuming using the latest version.");
+
+            NOTIFIED_UNKNOWN = true;
 
             return true;
         }
@@ -136,6 +144,8 @@ public enum Version implements Comparable<Version> {
         if (this == UNKNOWN) {
             Messenger.warn("Server version is UNKNOWN. Some features may not work correctly.");
             Messenger.warn("Assuming using the latest version.");
+
+            NOTIFIED_UNKNOWN = true;
 
             return true;
         }
