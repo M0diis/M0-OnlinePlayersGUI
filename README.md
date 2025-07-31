@@ -4,7 +4,7 @@
 
 [banner]: https://i.imgur.com/IufJw5D.png
 [ratingImage]: https://img.shields.io/badge/dynamic/json.svg?color=brightgreen&label=rating&query=%24.rating.average&suffix=%20%2F%205&url=https%3A%2F%2Fapi.spiget.org%2Fv2%2Fresources%2F86813
-[buildImage]: https://github.com/M0diis/M0-OnlinePlayersGUI/workflows/Java%20CI%20with%20Gradle/badge.svg
+[buildImage]: https://github.com/M0diis/M0-OnlinePlayersGUI/actions/workflows/gradle-j21.yml/badge.svg
 [releaseImage]: https://img.shields.io/github/v/release/M0diis/M0-OnlinePlayersGUI.svg?label=github%20release
 [downloadsImage]: https://img.shields.io/badge/dynamic/json.svg?color=brightgreen&label=downloads%20%28spigotmc.org%29&query=%24.downloads&url=https%3A%2F%2Fapi.spiget.org%2Fv2%2Fresources%2F86813
 [licenseImage]: https://img.shields.io/github/license/M0diis/M0-OnlinePlayersGUI.svg
