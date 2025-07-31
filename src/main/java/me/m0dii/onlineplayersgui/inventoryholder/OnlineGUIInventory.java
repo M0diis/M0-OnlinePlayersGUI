@@ -16,6 +16,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.IntStream;
 
 public class OnlineGUIInventory implements InventoryHolder, CustomGUI {
     private Inventory inv;
@@ -38,6 +39,7 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI {
 
         setCustomItems(player);
         initByPage(page);
+        setButtons();
     }
 
     @Override
@@ -146,6 +148,7 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI {
 
         initByPage(this.page);
         setCustomItems(p);
+        setButtons();
 
         p.openInventory(this.inv);
     }
@@ -159,21 +162,16 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI {
     }
 
     private void initByPage(int page) {
-        setButtons();
-
         List<Player> byPage = getByPage(page);
 
         for (Player player : byPage) {
             ItemStack head = VersionUtils.getSkull(player, cfg.getPlayerHeadLore(), cfg.getPlayerHeadName());
 
-            for (int i = 0; i < inv.getSize(); i++) {
-                if (inv.getItem(i) == null) {
-                    if (cfg.getNextPageSlot() != i && cfg.getPrevPageSlot() != i) {
-                        inv.setItem(i, head);
-                        break;
-                    }
-                }
-            }
+            IntStream.range(0, inv.getSize())
+                    .filter(i -> inv.getItem(i) == null)
+                    .filter(i -> cfg.getNextPageSlot() != i && cfg.getPrevPageSlot() != i)
+                    .findFirst()
+                    .ifPresent(i -> inv.setItem(i, head));
         }
     }
 

@@ -13,6 +13,7 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,10 +45,11 @@ public class ConditionalGUIInventory implements InventoryHolder, CustomGUI {
         this.inv = Bukkit.createInventory(this, this.size, this.cfg.getGuiTitle());
 
         initByPage(page);
+        setButtons();
     }
 
     @Override
-    public void execute(Player clickee, ItemStack clicked, ClickType clickType, int slot) {
+    public void execute(@NotNull Player clickee, @Nullable ItemStack clicked, @NotNull ClickType clickType, int slot) {
         if (clicked == null) {
             return;
         }
@@ -127,6 +129,7 @@ public class ConditionalGUIInventory implements InventoryHolder, CustomGUI {
 
         initByPage(this.page);
         setCustomItems(p);
+        setButtons();
 
         p.openInventory(this.inv);
     }
@@ -208,8 +211,6 @@ public class ConditionalGUIInventory implements InventoryHolder, CustomGUI {
                     .findFirst()
                     .ifPresent(i -> inv.setItem(i, head));
         }
-
-        setButtons();
     }
 
     public boolean hasPlayers() {

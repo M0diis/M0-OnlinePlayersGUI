@@ -52,11 +52,16 @@ public class CommandActionParser {
 
         String action = command.substring(command.indexOf("["), command.indexOf("]") + 1);
 
-        command = command.substring(command.indexOf("]") + 2);
-
         if (command.startsWith("[CLOSE]") || command.equalsIgnoreCase("[CLOSE]")) {
             sender.closeInventory();
         }
+
+        int closeIdx = command.indexOf("]") + 1;
+        if (closeIdx < command.length() && command.charAt(closeIdx) == ' ') {
+            closeIdx++;
+        }
+        command = command.substring(closeIdx);
+
         if (action.equalsIgnoreCase("[MESSAGE]") || action.equalsIgnoreCase("[TEXT]")) {
             sender.sendMessage(TextUtils.kyorify(command));
         } else if (action.equalsIgnoreCase("[TITLE]")) {

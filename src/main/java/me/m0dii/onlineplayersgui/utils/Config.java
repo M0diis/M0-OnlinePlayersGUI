@@ -200,14 +200,10 @@ public class Config {
                 }
             }
 
-            if (xmat.isEmpty()) {
-                return;
-            }
+            Material material = xmat.map(XMaterial::parseMaterial).orElseGet(() -> Material.getMaterial(itemName));
 
-            Material material = xmat.get().parseMaterial();
-
-            if (material == null || material.equals(Material.AIR)) {
-                return;
+            if (material == null) {
+                material = Material.AIR; // Fallback to AIR if material is invalid
             }
 
             ItemStack item = new ItemStack(material);
