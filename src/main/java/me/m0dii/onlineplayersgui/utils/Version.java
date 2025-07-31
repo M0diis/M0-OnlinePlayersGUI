@@ -3,6 +3,7 @@ package me.m0dii.onlineplayersgui.utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
 
+@SuppressWarnings("java:S115")
 public enum Version implements Comparable<Version> {
     // https://www.spigotmc.org/wiki/spigot-nms-and-minecraft-versions-1-16/
     // https://www.spigotmc.org/wiki/spigot-nms-and-minecraft-versions-1-21/
