@@ -1,7 +1,4 @@
-# This workflow will build a Java project with Gradle
-# For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-gradle
-
-name: Java CI with Gradle
+name: Java CI with Gradle Java 8
 
 on:
   push:
@@ -25,7 +22,7 @@ jobs:
     - name: Build with Gradle
       run: ./gradlew shadowJar
     - name: Upload artifacts
-      uses: actions/upload-artifact@v2-preview
+      uses: actions/upload-artifact@v4
       with:
         name: ${{ github.event.repository.name }}
         path: build/libs/*.jar

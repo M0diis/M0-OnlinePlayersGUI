@@ -56,14 +56,14 @@ public class InventoryListener implements Listener {
 
     @EventHandler
     public void updateOnJoin(PlayerJoinEvent e) {
-        if (this.plugin.getCfg().doUpdateOnJoin()) {
+        if (this.plugin.getCfg().isUpdateOnJoin()) {
             updateView();
         }
     }
 
     @EventHandler
     public void updateOnLeave(PlayerQuitEvent e) {
-        if (this.plugin.getCfg().doUpdateOnLeave()) {
+        if (this.plugin.getCfg().isUpdateOnLeave()) {
             updateView();
 
             viewers.remove(e.getPlayer());
@@ -75,8 +75,8 @@ public class InventoryListener implements Listener {
             for (HumanEntity p : viewers) {
                 Inventory inv = p.getOpenInventory().getTopInventory();
 
-                if (inv.getHolder() instanceof CustomGUI) {
-                    ((CustomGUI) inv.getHolder()).refresh((Player) p);
+                if (inv.getHolder() instanceof CustomGUI customGui) {
+                    customGui.refresh((Player) p);
                 }
             }
         });
@@ -86,10 +86,10 @@ public class InventoryListener implements Listener {
     public void onInventoryClick(InventoryClickEvent e) {
         Inventory inv = e.getClickedInventory();
 
-        if (inv != null && inv.getHolder() instanceof CustomGUI) {
+        if (inv != null && inv.getHolder() instanceof CustomGUI customGui) {
             e.setCancelled(true);
 
-            ((CustomGUI) inv.getHolder()).execute((Player) e.getWhoClicked(), e.getCurrentItem(), e.getClick(), e.getSlot());
+            customGui.execute((Player) e.getWhoClicked(), e.getCurrentItem(), e.getClick(), e.getSlot());
         }
 
         if (e.getView().getTopInventory().getHolder() instanceof CustomGUI && e.getClick().isShiftClick()) {

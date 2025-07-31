@@ -2,9 +2,8 @@ package me.m0dii.onlineplayersgui.inventoryholder;
 
 import me.m0dii.onlineplayersgui.CustomItem;
 import me.m0dii.onlineplayersgui.OnlineGUI;
-import me.m0dii.onlineplayersgui.utils.Config;
-import me.m0dii.onlineplayersgui.utils.Utils;
-import me.m0dii.onlineplayersgui.utils.VersionUtils;
+import me.m0dii.onlineplayersgui.utils.*;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -12,20 +11,21 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class OnlineGUIInventory implements InventoryHolder, CustomGUI {
     private Inventory inv;
-    private final String name;
-    private final int size, page;
+    private final Component name;
+    private final int size;
+    private final int page;
     private final OnlineGUI plugin;
     private final Config cfg;
 
-    public OnlineGUIInventory(OnlineGUI plugin, String name, int page, Player p) {
+    public OnlineGUIInventory(@NotNull OnlineGUI plugin, @NotNull Component name, int page, @NotNull Player player) {
         this.name = name;
         this.page = page;
 
@@ -36,17 +36,17 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI {
 
         this.inv = Bukkit.createInventory(this, this.size, name);
 
-        setCustomItems(p);
-
+        setCustomItems(player);
         initByPage(page);
     }
 
+    @Override
     public void execute(Player clickee, ItemStack clicked, ClickType clickType, int slot) {
         if (clicked == null) {
             return;
         }
 
-        if (clicked.getType().equals(cfg.getDisplay().getType())) {
+        if (clicked.getType().equals(cfg.getPlayerHeadDisplay().getType())) {
             Player skullOwner = VersionUtils.getSkullOwner(clicked);
 
             if (skullOwner == null) {
@@ -67,7 +67,7 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI {
                 cmds = this.cfg.getRightClickCmds();
             }
 
-            cmds.forEach(cmd -> Utils.sendCommand(clickee, skullOwner, cmd));
+            CommandActionParser.parse(clickee, skullOwner, cmds);
         }
 
         if (clicked.getType().equals(this.cfg.getPrevPageMat()) || clicked.getType().equals(this.cfg.getNextPageMat())) {
@@ -75,8 +75,7 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI {
 
             if (cfg.getNextPageSlot() == slot) {
                 nextPage = page + 1;
-            }
-            else if (cfg.getPrevPageSlot() == slot) {
+            } else if (cfg.getPrevPageSlot() == slot) {
                 nextPage = page - 1;
             }
 
@@ -86,8 +85,7 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI {
                 if (newinv.hasPlayers()) {
                     clickee.openInventory(newinv.getInventory());
                 }
-            }
-            catch (IndexOutOfBoundsException ex) {
+            } catch (IndexOutOfBoundsException ex) {
                 // TODO
             }
         }
@@ -101,38 +99,36 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI {
         List<String> cicmds = new ArrayList<>();
 
         if (clickType.equals(ClickType.LEFT)) {
-            cicmds = c.getLCC();
+            cicmds = c.getLcc();
         }
 
         if (clickType.equals(ClickType.MIDDLE)) {
-            cicmds = c.getMCC();
+            cicmds = c.getMcc();
         }
 
         if (clickType.equals(ClickType.RIGHT)) {
-            cicmds = c.getRCC();
+            cicmds = c.getRcc();
         }
 
-        cicmds.forEach(cmd -> Utils.sendCommand(clickee, clickee, cmd));
+        CommandActionParser.parse(clickee, clickee, cicmds);
     }
 
     private CustomItem getCustomItemBySlot(int slot) {
         return cfg.getCustomItems().getOrDefault(slot, null);
     }
 
-    public void setCustomItems(Player p) {
+    public void setCustomItems(@NotNull Player p) {
         plugin.getGuiUtils().setCustomItems(inv, p, cfg.getCustomItems());
     }
 
-    private int adjustSize(Config cfg) {
-        int size = cfg.getGuiSize();
+    private int adjustSize(@NotNull Config cfg) {
+        int guiSize = cfg.getGuiSize();
 
-        if (size % 9 == 0) {
-            return size;
-        }
-        else if (size < 18) {
+        if (guiSize % 9 == 0) {
+            return guiSize;
+        } else if (guiSize < 18) {
             return 18;
-        }
-        else if (size > 54) {
+        } else if (guiSize > 54) {
             return 54;
         }
 
@@ -140,11 +136,12 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI {
     }
 
     @Override
-    public Inventory getInventory() {
+    public @NotNull Inventory getInventory() {
         return inv;
     }
 
-    public void refresh(Player p) {
+    @Override
+    public void refresh(@NotNull Player p) {
         this.inv = Bukkit.createInventory(this, this.size, this.name);
 
         initByPage(this.page);
@@ -154,11 +151,11 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI {
     }
 
     public boolean hasPlayers() {
-        return getByPage(page).size() != 0;
+        return !getByPage(page).isEmpty();
     }
 
     public boolean hasPlayers(int offset) {
-        return getByPage(page + offset).size() != 0;
+        return !getByPage(page + offset).isEmpty();
     }
 
     private void initByPage(int page) {
@@ -167,7 +164,7 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI {
         List<Player> byPage = getByPage(page);
 
         for (Player player : byPage) {
-            ItemStack head = VersionUtils.getSkull(player, cfg.getHeadLore(), cfg.getHeadText());
+            ItemStack head = VersionUtils.getSkull(player, cfg.getPlayerHeadLore(), cfg.getPlayerHeadName());
 
             for (int i = 0; i < inv.getSize(); i++) {
                 if (inv.getItem(i) == null) {
@@ -181,7 +178,7 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI {
     }
 
     private List<Player> getByPage(int page) {
-        String permission = cfg.isPermissionRequired() ? cfg.getRequiredPerm() : null;
+        String permission = cfg.isPermissionRequired() ? cfg.getRequiredPermission() : null;
 
         String condition = cfg.isConditionRequired() ? cfg.getCondition() : null;
 
@@ -220,19 +217,13 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI {
     }
 
     private void setButtons() {
-        boolean show = cfg.areButtonsAlwaysOn();
+        boolean show = cfg.isButtonsAlwaysVisible();
 
-        if (show) {
-            setNextButton();
-        }
-        else if (hasPlayers(1)) {
+        if (show || hasPlayers(1)) {
             setNextButton();
         }
 
-        if (show) {
-            setPreviousButton();
-        }
-        else if (page != 0) {
+        if (show || page != 0) {
             setPreviousButton();
         }
     }
@@ -241,11 +232,13 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI {
         ItemStack nextButton = new ItemStack(cfg.getNextPageMat());
         ItemMeta nextButtonMeta = nextButton.getItemMeta();
 
-        List<String> nextLore =
-                cfg.getNextPageLore().stream().map(str -> Utils.setPlaceholders(str, null)).collect(Collectors.toList());
+        List<Component> nextLore = cfg.getNextPageLore().stream()
+                .map(str -> Utils.setPlaceholders(str, null))
+                .map(TextUtils::kyorify)
+                .toList();
 
-        nextButtonMeta.setLore(nextLore);
-        nextButtonMeta.setDisplayName(cfg.getNextPageName());
+        nextButtonMeta.lore(nextLore);
+        nextButtonMeta.displayName(cfg.getNextPageName());
         nextButton.setItemMeta(nextButtonMeta);
 
         inv.setItem(cfg.getNextPageSlot(), nextButton);
@@ -255,11 +248,13 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI {
         ItemStack prevButton = new ItemStack(cfg.getPrevPageMat());
         ItemMeta prevButtonMeta = prevButton.getItemMeta();
 
-        List<String> prevLore =
-                cfg.getPrevPageLore().stream().map(str -> Utils.setPlaceholders(str, null)).collect(Collectors.toList());
+        List<Component> prevLore = cfg.getPrevPageLore().stream()
+                .map(str -> Utils.setPlaceholders(str, null))
+                .map(TextUtils::kyorify)
+                .toList();
 
-        prevButtonMeta.setLore(prevLore);
-        prevButtonMeta.setDisplayName(Utils.format(cfg.getPrevPageName()));
+        prevButtonMeta.lore(prevLore);
+        prevButtonMeta.displayName(cfg.getPrevPageName());
         prevButton.setItemMeta(prevButtonMeta);
 
         inv.setItem(cfg.getPrevPageSlot(), prevButton);

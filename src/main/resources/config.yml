@@ -79,6 +79,16 @@ gui:
 # Custom Items
 # These items will be displayed in the same row as
 # the previous and next buttons are
+# Available command actions:
+# [MESSAGE] - Sends a message to the player: [MESSAGE] Hello, %player_name%!
+# [CHAT] - Sends a chat message to the player: [CHAT] Hello, %player_name%!
+# [TITLE] - Sends a title to the player: [TITLE] Hello, %player_name%!, 20, 60, 20
+# [ACTIONBAR] - Sends an action bar message to the player: [ACTIONBAR] Hello, %player_name%!
+# [SOUND] - Plays a sound to the player: [SOUND] ENTITY_EXPERIENCE_ORB_PICKUP, 1, 1
+# [PLAYER] - Executes a command as the player: [PLAYER] /command %player_name%
+# [CONSOLE] - Executes a command as the console: [CONSOLE] /command %player_name%
+# [BROADCAST] - Broadcasts a message to the server: [BROADCAST] Hello, %player_name%!
+# [PARTICLE] - Spawns a particle at the player's location: [PARTICLE] FLAME, 1, 0, 0, 0
 custom-items:
   '1':
     material: RED_STAINED_GLASS_PANE

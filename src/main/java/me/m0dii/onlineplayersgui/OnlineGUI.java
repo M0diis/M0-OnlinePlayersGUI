@@ -1,5 +1,6 @@
 package me.m0dii.onlineplayersgui;
 
+import lombok.Getter;
 import me.m0dii.onlineplayersgui.commands.OnlineGUICommand;
 import me.m0dii.onlineplayersgui.inventoryholder.GUIUtils;
 import me.m0dii.onlineplayersgui.listeners.InventoryListener;
@@ -14,10 +15,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.plugin.java.JavaPluginLoader;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -25,55 +25,34 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Getter
 public class OnlineGUI extends JavaPlugin {
+    @Getter
     private static OnlineGUI instance;
 
-    public static OnlineGUI getInstance() {
-        return instance;
-    }
-
     private PluginManager manager;
-
-    protected OnlineGUI(JavaPluginLoader loader, PluginDescriptionFile description, File dataFolder, File file) {
-        super(loader, description, dataFolder, file);
-    }
 
     public OnlineGUI() {
         super();
     }
 
     private ConditionalGUIs cgis;
-
-    public ConditionalGUIs getCgis() {
-        return this.cgis;
-    }
-
     private List<Player> hiddenPlayersToggled;
 
-    public void toggleHiddenPlayer(Player p) {
+    public void toggleHiddenPlayer(@NotNull Player p) {
         if (hiddenPlayersToggled == null) {
             this.hiddenPlayersToggled = new ArrayList<>();
         }
 
         if (hiddenPlayersToggled.contains(p)) {
             hiddenPlayersToggled.remove(p);
-        }
-        else {
+        } else {
             hiddenPlayersToggled.add(p);
         }
     }
 
-    public List<Player> getHiddenPlayersToggled() {
-        return this.hiddenPlayersToggled;
-    }
-
     private File configFile = null;
-
     private Config cfg;
-
-    public Config getCfg() {
-        return this.cfg;
-    }
 
     private IEssentials ess = null;
 
@@ -88,11 +67,8 @@ public class OnlineGUI extends JavaPlugin {
         return this.ess;
     }
 
+    @Getter
     private GUIUtils guiUtils;
-
-    public GUIUtils getGuiUtils() {
-        return this.guiUtils;
-    }
 
     public void onEnable() {
         instance = this;
@@ -200,8 +176,7 @@ public class OnlineGUI extends JavaPlugin {
         try {
             this.getConfig().options().copyDefaults(true);
             this.getConfig().save(this.configFile);
-        }
-        catch (IOException ex) {
+        } catch (IOException ex) {
             ex.printStackTrace();
         }
 
@@ -232,8 +207,7 @@ public class OnlineGUI extends JavaPlugin {
 
                 out.close();
                 in.close();
-            }
-            catch (Exception ex) {
+            } catch (Exception ex) {
                 Messenger.error("Error copying resource: " + ex.getMessage());
 
                 ex.printStackTrace();

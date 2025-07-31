@@ -10,6 +10,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -21,22 +23,21 @@ public class GUIUtils {
         this.plugin = plugin;
     }
 
-    public List<Player> getOnline(String permission, String condition) {
+    public List<Player> getOnline(@Nullable String permission, @Nullable String condition) {
         List<Player> online;
 
         List<Player> toggled = plugin.getHiddenPlayersToggled();
 
         if (plugin.getCfg().ESSX_HOOK()) {
-            online =
-                    Bukkit.getOnlinePlayers().stream().filter(p -> !p.hasPermission("m0onlinegui.hidden") ||
+            online = Bukkit.getOnlinePlayers().stream()
+                    .filter(p -> !p.hasPermission("m0onlinegui.hidden") ||
                             !plugin.getEssentials().getUser(p).isVanished() || !toggled.contains(p))
-                            .collect(Collectors.toList());
-        }
-        else {
-            online =
-                    Bukkit.getOnlinePlayers().stream().filter(p -> !p.hasPermission("m0onlinegui.hidden")
+                    .collect(Collectors.toList());
+        } else {
+            online = Bukkit.getOnlinePlayers().stream()
+                    .filter(p -> !p.hasPermission("m0onlinegui.hidden")
                             || !toggled.contains(p))
-                            .collect(Collectors.toList());
+                    .collect(Collectors.toList());
         }
 
         if (permission != null) {
@@ -50,7 +51,7 @@ public class GUIUtils {
         return online;
     }
 
-    public void setCustomItems(Inventory inv, Player p, Map<Integer, CustomItem> customItems) {
+    public void setCustomItems(@NotNull Inventory inv, @NotNull Player player, @NotNull Map<Integer, CustomItem> customItems) {
         for (Map.Entry<Integer, CustomItem> entry : customItems.entrySet()) {
             CustomItem c = entry.getValue();
             ItemStack item = c.getItem();
@@ -60,7 +61,7 @@ public class GUIUtils {
             int slot = c.getItemSlot();
 
             List<String> lore =
-                    c.getLore().stream().map(str -> PlaceholderAPI.setPlaceholders(p, str)).collect(Collectors.toList());
+                    c.getLore().stream().map(str -> PlaceholderAPI.setPlaceholders(player, str)).collect(Collectors.toList());
 
             m.setLore(lore);
 
@@ -113,56 +114,41 @@ public class GUIUtils {
                         "/\\\\\\[\\]{}:\"?]", ""));
 
                 switch (op) {
-                    case ">":
-                    case "greater_than":
+                    case ">", "gt", "greater_than" -> {
                         if (left > right) {
                             filtered.add(p);
                         }
-                        break;
-
-                    case "<":
-                    case "less_than":
+                    }
+                    case "<", "lt", "less_than" -> {
                         if (left < right) {
                             filtered.add(p);
                         }
-                        break;
-
-                    case "<=":
-                    case "less_than_or_equal":
+                    }
+                    case "<=", "lte", "less_than_or_equal" -> {
                         if (left <= right) {
                             filtered.add(p);
                         }
-                        break;
-
-                    case ">=":
-                    case "greater_than_or_equal":
+                    }
+                    case ">=", "gte", "greater_than_or_equal" -> {
                         if (left >= right) {
                             filtered.add(p);
                         }
-                        break;
-
-                    case "=":
-                    case "==":
-                    case "equal_to":
-                    case "equals":
+                    }
+                    case "=", "==", "eq", "equal_to", "equals" -> {
                         if (left == right) {
                             filtered.add(p);
                         }
-                        break;
-
-                    case "!=":
-                    case "not_equal":
+                    }
+                    case "!=", "neq", "ne", "not_equal" -> {
                         if (left != right) {
                             filtered.add(p);
                         }
-                        break;
-
-                    default:
-                        break;
+                    }
+                    default -> {
+                    }
                 }
             }
-        }
-        catch (NumberFormatException ex) {
+        } catch (NumberFormatException ex) {
             Messenger.warn("Error occured trying to parse the condition.");
         }
 

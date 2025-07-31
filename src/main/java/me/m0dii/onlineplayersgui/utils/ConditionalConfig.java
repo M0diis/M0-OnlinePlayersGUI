@@ -1,41 +1,40 @@
 package me.m0dii.onlineplayersgui.utils;
 
 import com.cryptomorin.xseries.XMaterial;
+import lombok.Getter;
 import me.m0dii.onlineplayersgui.CustomItem;
-import me.m0dii.onlineplayersgui.OnlineGUI;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
+@Getter
 public class ConditionalConfig {
     private String headName;
     private ItemStack playerHeadDisplay;
-    private String nextPageName, prevPageName;
-    private String guiTitle;
+    private Component nextPageName, prevPageName;
+    private Component guiTitle;
 
     private List<String> headLore, nextPageLore, prevPageLore;
     private List<String> leftClickCommands, middleClickCommands, rightClickCommands;
 
-    private int GUI_SIZE;
+    private int guiSize;
 
     private Material nextPageMat, prevPageMat;
     private int nextPageSlot, prevPageSlot;
 
     private boolean permissionRequired;
-    private String condition, permission;
+    private String condition, requiredPermission;
 
-    private final OnlineGUI plugin;
-
-    public ConditionalConfig(OnlineGUI plugin, FileConfiguration cfg) {
-        this.plugin = plugin;
+    public ConditionalConfig(@NotNull FileConfiguration cfg) {
         this.cfg = cfg;
 
         this.load();
@@ -43,8 +42,12 @@ public class ConditionalConfig {
 
     final FileConfiguration cfg;
 
-    private String getStringf(String path) {
-        return Utils.format(cfg.getString(path));
+    private Component getStringMiniMessage(@NotNull String path) {
+        return TextUtils.kyorify(cfg.getString(path));
+    }
+
+    private String getStringFormatted(@NotNull String path) {
+        return TextUtils.format(cfg.getString(path));
     }
 
     private List<String> getStringList(String path) {
@@ -52,16 +55,16 @@ public class ConditionalConfig {
     }
 
     public void load() {
-        headName = getStringf("player-display.name");
+        headName = getStringFormatted("player-display.name");
         headLore = getStringList("player-display.lore");
 
-        guiTitle = getStringf("gui.title");
+        guiTitle = getStringMiniMessage("gui.title");
 
         leftClickCommands = getStringList("player-display.commands.left-click");
         middleClickCommands = getStringList("player-display.commands.middle-click");
         rightClickCommands = getStringList("player-display.commands.right-click");
 
-        GUI_SIZE = cfg.getInt("gui.size");
+        guiSize = cfg.getInt("gui.size");
 
         String mat1 = cfg.getString("next-button.material", "ENCHANTED_BOOK");
         String mat2 = cfg.getString("previous-button.material", "ENCHANTED_BOOK");
@@ -78,11 +81,10 @@ public class ConditionalConfig {
 
         if (Version.serverIsNewerThan(Version.v1_12_R1)) {
             playerHeadDisplay = new ItemStack(Material.PLAYER_HEAD);
-        }
-        else {
+        } else {
             Optional<XMaterial> mat = XMaterial.matchXMaterial("PLAYER_HEAD");
 
-            if (!mat.isPresent()) {
+            if (mat.isEmpty()) {
                 mat = XMaterial.matchXMaterial("SKULL_ITEM");
             }
 
@@ -105,15 +107,15 @@ public class ConditionalConfig {
         prevPageLore = getStringList("previous-button.lore");
         nextPageLore = getStringList("next-button.lore");
 
-        prevPageName = getStringf("previous-button.name");
-        nextPageName = getStringf("next-button.name");
+        prevPageName = getStringMiniMessage("previous-button.name");
+        nextPageName = getStringMiniMessage("next-button.name");
 
         prevPageSlot = cfg.getInt("previous-button.slot");
         nextPageSlot = cfg.getInt("next-button.slot");
 
         permissionRequired = cfg.getBoolean("condition.permission.required");
         condition = cfg.getString("condition.placeholder");
-        permission = cfg.getString("condition.permission.node");
+        requiredPermission = cfg.getString("condition.permission.node");
 
         setUpCustomItems();
     }
@@ -143,13 +145,15 @@ public class ConditionalConfig {
             if (customItem != null && !customItem.equals(Material.AIR)) {
                 ItemStack item = new ItemStack(customItem);
 
-                String customItemName = Utils.format(itemSec.getString("name"));
+                Component customItemName = TextUtils.kyorify(itemSec.getString("name"));
 
-                List<String> customItemLore = format(itemSec.getStringList("lore"));
+                List<String> customItemLore = itemSec.getStringList("lore").stream()
+                        .map(TextUtils::format)
+                        .toList();
 
                 ItemMeta meta = item.getItemMeta();
 
-                meta.setDisplayName(customItemName);
+                meta.displayName(customItemName);
                 meta.setLore(customItemLore);
 
                 List<String> lcc = itemSec.getStringList("commands.left-click");
@@ -164,8 +168,7 @@ public class ConditionalConfig {
                         for (int i = start; i <= end; i++) {
                             addCustomItem(meta, i, item, lcc, mcc, rcc, customItemLore);
                         }
-                    }
-                    else {
+                    } else {
                         Object slots = itemSec.get("slots");
 
                         if (slots instanceof List) {
@@ -174,15 +177,13 @@ public class ConditionalConfig {
                             for (Integer slot : slotList) {
                                 addCustomItem(meta, slot, item, lcc, mcc, rcc, customItemLore);
                             }
-                        }
-                        else {
+                        } else {
                             int slot = itemSec.getInt("slot", -1);
 
                             addCustomItem(meta, slot, item, lcc, mcc, rcc, customItemLore);
                         }
                     }
-                }
-                else {
+                } else {
                     int slot = itemSec.getInt("slot", -1);
 
                     addCustomItem(meta, slot, item, lcc, mcc, rcc, customItemLore);
@@ -195,90 +196,7 @@ public class ConditionalConfig {
                                List<String> customItemLore) {
         item.setItemMeta(meta);
 
-        customItems.put(slot, new CustomItem(item, slot, lcc, mcc, rcc, customItemLore));
+        customItems.put(slot, new CustomItem(slot, item, lcc, mcc, rcc, customItemLore));
     }
 
-    private List<String> format(List<String> list) {
-        return list.stream().map(Utils::format).collect(Collectors.toList());
-    }
-
-    public int getPrevPageSlot() {
-        return prevPageSlot;
-    }
-
-    public int getNextPageSlot() {
-        return nextPageSlot;
-    }
-
-    public Map<Integer, CustomItem> getCustomItems() {
-        return this.customItems;
-    }
-
-    public int getGuiSize() {
-        return GUI_SIZE;
-    }
-
-    public List<String> getNextPageLore() {
-        return nextPageLore;
-    }
-
-    public List<String> getPrevPageLore() {
-        return prevPageLore;
-    }
-
-    public List<String> getRightClickCmds() {
-        return rightClickCommands;
-    }
-
-    public List<String> getMiddleClickCmds() {
-        return middleClickCommands;
-    }
-
-    public List<String> getLeftClickCmds() {
-        return leftClickCommands;
-    }
-
-    public List<String> getHeadLore() {
-        return headLore;
-    }
-
-    public String getNextPageName() {
-        return nextPageName;
-    }
-
-    public String getPrevPageName() {
-        return prevPageName;
-    }
-
-    public String getHeadText() {
-        return headName;
-    }
-
-    public Material getNextPageMat() {
-        return nextPageMat;
-    }
-
-    public Material getPrevPageMat() {
-        return prevPageMat;
-    }
-
-    public String getCondition() {
-        return condition;
-    }
-
-    public boolean isPermissionRequired() {
-        return permissionRequired;
-    }
-
-    public String getRequiredPermission() {
-        return permission;
-    }
-
-    public String getGuiTitle() {
-        return guiTitle;
-    }
-
-    public ItemStack getDisplay() {
-        return this.playerHeadDisplay;
-    }
 }

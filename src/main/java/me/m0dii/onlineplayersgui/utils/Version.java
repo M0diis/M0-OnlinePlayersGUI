@@ -4,12 +4,21 @@ import org.bukkit.Bukkit;
 import org.bukkit.Server;
 
 public enum Version implements Comparable<Version> {
-    v1_21_R1(21),
-    v1_20_R1(20),
-    v1_19_R2(19),
-    v1_19_R1(18),
-    v1_18_R2(17),
-    v1_18_R1(16),
+    // https://www.spigotmc.org/wiki/spigot-nms-and-minecraft-versions-1-16/
+    // https://www.spigotmc.org/wiki/spigot-nms-and-minecraft-versions-1-21/
+    v1_21_R4(28), // 1.21.5
+    v1_21_R3(27), // 1.21.4 / 1.21.5
+    v1_21_R2(26), // 1.21.2 / 1.21.3
+    v1_21_R1(25), // 1.21 / 1.21.1
+    v1_20_R4(24), // 1.20.6 / 1.20.5
+    v1_20_R3(23), // 1.20.3 / 1.20.4
+    v1_20_R2(22), // 1.20.2
+    v1_20_R1(21), // 1.20 / 1.20.1
+    v1_19_R3(20), // 1.19.4
+    v1_19_R2(19), // 1.19.3
+    v1_19_R1(18), // 1.19.1 / 1.19.2
+    v1_18_R2(17), // 1.18.2
+    v1_18_R1(16), // 1.18 / 1.18.1
     v1_17_R1(15),
     v1_16_R3(14),
     v1_16_R2(13),

@@ -1,29 +1,32 @@
 package me.m0dii.onlineplayersgui.utils;
 
 import com.cryptomorin.xseries.XMaterial;
+import lombok.Getter;
 import me.m0dii.onlineplayersgui.CustomItem;
 import me.m0dii.onlineplayersgui.OnlineGUI;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
+@Getter
 public class Config {
     private String playerHeadName;
     private ItemStack playerHeadDisplay;
-    private String configReloadedMsg, noPermissionMsg, noPermissionCondMsg;
+    private Component configReloadedMsg, noPermissionMsg, noPermissionCondMsg;
 
-    private String nextPageName, prevPageName;
-    private String guiTitle;
+    private Component nextPageName, prevPageName;
+    private Component guiTitle;
 
-    private String visibilityToggleMsg;
+    private Component visibilityToggleMsg;
 
     private List<String> playerHeadLore, nextPageLore, prevPageLore;
     private List<String> leftClickCmds, middleClickCmds, rightClickCmds;
@@ -37,7 +40,7 @@ public class Config {
     private boolean essxHook;
 
     private boolean conditionRequired, permissionRequired;
-    private String condition, permission;
+    private String condition, requiredPermission;
 
     private boolean DEBUG_ENABLED;
 
@@ -61,12 +64,16 @@ public class Config {
         return cfg.getBoolean(path);
     }
 
-    private String getStringf(String path) {
-        return Utils.format(cfg.getString(path));
+    private Component getStringMiniMessage(@NotNull String path) {
+        return TextUtils.kyorify(cfg.getString(path));
+    }
+
+    private String getStringFormatted(@NotNull String path) {
+        return TextUtils.format(cfg.getString(path));
     }
 
     private List<String> getStringList(String path) {
-        return cfg.getStringList(path).stream().map(Utils::format).collect(Collectors.toList());
+        return cfg.getStringList(path).stream().map(TextUtils::format).toList();
     }
 
     public void load() {
@@ -77,16 +84,16 @@ public class Config {
 
         DEBUG_ENABLED = cfg.getBoolean("debug", false);
 
-        playerHeadName = getStringf("player-display.name");
+        playerHeadName = getStringFormatted("player-display.name");
         playerHeadLore = getStringList("player-display.lore");
 
-        guiTitle = getStringf("gui.title");
+        guiTitle = getStringMiniMessage("gui.title");
 
-        noPermissionMsg = getStringf("messages.no-permission");
-        noPermissionCondMsg = getStringf("messages.no-permission-conditional");
-        configReloadedMsg = getStringf("messages.reload");
+        noPermissionMsg = getStringMiniMessage("messages.no-permission");
+        noPermissionCondMsg = getStringMiniMessage("messages.no-permission-conditional");
+        configReloadedMsg = getStringMiniMessage("messages.reload");
 
-        visibilityToggleMsg = getStringf("messages.toggle-visibility");
+        visibilityToggleMsg = getStringMiniMessage("messages.toggle-visibility");
 
         leftClickCmds = getStringList("player-display.commands.left-click");
         middleClickCmds = getStringList("player-display.commands.middle-click");
@@ -109,11 +116,10 @@ public class Config {
 
         if (Version.serverIsNewerThan(Version.v1_12_R1)) {
             playerHeadDisplay = new ItemStack(Material.PLAYER_HEAD);
-        }
-        else {
+        } else {
             Optional<XMaterial> mat = XMaterial.matchXMaterial("PLAYER_HEAD");
 
-            if (!mat.isPresent()) {
+            if (mat.isEmpty()) {
                 mat = XMaterial.matchXMaterial("SKULL_ITEM");
             }
 
@@ -136,8 +142,8 @@ public class Config {
         prevPageLore = getStringList("previous-button.lore");
         nextPageLore = getStringList("next-button.lore");
 
-        prevPageName = getStringf("previous-button.name");
-        nextPageName = getStringf("next-button.name");
+        prevPageName = getStringMiniMessage("previous-button.name");
+        nextPageName = getStringMiniMessage("next-button.name");
 
         prevPageSlot = cfg.getInt("previous-button.slot", 0);
         nextPageSlot = cfg.getInt("next-button.slot", 8);
@@ -147,7 +153,7 @@ public class Config {
         conditionRequired = getBool("condition.required");
         permissionRequired = getBool("condition.permission.required");
         condition = cfg.getString("condition.placeholder");
-        permission = cfg.getString("condition.permission.node");
+        requiredPermission = cfg.getString("condition.permission.node");
 
         setUpCustomItems(plugin);
     }
@@ -194,7 +200,7 @@ public class Config {
                 }
             }
 
-            if (!xmat.isPresent()) {
+            if (xmat.isEmpty()) {
                 return;
             }
 
@@ -206,13 +212,16 @@ public class Config {
 
             ItemStack item = new ItemStack(material);
 
-            String customItemName = Utils.format(itemSec.getString("name"));
+            Component customItemName = TextUtils.kyorify(Optional.ofNullable(itemSec.getString("name"))
+                    .orElse(""));
 
-            List<String> customItemLore = format(itemSec.getStringList("lore"));
+            List<String> customItemLore = itemSec.getStringList("lore").stream()
+                    .map(TextUtils::format)
+                    .toList();
 
             ItemMeta meta = item.getItemMeta();
 
-            meta.setDisplayName(customItemName);
+            meta.displayName(customItemName);
             meta.setLore(customItemLore);
 
             List<String> lcc = itemSec.getStringList("commands.left-click");
@@ -227,8 +236,7 @@ public class Config {
                     for (int i = start; i <= end; i++) {
                         addCustomItem(meta, i, item, lcc, mcc, rcc, customItemLore);
                     }
-                }
-                else {
+                } else {
                     Object slots = itemSec.get("slots");
 
                     if (slots instanceof List) {
@@ -237,15 +245,13 @@ public class Config {
                         for (Integer slot : slotList) {
                             addCustomItem(meta, slot, item, lcc, mcc, rcc, customItemLore);
                         }
-                    }
-                    else {
+                    } else {
                         int slot = itemSec.getInt("slot", -1);
 
                         addCustomItem(meta, slot, item, lcc, mcc, rcc, customItemLore);
                     }
                 }
-            }
-            else {
+            } else {
                 int slot = itemSec.getInt("slot", -1);
 
                 addCustomItem(meta, slot, item, lcc, mcc, rcc, customItemLore);
@@ -253,91 +259,16 @@ public class Config {
         });
     }
 
-    private void addCustomItem(ItemMeta meta, int slot, ItemStack item, List<String> lcc, List<String> mcc, List<String> rcc,
+    private void addCustomItem(ItemMeta meta,
+                               int slot,
+                               ItemStack item,
+                               List<String> lcc,
+                               List<String> mcc,
+                               List<String> rcc,
                                List<String> customItemLore) {
         item.setItemMeta(meta);
 
-        this.customItems.put(slot, new CustomItem(item, slot, lcc, mcc, rcc, customItemLore));
-    }
-
-    private List<String> format(List<String> list) {
-        return list.stream().map(Utils::format).collect(Collectors.toList());
-    }
-
-    public Map<Integer, CustomItem> getCustomItems() {
-        return this.customItems;
-    }
-
-    public int getGuiSize() {
-        return guiSize;
-    }
-
-    public boolean doUpdateOnJoin() {
-        return updateOnJoin;
-    }
-
-    public boolean doUpdateOnLeave() {
-        return updateOnLeave;
-    }
-
-    public boolean areButtonsAlwaysOn() {
-        return buttonsAlwaysVisible;
-    }
-
-    public List<String> getNextPageLore() {
-        return nextPageLore;
-    }
-
-    public List<String> getPrevPageLore() {
-        return prevPageLore;
-    }
-
-    public List<String> getRightClickCmds() {
-        return rightClickCmds;
-    }
-
-    public List<String> getLeftClickCmds() {
-        return leftClickCmds;
-    }
-
-    public List<String> getMiddleClickCmds() {
-        return this.middleClickCmds;
-    }
-
-    public List<String> getHeadLore() {
-        return playerHeadLore;
-    }
-
-    public String getGuiTitle() {
-        return guiTitle;
-    }
-
-    public int getNextPageSlot() {
-        return nextPageSlot;
-    }
-
-    public int getPrevPageSlot() {
-        return prevPageSlot;
-    }
-
-    public String getNextPageName() {
-        return nextPageName;
-    }
-
-    public String getPrevPageName() {
-        return prevPageName;
-    }
-
-    public String getNoPermMsg() {
-        return noPermissionMsg;
-    }
-
-    public String getCfgReloadMsg() {
-        return configReloadedMsg;
-    }
-
-    public String getHeadText() {
-        return playerHeadName;
+        this.customItems.put(slot, new CustomItem(slot, item, lcc, mcc, rcc, customItemLore));
     }
 
     public boolean ESSX_HOOK() {
@@ -348,43 +279,7 @@ public class Config {
         return essxHook;
     }
 
-    public Material getNextPageMat() {
-        return this.nextPageMat;
-    }
-
-    public Material getPrevPageMat() {
-        return this.prevPageMat;
-    }
-
-    public boolean isConditionRequired() {
-        return this.conditionRequired;
-    }
-
-    public String getCondition() {
-        return this.condition;
-    }
-
-    public String getToggleMsg() {
-        return visibilityToggleMsg;
-    }
-
-    public String getNoPermissionCondMsg() {
-        return noPermissionCondMsg;
-    }
-
-    public String getRequiredPerm() {
-        return this.permission;
-    }
-
-    public boolean isPermissionRequired() {
-        return this.permissionRequired;
-    }
-
     public boolean DEBUG_ENABLED() {
         return this.DEBUG_ENABLED;
-    }
-
-    public ItemStack getDisplay() {
-        return this.playerHeadDisplay;
     }
 }

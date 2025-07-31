@@ -2,7 +2,7 @@ package me.m0dii.onlineplayersgui;
 
 import me.m0dii.onlineplayersgui.inventoryholder.ConditionalGUIInventory;
 import me.m0dii.onlineplayersgui.utils.ConditionalConfig;
-import me.m0dii.onlineplayersgui.utils.Utils;
+import me.m0dii.onlineplayersgui.utils.TextUtils;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
@@ -41,7 +41,7 @@ public class ConditionalGUIs {
 
         File[] files = folder.listFiles();
 
-        if (files == null || files.length == 0) {
+        if (files == null) {
             return;
         }
 
@@ -63,8 +63,10 @@ public class ConditionalGUIs {
 
         YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
 
-        ConditionalGUIInventory cgi = new ConditionalGUIInventory(plugin, Utils.format(cfg.getString("GUI.Title")), 0,
-                new ConditionalConfig(plugin, cfg)
+        ConditionalGUIInventory cgi = new ConditionalGUIInventory(plugin,
+                TextUtils.kyorify(cfg.getString("GUI.Title")),
+                0,
+                new ConditionalConfig(cfg)
         );
 
         cgi.setCustomItems(p);
