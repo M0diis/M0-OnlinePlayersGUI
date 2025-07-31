@@ -17,7 +17,25 @@ essentialsx-hook: false
 # https://github.com/PlaceholderAPI/PlaceholderAPI/wiki/Placeholders
 condition:
   required: false
-  # You can also use ==, !=, <, >, <=, >= for placeholders that return numbers
+  # Condition Operators:
+  ## Text operators:
+  # =, ==, eq, equal_to, equals — equals
+  # !=, neq, ne, not_equal — not equals
+  # ~=, ~~, contains, contains_string — contains
+  # !~=, !~~, !contains, not_contains, not_contains_string — does not contain
+  # starts, starts_with — starts with
+  # ends, ends_with — ends with
+  # matches, regex — matches regex
+  # !matches, !regex, not_matches, not_regex — does not match regex
+  #
+  ## Digit operators:
+  # >, gt, greater_than — greater than
+  # <, lt, less_than — less than
+  # >=, gte, greater_than_or_equal — greater than or equal
+  # <=, lte, less_than_or_equal — less than or equal
+  # =, ==, eq, equal_to, equals — equals
+  # !=, neq, ne, not_equal — not equals
+  # (All text operators above also work for digits, comparing as strings.)
   # Ex.: %player_health% == 20
   placeholder: "%checkitem_mat:DIRT%" # Requires CheckItem PAPI extension
   permission:

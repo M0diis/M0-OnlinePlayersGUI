@@ -97,15 +97,58 @@ public class GUIUtils {
                 String leftStr = condSplit.get(0);
                 String rightStr = condSplit.get(2);
 
-                if (Objects.equals(op, "=") || Objects.equals(op, "==")) {
-                    if (!Utils.isDigit(leftStr) && !Utils.isDigit(rightStr)) {
-                        if (leftStr.equalsIgnoreCase(rightStr)) {
-                            filtered.add(p);
-                        }
+                if (!Utils.isDigit(leftStr) && !Utils.isDigit(rightStr)) {
+                    final String leftStrPlaceholders = PlaceholderAPI.setPlaceholders(p, leftStr);
+                    final String rightStrPlaceholders = PlaceholderAPI.setPlaceholders(p, rightStr);
 
-                        continue;
+                    switch(op) {
+                        case "=", "==", "eq", "equal_to", "equals" -> {
+                            if (leftStrPlaceholders.equalsIgnoreCase(rightStrPlaceholders)) {
+                                filtered.add(p);
+                            }
+                        }
+                        case "!=", "neq", "ne", "not_equal" -> {
+                            if (!leftStrPlaceholders.equalsIgnoreCase(rightStrPlaceholders)) {
+                                filtered.add(p);
+                            }
+                        }
+                        case "~=", "~~", "contains", "contains_string" -> {
+                            if (leftStrPlaceholders.toLowerCase().contains(rightStrPlaceholders.toLowerCase())) {
+                                filtered.add(p);
+                            }
+                        }
+                        case "!~=", "!~~", "!contains", "not_contains", "not_contains_string" -> {
+                            if (!leftStrPlaceholders.toLowerCase().contains(rightStrPlaceholders.toLowerCase())) {
+                                filtered.add(p);
+                            }
+                        }
+                        case "starts", "starts_with" -> {
+                            if (leftStrPlaceholders.toLowerCase().startsWith(rightStrPlaceholders.toLowerCase())) {
+                                filtered.add(p);
+                            }
+                        }
+                        case "ends", "ends_with" -> {
+                            if (leftStrPlaceholders.toLowerCase().endsWith(rightStrPlaceholders.toLowerCase())) {
+                                filtered.add(p);
+                            }
+                        }
+                        case "matches", "regex" -> {
+                            if (leftStrPlaceholders.matches(rightStrPlaceholders)) {
+                                filtered.add(p);
+                            }
+                        }
+                        case "!matches", "!regex", "not_matches", "not_regex" -> {
+                            if (!leftStrPlaceholders.matches(rightStrPlaceholders)) {
+                                filtered.add(p);
+                            }
+                        }
+                        default -> {
+                        }
                     }
+
+                    continue;
                 }
+
 
                 double left = Double.parseDouble(PlaceholderAPI.setPlaceholders(p, leftStr).replaceAll("[a-zA-Z!@#$&*()" +
                         "/\\\\\\[\\]{}:\"?]", ""));
@@ -141,6 +184,36 @@ public class GUIUtils {
                     }
                     case "!=", "neq", "ne", "not_equal" -> {
                         if (left != right) {
+                            filtered.add(p);
+                        }
+                    }
+                    case "~=", "~~", "contains", "contains_string" -> {
+                        if (String.valueOf(left).toLowerCase().contains(String.valueOf(right).toLowerCase())) {
+                            filtered.add(p);
+                        }
+                    }
+                    case "!~=", "!~~", "!contains", "not_contains", "not_contains_string" -> {
+                        if (!String.valueOf(left).toLowerCase().contains(String.valueOf(right).toLowerCase())) {
+                            filtered.add(p);
+                        }
+                    }
+                    case "starts", "starts_with" -> {
+                        if (String.valueOf(left).toLowerCase().startsWith(String.valueOf(right).toLowerCase())) {
+                            filtered.add(p);
+                        }
+                    }
+                    case "ends", "ends_with" -> {
+                        if (String.valueOf(left).toLowerCase().endsWith(String.valueOf(right).toLowerCase())) {
+                            filtered.add(p);
+                        }
+                    }
+                    case "matches", "regex" -> {
+                        if (String.valueOf(left).matches(String.valueOf(right))) {
+                            filtered.add(p);
+                        }
+                    }
+                    case "!matches", "!regex", "not_matches", "not_regex" -> {
+                        if (!String.valueOf(left).matches(String.valueOf(right))) {
                             filtered.add(p);
                         }
                     }
