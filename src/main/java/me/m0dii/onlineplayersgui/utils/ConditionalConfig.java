@@ -20,16 +20,26 @@ import java.util.Optional;
 public class ConditionalConfig {
     private String headName;
     private ItemStack playerHeadDisplay;
-    private Component nextPageName, prevPageName;
+    private Component nextPageName;
+    private Component prevPageName;
+
     private Component guiTitle;
 
-    private List<String> headLore, nextPageLore, prevPageLore;
-    private List<String> leftClickCommands, middleClickCommands, rightClickCommands;
+    private List<String> headLore;
+    private List<String> nextPageLore;
+    private List<String> prevPageLore;
+
+    private List<String> leftClickCommands;
+    private List<String> middleClickCommands;
+    private List<String> rightClickCommands;
 
     private int guiSize;
 
-    private Material nextPageMat, prevPageMat;
-    private int nextPageSlot, prevPageSlot;
+    private Material nextPageMat;
+    private Material prevPageMat;
+
+    private int nextPageSlot;
+    private int prevPageSlot;
 
     private boolean permissionRequired;
     private String condition;

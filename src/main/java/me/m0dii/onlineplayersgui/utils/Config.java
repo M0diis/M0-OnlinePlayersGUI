@@ -21,25 +21,42 @@ import java.util.Optional;
 public class Config {
     private String playerHeadName;
     private ItemStack playerHeadDisplay;
-    private Component configReloadedMsg, noPermissionMsg, noPermissionCondMsg;
+    private Component configReloadedMsg;
+    private Component noPermissionMsg;
+    private Component noPermissionCondMsg;
 
-    private Component nextPageName, prevPageName;
+    private Component nextPageName;
+    private Component prevPageName;
     private Component guiTitle;
 
     private Component visibilityToggleMsg;
 
-    private List<String> playerHeadLore, nextPageLore, prevPageLore;
-    private List<String> leftClickCmds, middleClickCmds, rightClickCmds;
+    private List<String> playerHeadLore;
+    private List<String> nextPageLore;
+    private List<String> prevPageLore;
 
-    private boolean updateOnJoin, updateOnLeave, buttonsAlwaysVisible;
+    private List<String> leftClickCmds;
+    private List<String> middleClickCmds;
+    private List<String> rightClickCmds;
+
+    private boolean updateOnJoin;
+    private boolean updateOnLeave;
+    private boolean buttonsAlwaysVisible;
+
     private int guiSize;
 
-    private Material nextPageMat, prevPageMat;
-    private int nextPageSlot, prevPageSlot;
+    private Material nextPageMat;
+    private Material prevPageMat;
+
+    private int nextPageSlot;
+    private int prevPageSlot;
 
     private boolean essxHook;
+    private boolean premiumVanishHook;
 
-    private boolean conditionRequired, permissionRequired;
+    private boolean conditionRequired;
+    private boolean permissionRequired;
+
     private String condition;
     private List<String> requiredPermissions;
 
@@ -149,7 +166,8 @@ public class Config {
         prevPageSlot = cfg.getInt("previous-button.slot", 0);
         nextPageSlot = cfg.getInt("next-button.slot", 8);
 
-        essxHook = getBool("essentialsx-hook");
+        essxHook = getBool("hooks.essentialsx-hook");
+        premiumVanishHook = getBool("hooks.premium-vanish-hook");
 
         conditionRequired = getBool("condition.required");
         permissionRequired = getBool("condition.permission.required");

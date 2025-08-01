@@ -4,7 +4,7 @@ description: M0-OnlinePlayersGUI
 version: ${version}
 api-version: 1.13
 author: M0dii
-softdepend: [PlaceholderAPI, EssentialsX]
+softdepend: [PlaceholderAPI, EssentialsX, SuperVanish, PremiumVanish]
 commands:
   online:
     description: Online gui player list command.

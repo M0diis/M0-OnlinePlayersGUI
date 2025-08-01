@@ -1,5 +1,6 @@
 package me.m0dii.onlineplayersgui.inventoryholder;
 
+import de.myzelyam.api.vanish.VanishAPI;
 import me.clip.placeholderapi.PlaceholderAPI;
 import me.m0dii.onlineplayersgui.CustomItem;
 import me.m0dii.onlineplayersgui.OnlineGUI;
@@ -27,21 +28,25 @@ public class GUIUtils {
     }
 
     public List<Player> getOnline(@Nullable List<String> permissions, @Nullable String condition) {
-        List<Player> online;
+        List<Player> online = new ArrayList<>(Bukkit.getOnlinePlayers());
 
         List<Player> toggled = plugin.getHiddenPlayersToggled();
 
         if (plugin.getCfg().ESSX_HOOK()) {
-            online = Bukkit.getOnlinePlayers().stream()
-                    .filter(p -> !p.hasPermission("m0onlinegui.hidden") ||
-                            !plugin.getEssentials().getUser(p).isVanished() || !toggled.contains(p))
-                    .collect(Collectors.toList());
-        } else {
-            online = Bukkit.getOnlinePlayers().stream()
-                    .filter(p -> !p.hasPermission("m0onlinegui.hidden")
-                            || !toggled.contains(p))
-                    .collect(Collectors.toList());
+            online = online.stream()
+                    .filter(p -> !plugin.getEssentials().getUser(p).isVanished())
+                    .toList();
         }
+
+        if(plugin.getCfg().isPremiumVanishHook()) {
+            online = online.stream()
+                    .filter(p -> !VanishAPI.isInvisible(p))
+                    .toList();
+        }
+
+        online = online.stream()
+                .filter(p -> !p.hasPermission("m0onlinegui.hidden") || !toggled.contains(p))
+                .toList();
 
         if (permissions != null && !permissions.isEmpty()) {
             online = online.stream().filter(onlinePlayer -> permissions.stream()
@@ -78,7 +83,7 @@ public class GUIUtils {
         }
     }
 
-    public List<Player> filterByCondition(List<Player> players, String cond) {
+    public List<Player> filterByCondition(@NotNull List<Player> players, @NotNull String cond) {
         List<Player> filtered = new ArrayList<>();
 
         List<String> condSplit = Arrays.asList(cond.split(" "));

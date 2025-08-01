@@ -146,6 +146,14 @@ public class OnlineGUI extends JavaPlugin {
             }
         }
 
+        if (this.cfg.isPremiumVanishHook()) {
+            if (this.manager.getPlugin("PremiumVanish") == null && this.manager.getPlugin("SuperVanish") == null) {
+                Messenger.warn("PremiumVanish/SuperVanish hook is enabled but could not find the plugin.");
+            } else {
+                Messenger.info("PremiumVanish/SuperVanish hook is enabled.");
+            }
+        }
+
         if (this.manager.getPlugin("PlaceholderAPI") == null) {
             Messenger.warn("Could not find PlaceholderAPI! Placeholders will not work.");
 
@@ -184,8 +192,13 @@ public class OnlineGUI extends JavaPlugin {
 
         this.cfg.load();
         this.copy(this.getResource("config.yml_backup"), new File(this.getDataFolder(), "config.yml_backup"));
-        this.copy(this.getResource("custom" + File.separator + "custom_gui.yml_example"), this.configFile);
 
+        File customDir = new File(getDataFolder(), "custom");
+        if (!customDir.exists()) {
+            customDir.mkdirs();
+        }
+        File target = new File(customDir, "custom_gui.yml_example");
+        this.copy(this.getResource("custom/custom_gui.yml_example"), target);
     }
 
     private void info(String message) {
@@ -194,8 +207,7 @@ public class OnlineGUI extends JavaPlugin {
 
     private void copy(InputStream in, File file) {
         if (in != null) {
-            try {
-                OutputStream out = new FileOutputStream(file);
+            try (OutputStream out = new FileOutputStream(file)) {
 
                 byte[] buf = new byte[1024];
 
@@ -205,7 +217,6 @@ public class OnlineGUI extends JavaPlugin {
                     out.write(buf, 0, len);
                 }
 
-                out.close();
                 in.close();
             } catch (Exception ex) {
                 Messenger.error("Error copying resource: " + ex.getMessage());

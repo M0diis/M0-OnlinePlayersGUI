@@ -8,9 +8,11 @@ messages:
 # Whether to hide buttons if there are not enough players
 # to fill up more than one page
 buttons-always-visible: false
-# Hook to EssentialsX which will hide players
+# Hook to EssentialsX/SuperVanish/PremiumVanish, which will hide players
 # in the GUI if they are vanished
-essentialsx-hook: false
+hooks:
+  essentialsx-hook: true # Also includes EssentialsX Vanish
+  premium-vanish-hook: true # Also includes PremiumVanish
 # Conditional display
 # It will check whether the placeholder applies (is true) for the
 # player and if not, it will exclude the player from the GUI
