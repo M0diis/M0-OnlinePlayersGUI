@@ -258,11 +258,22 @@ public class Config {
                 } else {
                     Object slots = itemSec.get("slots");
 
-                    if (slots instanceof List) {
-                        List<Integer> slotList = (List<Integer>) slots;
-
-                        for (Integer slot : slotList) {
-                            addCustomItem(meta, slot, item, lcc, mcc, rcc, customItemLore);
+                    if (slots instanceof List<?> slotList) {
+                        for (Object slotObj : slotList) {
+                            try {
+                                int slot;
+                                if (slotObj instanceof Integer) {
+                                    slot = (Integer) slotObj;
+                                } else if (slotObj instanceof String) {
+                                    slot = Integer.parseInt((String) slotObj);
+                                } else {
+                                    Messenger.warn("Invalid slot type for custom item: " + key + " (" + slotObj + ")");
+                                    continue;
+                                }
+                                addCustomItem(meta, slot, item, lcc, mcc, rcc, customItemLore);
+                            } catch (Exception eex) {
+                                Messenger.warn("Failed to parse slot for custom item: " + key + " (" + slotObj + "): " + eex.getMessage());
+                            }
                         }
                     } else {
                         int slot = itemSec.getInt("slot", -1);

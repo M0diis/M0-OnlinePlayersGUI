@@ -48,6 +48,19 @@ public class OnlineGUICommand implements CommandExecutor, TabCompleter {
                     sender.sendMessage(this.cfg.getNoPermissionMsg());
                 }
             }
+
+
+            if (alias(args[0], "version")) {
+                if (sender.hasPermission("m0onlinegui.command.version")) {
+                    sender.sendMessage(TextUtils.kyorify(
+                            "&aYou are using M0-OnlinePlayersGUI version &2" +
+                                    this.plugin.getPluginMeta().getVersion() + ".")
+                    );
+                }
+                else {
+                    sender.sendMessage(this.cfg.getNoPermissionMsg());
+                }
+            }
         }
 
         if (sender instanceof Player player && args.length == 1) {
@@ -68,18 +81,6 @@ public class OnlineGUICommand implements CommandExecutor, TabCompleter {
                     this.plugin.toggleHiddenPlayer(player);
 
                     player.sendMessage(this.cfg.getVisibilityToggleMsg());
-                }
-                else {
-                    player.sendMessage(this.cfg.getNoPermissionMsg());
-                }
-            }
-
-            if (alias(args[0], "version")) {
-                if (player.hasPermission("m0onlinegui.command.version")) {
-                    player.sendMessage(TextUtils.kyorify(
-                            "&aYou are using M0-OnlinePlayersGUI version &2" +
-                            this.plugin.getDescription().getVersion() + ".")
-                    );
                 }
                 else {
                     player.sendMessage(this.cfg.getNoPermissionMsg());

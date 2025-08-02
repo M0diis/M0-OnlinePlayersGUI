@@ -127,8 +127,9 @@ public class OnlineGUI extends JavaPlugin {
 
     private void checkForUpdates() {
         new UpdateChecker(this, 86813).getVersion(ver -> {
-            if (!this.getDescription().getVersion().equalsIgnoreCase(ver.replace("v", ""))) {
-                Messenger.info("You are running an outdated version of M0-OnlinePlayersGUI.");
+            if (!this.getPluginMeta().getVersion().equalsIgnoreCase(ver.replace("v", ""))) {
+                Messenger.info("You are running an outdated/development version of M0-OnlinePlayersGUI.");
+                Messenger.info("Current version: " + this.getPluginMeta().getVersion() + ", latest version: " + ver);
                 Messenger.info("You can download the latest version on Spigot:");
                 Messenger.info("https://www.spigotmc.org/resources/86813/");
             }
