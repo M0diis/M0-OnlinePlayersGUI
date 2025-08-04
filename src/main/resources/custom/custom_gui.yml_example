@@ -6,6 +6,11 @@
 # /onlinegui custom_gui -> in this case
 
 condition:
+  truthy-values:
+    - 'true'
+    - 'enabled'
+    - 'yes'
+    - 'on'
   # Condition Operators:
   ## Text operators:
   # =, ==, eq, equal_to, equals — equals

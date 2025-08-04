@@ -1,9 +1,10 @@
 
 messages:
-  reload: '&2Configuration has been reloaded.'
-  no-permission: '&2You do not have permission to this command.'
-  no-permission-conditional: '&2You do not have permission to view this GUI'
-  toggle-visibility: '&2You have toggled your visibility in Online GUI.'
+  prefix: '&2[&aOnlineGUI&2] '
+  reload: '%prefix% &2Configuration has been reloaded.'
+  no-permission: '%prefix% &2You do not have permission to this command.'
+  no-permission-conditional: '%prefix% &2You do not have permission to view this GUI'
+  toggle-visibility: '%prefix% &2You have toggled your visibility in Online GUI.'
 
 # Whether to hide buttons if there are not enough players
 # to fill up more than one page
@@ -18,6 +19,12 @@ hooks:
 # player and if not, it will exclude the player from the GUI
 # https://github.com/PlaceholderAPI/PlaceholderAPI/wiki/Placeholders
 condition:
+  # The placeholder (as in the example "%checkitem_mat:DIRT%" needs to return either of the following:
+  truthy-values:
+    - 'true'
+    - 'enabled'
+    - 'yes'
+    - 'on'
   required: false
   # Condition Operators:
   ## Text operators:

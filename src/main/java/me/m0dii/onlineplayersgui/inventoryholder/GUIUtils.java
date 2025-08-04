@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class GUIUtils {
     final OnlineGUI plugin;
@@ -27,7 +26,7 @@ public class GUIUtils {
         this.plugin = plugin;
     }
 
-    public List<Player> getOnline(@Nullable List<String> permissions, @Nullable String condition) {
+    public List<Player> getOnline(@Nullable List<String> permissions, @Nullable String condition, List<String> truthyConditionValues) {
         List<Player> online = new ArrayList<>(Bukkit.getOnlinePlayers());
 
         List<Player> toggled = plugin.getHiddenPlayersToggled();
@@ -38,7 +37,7 @@ public class GUIUtils {
                     .toList();
         }
 
-        if(plugin.getCfg().isPremiumVanishHook()) {
+        if (plugin.getCfg().isPremiumVanishHook()) {
             online = online.stream()
                     .filter(p -> !VanishAPI.isInvisible(p))
                     .toList();
@@ -55,7 +54,7 @@ public class GUIUtils {
         }
 
         if (condition != null) {
-            return filterByCondition(online, condition);
+            return filterByCondition(online, condition, truthyConditionValues);
         }
 
         return online;
@@ -70,8 +69,9 @@ public class GUIUtils {
 
             int slot = c.getItemSlot();
 
-            List<String> lore =
-                    c.getLore().stream().map(str -> PlaceholderAPI.setPlaceholders(player, str)).collect(Collectors.toList());
+            List<String> lore = c.getLore().stream()
+                    .map(str -> PlaceholderAPI.setPlaceholders(player, str))
+                    .toList();
 
             m.setLore(lore);
 
@@ -83,16 +83,18 @@ public class GUIUtils {
         }
     }
 
-    public List<Player> filterByCondition(@NotNull List<Player> players, @NotNull String cond) {
+    public List<Player> filterByCondition(@NotNull List<Player> players,
+                                          @NotNull String cond,
+                                          @NotNull List<String> truthyConditionValues) {
         List<Player> filtered = new ArrayList<>();
 
         List<String> condSplit = Arrays.asList(cond.split(" "));
 
         if (condSplit.size() != 3) {
             for (Player p : players) {
-                String result = PlaceholderAPI.setPlaceholders(p, cond).toLowerCase();
+                String result = PlaceholderAPI.setPlaceholders(p, cond);
 
-                if (result.equals("yes") || result.equals("true")) {
+                if (truthyConditionValues.stream().anyMatch(result::equalsIgnoreCase)) {
                     filtered.add(p);
                 }
             }
@@ -152,8 +154,7 @@ public class GUIUtils {
                                 filtered.add(p);
                             }
                         }
-                        default -> {
-                        }
+                        default -> Messenger.warn("Unknown operator '" + op + "' used in condition: " + cond);
                     }
 
                     continue;
@@ -227,8 +228,7 @@ public class GUIUtils {
                             filtered.add(p);
                         }
                     }
-                    default -> {
-                    }
+                    default -> Messenger.warn("Unknown operator '" + op + "' used in condition: " + cond);
                 }
             }
         } catch (NumberFormatException ex) {

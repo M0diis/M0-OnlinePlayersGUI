@@ -5,6 +5,7 @@ import lombok.Getter;
 import me.m0dii.onlineplayersgui.CustomItem;
 import me.m0dii.onlineplayersgui.OnlineGUI;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextReplacementConfig;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -21,15 +22,16 @@ import java.util.Optional;
 public class Config {
     private String playerHeadName;
     private ItemStack playerHeadDisplay;
+
+    private Component prefix;
     private Component configReloadedMsg;
     private Component noPermissionMsg;
     private Component noPermissionCondMsg;
+    private Component visibilityToggleMsg;
 
     private Component nextPageName;
     private Component prevPageName;
     private Component guiTitle;
-
-    private Component visibilityToggleMsg;
 
     private List<String> playerHeadLore;
     private List<String> nextPageLore;
@@ -57,6 +59,7 @@ public class Config {
     private boolean conditionRequired;
     private boolean permissionRequired;
 
+    private List<String> truthyConditionValues;
     private String condition;
     private List<String> requiredPermissions;
 
@@ -83,7 +86,11 @@ public class Config {
     }
 
     private Component getStringMiniMessage(@NotNull String path) {
-        return TextUtils.kyorify(cfg.getString(path));
+        return TextUtils.kyorify(cfg.getString(path))
+                .replaceText(TextReplacementConfig.builder()
+                        .matchLiteral("%prefix%")
+                        .replacement(prefix)
+                        .build());
     }
 
     private String getStringFormatted(@NotNull String path) {
@@ -107,9 +114,10 @@ public class Config {
 
         guiTitle = getStringMiniMessage("gui.title");
 
+        prefix = getStringMiniMessage("messages.prefix");
+        configReloadedMsg = getStringMiniMessage("messages.reload");
         noPermissionMsg = getStringMiniMessage("messages.no-permission");
         noPermissionCondMsg = getStringMiniMessage("messages.no-permission-conditional");
-        configReloadedMsg = getStringMiniMessage("messages.reload");
 
         visibilityToggleMsg = getStringMiniMessage("messages.toggle-visibility");
 
@@ -176,6 +184,12 @@ public class Config {
         requiredPermissions = cfg.getStringList("condition.permission.nodes");
         if (requiredPermission != null && !requiredPermission.isEmpty()) {
             requiredPermissions.add(requiredPermission);
+        }
+
+        truthyConditionValues = cfg.getStringList("condition.truthy-values");
+
+        if(truthyConditionValues.isEmpty()) {
+            truthyConditionValues = List.of("true", "yes", "on", "enabled");
         }
 
         setUpCustomItems(plugin);
@@ -262,10 +276,10 @@ public class Config {
                         for (Object slotObj : slotList) {
                             try {
                                 int slot;
-                                if (slotObj instanceof Integer) {
-                                    slot = (Integer) slotObj;
-                                } else if (slotObj instanceof String) {
-                                    slot = Integer.parseInt((String) slotObj);
+                                if (slotObj instanceof Integer slotInt) {
+                                    slot = slotInt;
+                                } else if (slotObj instanceof String slotStr) {
+                                    slot = Integer.parseInt(slotStr);
                                 } else {
                                     Messenger.warn("Invalid slot type for custom item: " + key + " (" + slotObj + ")");
                                     continue;
@@ -278,11 +292,21 @@ public class Config {
                     } else {
                         int slot = itemSec.getInt("slot", -1);
 
+                        if (slot == -1) {
+                            Messenger.warn("No slot specified for custom item: " + key);
+                            return;
+                        }
+
                         addCustomItem(meta, slot, item, lcc, mcc, rcc, customItemLore);
                     }
                 }
             } else {
                 int slot = itemSec.getInt("slot", -1);
+
+                if(slot == -1) {
+                    Messenger.warn("No slot specified for custom item: " + key);
+                    return;
+                }
 
                 addCustomItem(meta, slot, item, lcc, mcc, rcc, customItemLore);
             }

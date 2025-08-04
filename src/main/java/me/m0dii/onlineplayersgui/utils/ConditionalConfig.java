@@ -42,6 +42,8 @@ public class ConditionalConfig {
     private int prevPageSlot;
 
     private boolean permissionRequired;
+
+    private List<String> truthyConditionValues;
     private String condition;
     private List<String> requiredPermissions;
 
@@ -131,6 +133,12 @@ public class ConditionalConfig {
         requiredPermissions = cfg.getStringList("condition.permission.nodes");
         if (requiredPermission != null && !requiredPermission.isEmpty()) {
             requiredPermissions.add(requiredPermission);
+        }
+
+        truthyConditionValues = cfg.getStringList("condition.truthy-values");
+
+        if(truthyConditionValues.isEmpty()) {
+            truthyConditionValues = List.of("true", "yes", "on", "enabled");
         }
 
         setUpCustomItems();

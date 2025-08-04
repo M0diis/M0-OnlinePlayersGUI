@@ -92,7 +92,9 @@ public class InventoryListener implements Listener {
             customGui.execute((Player) e.getWhoClicked(), e.getCurrentItem(), e.getClick(), e.getSlot());
         }
 
-        if (e.getView().getTopInventory().getHolder() instanceof CustomGUI && e.getClick().isShiftClick()) {
+        if (e.getInventory() != e.getClickedInventory() &&
+                e.getWhoClicked().getOpenInventory().getTopInventory().getHolder() instanceof CustomGUI &&
+                e.getClick().isShiftClick()) {
             e.setCancelled(true);
         }
     }

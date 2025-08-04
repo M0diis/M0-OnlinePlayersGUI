@@ -2,6 +2,7 @@ package me.m0dii.onlineplayersgui.utils;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.title.Title;
+import org.apache.commons.lang3.StringUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -80,7 +81,7 @@ public class CommandActionParser {
             Bukkit.broadcast(TextUtils.kyorify(command));
         } else if (action.equalsIgnoreCase("[PARTICLE]")) {
             parseParticle(sender, command);
-        } else {
+        } else if(!StringUtils.isBlank(command)) {
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
         }
     }

@@ -165,7 +165,7 @@ public class ConditionalGUIInventory implements InventoryHolder, CustomGUI {
         List<String> permission = cfg.isPermissionRequired() ? cfg.getRequiredPermissions() : List.of();
         String cond = condition.isEmpty() ? null : condition;
 
-        List<Player> online = plugin.getGuiUtils().getOnline(permission, cond);
+        List<Player> online = plugin.getGuiUtils().getOnline(permission, cond, cfg.getTruthyConditionValues());
 
         List<Player> byPage = new ArrayList<>();
 

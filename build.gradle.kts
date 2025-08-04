@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "me.m0dii"
-version = "6.2.1"
+version = "6.3.0"
 
 tasks.shadowJar {
     relocate("org.bstats", "me.m0dii.onlineplayersgui")
@@ -111,7 +111,7 @@ fun TaskContainerScope.createVersionedRun(
         modrinth("viaversion", "5.5.0-SNAPSHOT+793")
         modrinth("viabackwards", "5.4.2")
         modrinth("luckperms", "v5.5.0-bukkit")
-        url("https://www.spigotmc.org/resources/1331/download?version=552626")
+        url("https://www.spigotmc.org/resources/1331/download?version=552626") // SuperVanish 6.2.20
     }
 
     runDirectory(file("run/$version"))

@@ -180,7 +180,7 @@ public class OnlineGUIInventory implements InventoryHolder, CustomGUI {
 
         String condition = cfg.isConditionRequired() ? cfg.getCondition() : null;
 
-        List<Player> online = plugin.getGuiUtils().getOnline(permission, condition);
+        List<Player> online = plugin.getGuiUtils().getOnline(permission, condition, cfg.getTruthyConditionValues());
 
         List<Player> byPage = new ArrayList<>();
 
