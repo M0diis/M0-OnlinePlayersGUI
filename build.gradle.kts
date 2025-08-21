@@ -4,6 +4,7 @@ plugins {
     java
     id("com.gradleup.shadow") version "8.3.5"
     id("xyz.jpenilla.run-paper") version "2.3.1"
+    id("org.cyclonedx.bom") version "1.8.1"
 }
 
 group = "me.m0dii"
