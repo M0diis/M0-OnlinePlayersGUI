@@ -42,7 +42,7 @@ repositories {
 
 dependencies {
     implementation("org.bstats:bstats-bukkit:3.0.0")
-    implementation("com.github.cryptomorin:XSeries:9.1.0")
+    implementation("com.github.cryptomorin:XSeries:13.3.3")
 
     compileOnly("io.papermc.paper:paper-api:1.21.8-R0.1-SNAPSHOT")
     compileOnly("org.projectlombok:lombok:1.18.38")
