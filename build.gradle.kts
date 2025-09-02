@@ -2,7 +2,7 @@ import xyz.jpenilla.runpaper.task.RunServer
 
 plugins {
     java
-    id("com.gradleup.shadow") version "8.3.5"
+    id("com.gradleup.shadow") version "9.1.0"
     id("xyz.jpenilla.run-paper") version "2.3.1"
     id("org.cyclonedx.bom") version "2.3.1"
 }
