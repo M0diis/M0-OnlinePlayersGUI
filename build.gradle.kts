@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "me.m0dii"
-version = "6.3.0"
+version = "6.3.1"
 
 tasks.shadowJar {
     relocate("org.bstats", "me.m0dii.onlineplayersgui")

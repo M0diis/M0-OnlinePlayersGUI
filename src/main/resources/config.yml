@@ -13,7 +13,7 @@ buttons-always-visible: false
 # in the GUI if they are vanished
 hooks:
   essentialsx-hook: true # Also includes EssentialsX Vanish
-  premium-vanish-hook: true # Also includes PremiumVanish
+  premium-vanish-hook: false # Also includes PremiumVanish
 # Conditional display
 # It will check whether the placeholder applies (is true) for the
 # player and if not, it will exclude the player from the GUI

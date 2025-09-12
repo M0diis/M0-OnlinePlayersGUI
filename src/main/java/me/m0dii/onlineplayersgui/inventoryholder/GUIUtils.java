@@ -1,6 +1,5 @@
 package me.m0dii.onlineplayersgui.inventoryholder;
 
-import de.myzelyam.api.vanish.VanishAPI;
 import me.clip.placeholderapi.PlaceholderAPI;
 import me.m0dii.onlineplayersgui.CustomItem;
 import me.m0dii.onlineplayersgui.OnlineGUI;
@@ -11,6 +10,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.metadata.MetadataValue;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -39,7 +39,7 @@ public class GUIUtils {
 
         if (plugin.getCfg().isPremiumVanishHook()) {
             online = online.stream()
-                    .filter(p -> !VanishAPI.isInvisible(p))
+                    .filter(p -> p.getMetadata("vanished").stream().anyMatch(MetadataValue::asBoolean))
                     .toList();
         }
 
