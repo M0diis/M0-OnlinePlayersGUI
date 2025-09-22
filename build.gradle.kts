@@ -46,13 +46,13 @@ dependencies {
     implementation("com.github.cryptomorin:XSeries:9.1.0")
 
     compileOnly("io.papermc.paper:paper-api:1.21.8-R0.1-SNAPSHOT")
-    compileOnly("org.projectlombok:lombok:1.18.38")
+    compileOnly("org.projectlombok:lombok:1.18.42")
     compileOnly("me.clip:placeholderapi:2.11.6")
     compileOnly("com.github.LeonMangler:SuperVanish:6.2.19")
     // compileOnly("net.essentialsx:EssentialsX:2.19.4")
     compileOnly("net.ess3:EssentialsX:2.18.2")
 
-    annotationProcessor("org.projectlombok:lombok:1.18.38")
+    annotationProcessor("org.projectlombok:lombok:1.18.42")
 }
 
 tasks.withType<JavaCompile> {
