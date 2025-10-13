@@ -45,7 +45,7 @@ dependencies {
     implementation("org.bstats:bstats-bukkit:3.1.0")
     implementation("com.github.cryptomorin:XSeries:9.1.0")
 
-    compileOnly("io.papermc.paper:paper-api:1.21.8-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:1.21.10-R0.1-SNAPSHOT")
     compileOnly("org.projectlombok:lombok:1.18.38")
     compileOnly("me.clip:placeholderapi:2.11.6")
     compileOnly("com.github.LeonMangler:SuperVanish:6.2.19")
